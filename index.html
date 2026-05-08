@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<title>Is Visa Required? | Free Visa Checker for 199 Countries</title>
+<meta name="description" content="Check visa requirements instantly for any passport and destination. Find out if you need a visa, visa on arrival, e-visa, or can travel freely.">
+<meta name="theme-color" content="#0f2744">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#0f2744;--navy2:#1e3a5f;--blue:#2563eb;--blue2:#3b82f6;
+  --green:#10b981;--gold:#f59e0b;--orange:#f97316;--red:#ef4444;--teal:#06b6d4;
+  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;
+  --g400:#9ca3af;--g500:#6b7280;--g700:#374151;--g900:#111827;
+  --white:#ffffff;--font:'Plus Jakarta Sans',sans-serif;
+  --sh:0 4px 6px -1px rgba(0,0,0,.1);--shlg:0 10px 15px -3px rgba(0,0,0,.12);
+  --r:12px;--rlg:16px
+}
+body{font-family:var(--font);color:var(--g900);background:var(--white);line-height:1.6}
+.hdr{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--g100)}
+.hdr-i{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;font-size:18px;color:var(--navy);cursor:pointer}
+.logo-g{width:34px;height:34px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.logo .tld{color:var(--blue)}
+nav{display:flex;gap:2px}
+.nl{padding:7px 14px;font-size:14px;font-weight:600;color:var(--g500);background:none;border:none;border-radius:8px;cursor:pointer;font-family:var(--font);transition:.15s}
+.nl:hover{color:var(--g900);background:var(--g100)}
+.nl.act{color:var(--blue);background:#eff6ff}
+.btn-si{padding:8px 18px;font-size:14px;font-weight:600;color:var(--g700);background:none;border:1.5px solid var(--g200);border-radius:8px;cursor:pointer;font-family:var(--font);transition:.15s}
+.hero{background:linear-gradient(145deg,#f0f7ff 0%,#e8f0ff 40%,#f5f0ff 100%);padding:80px 24px 110px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-30%;left:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(37,99,235,.07) 0%,transparent 65%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);color:var(--blue);font-size:13px;font-weight:700;padding:6px 16px;border-radius:100px;margin-bottom:28px}
+.hero h1{font-size:clamp(42px,6vw,74px);font-weight:800;color:var(--navy);line-height:1.08;letter-spacing:-.03em;margin-bottom:22px}
+.hero p{font-size:18px;color:var(--g500);max-width:560px;margin:0 auto 36px;line-height:1.65}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:52px}
+.btn-p{padding:13px 26px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s;display:flex;align-items:center;gap:8px}
+.btn-p:hover{background:var(--blue);transform:translateY(-1px);box-shadow:0 8px 24px rgba(37,99,235,.3)}
+.btn-s{padding:13px 26px;background:#fff;color:var(--navy);border:1.5px solid var(--g200);border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s;display:flex;align-items:center;gap:8px}
+.btn-s:hover{border-color:var(--g400);transform:translateY(-1px)}
+.hero-stats{display:flex;gap:28px;justify-content:center;flex-wrap:wrap}
+.stat{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--g500);font-weight:500}
+.chk-wrap{max-width:1100px;margin:-65px auto 0;padding:0 24px;position:relative;z-index:10}
+.chk-card{background:#fff;border-radius:22px;box-shadow:0 24px 64px -12px rgba(0,0,0,.16),0 0 0 1px rgba(0,0,0,.05);overflow:hidden}
+.chk-form{padding:32px}
+.chk-inputs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.ig{display:flex;flex-direction:column;gap:8px}
+.ilbl{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--g400)}
+.sw{position:relative}
+.sw select,.exsel{width:100%;padding:14px 40px 14px 16px;font-size:15px;font-weight:500;color:var(--g700);background:var(--g50);border:1.5px solid var(--g200);border-radius:10px;appearance:none;cursor:pointer;font-family:var(--font);transition:.15s;outline:none}
+.sw select:focus,.exsel:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.sa{position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--g400)}
+.btn-chk{width:100%;padding:17px;background:var(--navy);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--font);transition:.2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-chk:hover{background:var(--blue);transform:translateY(-1px);box-shadow:0 8px 28px rgba(37,99,235,.3)}
+.res-sec{padding:0 32px 32px}
+.disc{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 16px;font-size:13px;color:#92400e;margin-bottom:16px;display:flex;gap:8px}
+.rc{border-radius:14px;padding:22px;margin-bottom:12px;display:flex;align-items:center;gap:18px;animation:fi .3s ease;border:1.5px solid;flex-wrap:wrap}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.rc-flag{font-size:38px;line-height:1;flex-shrink:0}
+.rc-info{flex:1;min-width:180px}
+.rc-cname{font-size:18px;font-weight:800;color:var(--g900);margin-bottom:3px}
+.rc-detail{font-size:13px;color:var(--g500);line-height:1.5}
+.vb{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:100px;font-size:13px;font-weight:700;white-space:nowrap}
+.bf{background:#d1fae5;color:#065f46}.ba{background:#fef3c7;color:#92400e}
+.be{background:#dbeafe;color:#1e40af}.br2{background:#fee2e2;color:#991b1b}
+.bn2{background:#f3f4f6;color:#374151}
+.info-section{max-width:1100px;margin:64px auto;padding:0 24px}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.ic{background:#fff;border:1.5px solid var(--g100);border-radius:16px;padding:24px;transition:.2s}
+.ic:hover{box-shadow:var(--shlg);border-color:var(--g200);transform:translateY(-2px)}
+.ic-icon{font-size:36px;margin-bottom:14px}
+.ic-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.ic-desc{font-size:13px;color:var(--g500);line-height:1.65}
+.sec{max-width:1100px;margin:0 auto;padding:64px 24px}
+.sec-ttl{font-size:34px;font-weight:800;color:var(--navy);margin-bottom:8px;letter-spacing:-.02em}
+.sec-sub{font-size:16px;color:var(--g500);margin-bottom:36px}
+.exctrl{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.exstl{position:relative;min-width:220px}
+.exstl .exsel{padding:12px 40px 12px 16px;font-size:14px;font-weight:600;background:#fff}
+.exstl .sa2{position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--g400)}
+.ex-search{padding:12px 16px;border:1.5px solid var(--g200);border-radius:10px;font-size:14px;font-family:var(--font);outline:none;color:var(--g700);flex:1;min-width:160px;transition:.15s}
+.ex-search:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.li{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--g700)}
+.ld{width:10px;height:10px;border-radius:50%}
+.lf{background:#10b981}.la{background:#f59e0b}.le{background:#06b6d4}.lr{background:#f97316}.ln{background:#9ca3af}
+.sumbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}
+.sp{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;font-size:13px;font-weight:700}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.cc{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1.5px solid var(--g100);border-radius:10px;cursor:pointer;transition:.15s}
+.cc:hover{border-color:var(--blue2);box-shadow:var(--sh);transform:translateY(-1px)}
+.cf{font-size:22px;line-height:1}
+.cn2{font-size:13px;font-weight:600;color:var(--g700);flex:1}
+.cd{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pp-grid{display:grid;gap:10px}
+.pr{display:flex;align-items:center;gap:16px;padding:16px 20px;background:#fff;border:1.5px solid var(--g100);border-radius:12px;transition:.15s}
+.pr:hover{border-color:var(--blue2);box-shadow:var(--sh)}
+.prk{font-size:18px;font-weight:800;color:var(--navy);width:38px;text-align:center;flex-shrink:0}
+.prf{font-size:28px;flex-shrink:0}
+.pri{flex:1}
+.prn{font-size:15px;font-weight:700;color:var(--g900)}
+.pra{font-size:13px;color:var(--g500)}
+.pbar{display:flex;align-items:center;gap:12px;margin-top:6px}
+.bt{width:130px;height:6px;background:var(--g100);border-radius:100px;overflow:hidden;flex-shrink:0}
+.bf2{height:100%;background:linear-gradient(90deg,var(--blue),#8b5cf6);border-radius:100px}
+.bc{font-size:13px;font-weight:700;color:var(--blue)}
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.cmp-col{background:#fff;border:1.5px solid var(--g200);border-radius:16px;overflow:hidden}
+.cmp-hdr{padding:18px 20px;background:var(--g50);border-bottom:1px solid var(--g100)}
+.cmp-hdr label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g400);display:block;margin-bottom:8px}
+.cmp-hdr select{width:100%;padding:10px 14px;font-size:14px;font-weight:600;background:#fff;border:1.5px solid var(--g200);border-radius:8px;appearance:none;font-family:var(--font);cursor:pointer;color:var(--g800);outline:none}
+.cmp-list{padding:14px;max-height:460px;overflow-y:auto}
+.cmp-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;margin-bottom:3px}
+.cmp-item:hover{background:var(--g50)}
+.cmp-flag{font-size:18px}
+.cmp-name{flex:1;font-size:13px;font-weight:600;color:var(--g700)}
+.blog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:20px}
+.bc2{background:#fff;border:1.5px solid var(--g100);border-radius:16px;overflow:hidden;transition:.2s;cursor:pointer}
+.bc2:hover{box-shadow:var(--shlg);transform:translateY(-3px)}
+.bi{height:160px;display:flex;align-items:center;justify-content:center;font-size:56px}
+.bb{padding:22px}
+.btag{display:inline-block;padding:3px 11px;background:#eff6ff;color:var(--blue);font-size:12px;font-weight:700;border-radius:100px;margin-bottom:10px}
+.btl{font-size:16px;font-weight:700;color:var(--g900);line-height:1.4;margin-bottom:8px}
+.bex{font-size:13px;color:var(--g500);line-height:1.65}
+footer{background:var(--navy);color:rgba(255,255,255,.55);padding:52px 24px 32px;margin-top:80px}
+.ft-i{max-width:1100px;margin:0 auto}
+.ft-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.ft-brand{color:#fff;font-size:20px;font-weight:800;margin-bottom:12px}
+.ft-desc{font-size:14px;line-height:1.7;max-width:280px}
+.ft-ct{color:#fff;font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;margin-bottom:14px}
+.ft-links{list-style:none;display:flex;flex-direction:column;gap:9px}
+.ft-links a{color:rgba(255,255,255,.55);text-decoration:none;font-size:14px;transition:.15s;cursor:pointer}
+.ft-links a:hover{color:#fff}
+.ft-bot{border-top:1px solid rgba(255,255,255,.1);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:13px;flex-wrap:wrap;gap:12px}
+.pv{display:none}.pv.act{display:block}
+.es{text-align:center;padding:52px 24px;color:var(--g400);grid-column:1/-1}
+.es .ei{font-size:48px;margin-bottom:14px}
+.es h3{font-size:18px;font-weight:700;color:var(--g500);margin-bottom:8px}
+.es p{font-size:14px}
+.tip-box{border-radius:10px;padding:13px 16px;font-size:13px;margin-top:10px;line-height:1.6}
+@media(max-width:768px){
+  nav{display:none}
+  .chk-inputs{grid-template-columns:1fr}
+  .hero{padding:60px 20px 90px}
+  .ft-top{grid-template-columns:1fr 1fr}
+  .cmp-grid{grid-template-columns:1fr}
+  .hero-btns{flex-direction:column;align-items:center}
+}
+@media(max-width:480px){.ft-top{grid-template-columns:1fr}.hero h1{font-size:36px}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-i">
+    <div class="logo" onclick="goPage('check')">
+      <div class="logo-g">🌐</div>
+      isvisarequired<span class="tld">.com</span>
+    </div>
+    <nav>
+      <button class="nl act" id="nav-check" onclick="goPage('check')">Check Visa</button>
+      <button class="nl" id="nav-compare" onclick="goPage('compare')">Compare</button>
+      <button class="nl" id="nav-discover" onclick="goPage('discover')">Discover</button>
+      <button class="nl" id="nav-passports" onclick="goPage('passports')">Passports</button>
+      <button class="nl" id="nav-blog" onclick="goPage('blog')">Blog</button>
+    </nav>
+    <button class="btn-si">Sign In</button>
+  </div>
+</header>
+
+<!-- CHECK PAGE -->
+
+<div id="page-check" class="pv act">
+  <div class="hero">
+    <div class="hero-badge">🌍 &nbsp;199 countries · Instant results</div>
+    <h1>Do you need a visa?</h1>
+    <p>Select your passport and destination — get instant visa requirements, costs, and travel highlights.</p>
+    <div class="hero-btns">
+      <button class="btn-p" onclick="document.getElementById('checker').scrollIntoView({behavior:'smooth'})">🔍 Check Visa Now</button>
+      <button class="btn-s" onclick="goPage('discover')">🗺️ Explore Countries</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">🌍 199 countries covered</div>
+      <div class="stat">⚡ Instant results, no sign-up</div>
+      <div class="stat">🔓 Always free</div>
+      <div class="stat">👥 11k+ travellers subscribed</div>
+    </div>
+  </div>
+
+  <div class="chk-wrap" id="checker">
+    <div class="chk-card">
+      <div class="chk-form">
+        <div class="chk-inputs">
+          <div class="ig">
+            <label class="ilbl">Your Passport</label>
+            <div class="sw">
+              <select id="psel" onchange="clearRes()"><option value="">Select your passport...</option></select>
+              <svg class="sa" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+          <div class="ig">
+            <label class="ilbl">Destination Country</label>
+            <div class="sw">
+              <select id="dsel" onchange="clearRes()"><option value="">Select destination...</option></select>
+              <svg class="sa" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+        <button class="btn-chk" onclick="checkVisa()">🔍 &nbsp;Check Visa Requirements</button>
+      </div>
+      <div id="res-area" class="res-sec" style="display:none">
+        <div class="disc">⚠️ Visa requirements can change. Always verify with official embassy or government sources before travel.</div>
+        <div id="res-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-grid">
+      <div class="ic"><div class="ic-icon">🎉</div><div class="ic-title">Visa Free</div><div class="ic-desc">No visa needed! Just show your passport at immigration. Valid 30–90 days for tourism.</div></div>
+      <div class="ic"><div class="ic-icon">✈️</div><div class="ic-title">Visa on Arrival</div><div class="ic-desc">Get your visa when you land at the airport. No advance application required.</div></div>
+      <div class="ic"><div class="ic-icon">💻</div><div class="ic-title">eVisa</div><div class="ic-desc">Apply online before your trip. Usually approved within a few days — fast and convenient.</div></div>
+      <div class="ic"><div class="ic-icon">🛂</div><div class="ic-title">Visa Required</div><div class="ic-desc">Apply at the embassy in advance. Processing can take 2–8 weeks — plan ahead!</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- DISCOVER PAGE -->
+
+<div id="page-discover" class="pv">
+  <div class="sec">
+    <h2 class="sec-ttl">🗺️ Discover Countries</h2>
+    <p class="sec-sub">Select a passport to see visa requirements for every country in the world.</p>
+    <div class="exctrl">
+      <div class="exstl">
+        <select class="exsel" id="exsel" onchange="renderExplore()"><option value="">Select your passport...</option></select>
+        <svg class="sa2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <input type="text" class="ex-search" id="exsrch" placeholder="🔍 Search countries..." oninput="renderExplore()">
+      <div class="exstl" style="min-width:160px">
+        <select class="exsel" id="exflt" onchange="renderExplore()">
+          <option value="">All statuses</option>
+          <option value="free">Visa Free</option>
+          <option value="arrival">Visa on Arrival</option>
+          <option value="evisa">eVisa</option>
+          <option value="required">Visa Required</option>
+          <option value="noentry">No Entry</option>
+        </select>
+        <svg class="sa2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+    <div class="sumbar" id="exsum" style="display:none"></div>
+    <div class="legend">
+      <div class="li"><div class="ld lf"></div>Visa Free</div>
+      <div class="li"><div class="ld la"></div>Visa on Arrival</div>
+      <div class="li"><div class="ld le"></div>eVisa</div>
+      <div class="li"><div class="ld lr"></div>Visa Required</div>
+      <div class="li"><div class="ld ln"></div>No Entry</div>
+    </div>
+    <div class="cg" id="exgrid">
+      <div class="es"><div class="ei">🌐</div><h3>Select your passport</h3><p>Choose a passport above to see visa requirements for all countries</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARE PAGE -->
+
+<div id="page-compare" class="pv">
+  <div class="sec">
+    <h2 class="sec-ttl">⚖️ Compare Passports</h2>
+    <p class="sec-sub">Side-by-side visa requirement comparison for two passports across all destinations.</p>
+    <div class="cmp-grid">
+      <div class="cmp-col">
+        <div class="cmp-hdr">
+          <label>Passport A</label>
+          <select id="cmpa" onchange="renderCompare()"><option value="">Select passport...</option></select>
+        </div>
+        <div class="cmp-list" id="cmpl-a"><div class="es" style="grid-column:unset;padding:32px"><div class="ei">🛂</div><h3>Select a passport</h3></div></div>
+      </div>
+      <div class="cmp-col">
+        <div class="cmp-hdr">
+          <label>Passport B</label>
+          <select id="cmpb" onchange="renderCompare()"><option value="">Select passport...</option></select>
+        </div>
+        <div class="cmp-list" id="cmpl-b"><div class="es" style="grid-column:unset;padding:32px"><div class="ei">🛂</div><h3>Select a passport</h3></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PASSPORTS PAGE -->
+
+<div id="page-passports" class="pv">
+  <div class="sec">
+    <h2 class="sec-ttl">📔 Passport Power Index</h2>
+    <p class="sec-sub">World passports ranked by number of destinations accessible without a prior visa.</p>
+    <div class="pp-grid" id="pplist"></div>
+  </div>
+</div>
+
+<!-- BLOG PAGE -->
+
+<div id="page-blog" class="pv">
+  <div class="sec">
+    <h2 class="sec-ttl">📰 Travel Guides & Visa News</h2>
+    <p class="sec-sub">Latest updates, tips, and guides for international travellers.</p>
+    <div class="blog-grid" id="blogrid"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-i">
+    <div class="ft-top">
+      <div>
+        <div class="ft-brand">🌐 isvisarequired.com</div>
+        <p class="ft-desc">Free visa checker covering 199 countries. Instant results, no sign-up required. Data is for reference only — always verify with official embassy sources.</p>
+      </div>
+      <div>
+        <div class="ft-ct">Tools</div>
+        <ul class="ft-links">
+          <li><a onclick="goPage('check')">Visa Checker</a></li>
+          <li><a onclick="goPage('compare')">Compare Passports</a></li>
+          <li><a onclick="goPage('discover')">Discover</a></li>
+          <li><a onclick="goPage('passports')">Passport Index</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="ft-ct">Company</div>
+        <ul class="ft-links">
+          <li><a>About</a></li>
+          <li><a onclick="goPage('blog')">Blog</a></li>
+          <li><a>Contact</a></li>
+          <li><a>Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="ft-ct">Follow</div>
+        <ul class="ft-links">
+          <li><a>Twitter / X</a></li>
+          <li><a>Instagram</a></li>
+          <li><a>LinkedIn</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft-bot">
+      <span>© 2025 isvisarequired.com · All rights reserved</span>
+      <span>Information is for reference only. Verify before travel.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const F='free',A='arrival',E='evisa',R='required',N='noentry';
+
+const COUNTRIES=[
+ {c:'AF',n:'Afghanistan',f:'🇦🇫'},{c:'AL',n:'Albania',f:'🇦🇱'},{c:'DZ',n:'Algeria',f:'🇩🇿'},
+ {c:'AD',n:'Andorra',f:'🇦🇩'},{c:'AO',n:'Angola',f:'🇦🇴'},{c:'AG',n:'Antigua & Barbuda',f:'🇦🇬'},
+ {c:'AR',n:'Argentina',f:'🇦🇷'},{c:'AM',n:'Armenia',f:'🇦🇲'},{c:'AU',n:'Australia',f:'🇦🇺'},
+ {c:'AT',n:'Austria',f:'🇦🇹'},{c:'AZ',n:'Azerbaijan',f:'🇦🇿'},{c:'BS',n:'Bahamas',f:'🇧🇸'},
+ {c:'BH',n:'Bahrain',f:'🇧🇭'},{c:'BD',n:'Bangladesh',f:'🇧🇩'},{c:'BB',n:'Barbados',f:'🇧🇧'},
+ {c:'BY',n:'Belarus',f:'🇧🇾'},{c:'BE',n:'Belgium',f:'🇧🇪'},{c:'BZ',n:'Belize',f:'🇧🇿'},
+ {c:'BJ',n:'Benin',f:'🇧🇯'},{c:'BT',n:'Bhutan',f:'🇧🇹'},{c:'BO',n:'Bolivia',f:'🇧🇴'},
+ {c:'BA',n:'Bosnia & Herzegovina',f:'🇧🇦'},{c:'BW',n:'Botswana',f:'🇧🇼'},{c:'BR',n:'Brazil',f:'🇧🇷'},
+ {c:'BN',n:'Brunei',f:'🇧🇳'},{c:'BG',n:'Bulgaria',f:'🇧🇬'},{c:'BF',n:'Burkina Faso',f:'🇧🇫'},
+ {c:'BI',n:'Burundi',f:'🇧🇮'},{c:'KH',n:'Cambodia',f:'🇰🇭'},{c:'CM',n:'Cameroon',f:'🇨🇲'},
+ {c:'CA',n:'Canada',f:'🇨🇦'},{c:'CV',n:'Cape Verde',f:'🇨🇻'},{c:'CF',n:'Central African Rep.',f:'🇨🇫'},
+ {c:'TD',n:'Chad',f:'🇹🇩'},{c:'CL',n:'Chile',f:'🇨🇱'},{c:'CN',n:'China',f:'🇨🇳'},
+ {c:'CO',n:'Colombia',f:'🇨🇴'},{c:'KM',n:'Comoros',f:'🇰🇲'},{c:'CG',n:'Congo',f:'🇨🇬'},
+ {c:'CR',n:'Costa Rica',f:'🇨🇷'},{c:'HR',n:'Croatia',f:'🇭🇷'},{c:'CU',n:'Cuba',f:'🇨🇺'},
+ {c:'CY',n:'Cyprus',f:'🇨🇾'},{c:'CZ',n:'Czech Republic',f:'🇨🇿'},{c:'DK',n:'Denmark',f:'🇩🇰'},
+ {c:'DJ',n:'Djibouti',f:'🇩🇯'},{c:'DM',n:'Dominica',f:'🇩🇲'},{c:'DO',n:'Dominican Republic',f:'🇩🇴'},
+ {c:'EC',n:'Ecuador',f:'🇪🇨'},{c:'EG',n:'Egypt',f:'🇪🇬'},{c:'SV',n:'El Salvador',f:'🇸🇻'},
+ {c:'GQ',n:'Equatorial Guinea',f:'🇬🇶'},{c:'ER',n:'Eritrea',f:'🇪🇷'},{c:'EE',n:'Estonia',f:'🇪🇪'},
+ {c:'SZ',n:'Eswatini',f:'🇸🇿'},{c:'ET',n:'Ethiopia',f:'🇪🇹'},{c:'FJ',n:'Fiji',f:'🇫🇯'},
+ {c:'FI',n:'Finland',f:'🇫🇮'},{c:'FR',n:'France',f:'🇫🇷'},{c:'GA',n:'Gabon',f:'🇬🇦'},
+ {c:'GM',n:'Gambia',f:'🇬🇲'},{c:'GE',n:'Georgia',f:'🇬🇪'},{c:'DE',n:'Germany',f:'🇩🇪'},
+ {c:'GH',n:'Ghana',f:'🇬🇭'},{c:'GR',n:'Greece',f:'🇬🇷'},{c:'GD',n:'Grenada',f:'🇬🇩'},
+ {c:'GT',n:'Guatemala',f:'🇬🇹'},{c:'GN',n:'Guinea',f:'🇬🇳'},{c:'GW',n:'Guinea-Bissau',f:'🇬🇼'},
+ {c:'GY',n:'Guyana',f:'🇬🇾'},{c:'HT',n:'Haiti',f:'🇭🇹'},{c:'HN',n:'Honduras',f:'🇭🇳'},
+ {c:'HU',n:'Hungary',f:'🇭🇺'},{c:'IS',n:'Iceland',f:'🇮🇸'},{c:'IN',n:'India',f:'🇮🇳'},
+ {c:'ID',n:'Indonesia',f:'🇮🇩'},{c:'IR',n:'Iran',f:'🇮🇷'},{c:'IQ',n:'Iraq',f:'🇮🇶'},
+ {c:'IE',n:'Ireland',f:'🇮🇪'},{c:'IL',n:'Israel',f:'🇮🇱'},{c:'IT',n:'Italy',f:'🇮🇹'},
+ {c:'JM',n:'Jamaica',f:'🇯🇲'},{c:'JP',n:'Japan',f:'🇯🇵'},{c:'JO',n:'Jordan',f:'🇯🇴'},
+ {c:'KZ',n:'Kazakhstan',f:'🇰🇿'},{c:'KE',n:'Kenya',f:'🇰🇪'},{c:'KW',n:'Kuwait',f:'🇰🇼'},
+ {c:'KG',n:'Kyrgyzstan',f:'🇰🇬'},{c:'LA',n:'Laos',f:'🇱🇦'},{c:'LV',n:'Latvia',f:'🇱🇻'},
+ {c:'LB',n:'Lebanon',f:'🇱🇧'},{c:'LS',n:'Lesotho',f:'🇱🇸'},{c:'LR',n:'Liberia',f:'🇱🇷'},
+ {c:'LY',n:'Libya',f:'🇱🇾'},{c:'LI',n:'Liechtenstein',f:'🇱🇮'},{c:'LT',n:'Lithuania',f:'🇱🇹'},
+ {c:'LU',n:'Luxembourg',f:'🇱🇺'},{c:'MG',n:'Madagascar',f:'🇲🇬'},{c:'MW',n:'Malawi',f:'🇲🇼'},
+ {c:'MY',n:'Malaysia',f:'🇲🇾'},{c:'MV',n:'Maldives',f:'🇲🇻'},{c:'ML',n:'Mali',f:'🇲🇱'},
+ {c:'MT',n:'Malta',f:'🇲🇹'},{c:'MH',n:'Marshall Islands',f:'🇲🇭'},{c:'MR',n:'Mauritania',f:'🇲🇷'},
+ {c:'MU',n:'Mauritius',f:'🇲🇺'},{c:'MX',n:'Mexico',f:'🇲🇽'},{c:'FM',n:'Micronesia',f:'🇫🇲'},
+ {c:'MD',n:'Moldova',f:'🇲🇩'},{c:'MC',n:'Monaco',f:'🇲🇨'},{c:'MN',n:'Mongolia',f:'🇲🇳'},
+ {c:'ME',n:'Montenegro',f:'🇲🇪'},{c:'MA',n:'Morocco',f:'🇲🇦'},{c:'MZ',n:'Mozambique',f:'🇲🇿'},
+ {c:'MM',n:'Myanmar',f:'🇲🇲'},{c:'NA',n:'Namibia',f:'🇳🇦'},{c:'NP',n:'Nepal',f:'🇳🇵'},
+ {c:'NL',n:'Netherlands',f:'🇳🇱'},{c:'NZ',n:'New Zealand',f:'🇳🇿'},{c:'NI',n:'Nicaragua',f:'🇳🇮'},
+ {c:'NE',n:'Niger',f:'🇳🇪'},{c:'NG',n:'Nigeria',f:'🇳🇬'},{c:'MK',n:'North Macedonia',f:'🇲🇰'},
+ {c:'NO',n:'Norway',f:'🇳🇴'},{c:'OM',n:'Oman',f:'🇴🇲'},{c:'PK',n:'Pakistan',f:'🇵🇰'},
+ {c:'PW',n:'Palau',f:'🇵🇼'},{c:'PA',n:'Panama',f:'🇵🇦'},{c:'PG',n:'Papua New Guinea',f:'🇵🇬'},
+ {c:'PY',n:'Paraguay',f:'🇵🇾'},{c:'PE',n:'Peru',f:'🇵🇪'},{c:'PH',n:'Philippines',f:'🇵🇭'},
+ {c:'PL',n:'Poland',f:'🇵🇱'},{c:'PT',n:'Portugal',f:'🇵🇹'},{c:'QA',n:'Qatar',f:'🇶🇦'},
+ {c:'RO',n:'Romania',f:'🇷🇴'},{c:'RU',n:'Russia',f:'🇷🇺'},{c:'RW',n:'Rwanda',f:'🇷🇼'},
+ {c:'KN',n:'Saint Kitts & Nevis',f:'🇰🇳'},{c:'LC',n:'Saint Lucia',f:'🇱🇨'},{c:'VC',n:'Saint Vincent',f:'🇻🇨'},
+ {c:'WS',n:'Samoa',f:'🇼🇸'},{c:'SM',n:'San Marino',f:'🇸🇲'},{c:'ST',n:'São Tomé',f:'🇸🇹'},
+ {c:'SA',n:'Saudi Arabia',f:'🇸🇦'},{c:'SN',n:'Senegal',f:'🇸🇳'},{c:'RS',n:'Serbia',f:'🇷🇸'},
+ {c:'SC',n:'Seychelles',f:'🇸🇨'},{c:'SL',n:'Sierra Leone',f:'🇸🇱'},{c:'SG',n:'Singapore',f:'🇸🇬'},
+ {c:'SK',n:'Slovakia',f:'🇸🇰'},{c:'SI',n:'Slovenia',f:'🇸🇮'},{c:'SB',n:'Solomon Islands',f:'🇸🇧'},
+ {c:'SO',n:'Somalia',f:'🇸🇴'},{c:'ZA',n:'South Africa',f:'🇿🇦'},{c:'KR',n:'South Korea',f:'🇰🇷'},
+ {c:'SS',n:'South Sudan',f:'🇸🇸'},{c:'ES',n:'Spain',f:'🇪🇸'},{c:'LK',n:'Sri Lanka',f:'🇱🇰'},
+ {c:'SD',n:'Sudan',f:'🇸🇩'},{c:'SR',n:'Suriname',f:'🇸🇷'},{c:'SE',n:'Sweden',f:'🇸🇪'},
+ {c:'CH',n:'Switzerland',f:'🇨🇭'},{c:'SY',n:'Syria',f:'🇸🇾'},{c:'TW',n:'Taiwan',f:'🇹🇼'},
+ {c:'TJ',n:'Tajikistan',f:'🇹🇯'},{c:'TZ',n:'Tanzania',f:'🇹🇿'},{c:'TH',n:'Thailand',f:'🇹🇭'},
+ {c:'TL',n:'Timor-Leste',f:'🇹🇱'},{c:'TG',n:'Togo',f:'🇹🇬'},{c:'TO',n:'Tonga',f:'🇹🇴'},
+ {c:'TT',n:'Trinidad & Tobago',f:'🇹🇹'},{c:'TN',n:'Tunisia',f:'🇹🇳'},{c:'TR',n:'Turkey',f:'🇹🇷'},
+ {c:'TM',n:'Turkmenistan',f:'🇹🇲'},{c:'UG',n:'Uganda',f:'🇺🇬'},{c:'UA',n:'Ukraine',f:'🇺🇦'},
+ {c:'AE',n:'UAE',f:'🇦🇪'},{c:'GB',n:'United Kingdom',f:'🇬🇧'},{c:'US',n:'USA',f:'🇺🇸'},
+ {c:'UY',n:'Uruguay',f:'🇺🇾'},{c:'UZ',n:'Uzbekistan',f:'🇺🇿'},{c:'VU',n:'Vanuatu',f:'🇻🇺'},
+ {c:'VE',n:'Venezuela',f:'🇻🇪'},{c:'VN',n:'Vietnam',f:'🇻🇳'},{c:'YE',n:'Yemen',f:'🇾🇪'},
+ {c:'ZM',n:'Zambia',f:'🇿🇲'},{c:'ZW',n:'Zimbabwe',f:'🇿🇼'}
+];
+
+// Visa matrix: passport -> {dest: status}
+// Covers ~12 major passports with realistic data
+const VM={
+ IN:{AF:R,AL:R,DZ:R,AO:R,AG:F,AR:R,AM:E,AU:E,AT:R,AZ:E,BS:F,BH:A,BD:R,BB:F,BE:R,BZ:F,BJ:A,BT:F,BO:F,BA:R,BW:R,BR:R,BN:R,BG:R,BF:R,BI:R,KH:E,CM:R,CA:R,CV:A,CF:R,TD:R,CL:R,CN:R,CO:R,KM:A,CG:R,CR:R,HR:R,CU:R,CY:R,CZ:R,DK:R,DJ:A,DM:F,DO:F,EC:F,EG:A,SV:F,GQ:R,ER:R,EE:R,SZ:R,ET:A,FJ:F,FI:R,FR:R,GA:A,GM:R,GE:E,DE:R,GH:R,GR:R,GD:F,GT:R,GN:R,GW:A,GY:F,HT:F,HN:F,HU:R,IS:R,IN:null,ID:F,IR:A,IQ:R,IE:R,IL:R,IT:R,JM:F,JP:R,JO:A,KZ:R,KE:E,KW:R,KG:E,LA:A,LV:R,LB:R,LS:R,LR:A,LY:R,LI:R,LT:R,LU:R,MG:A,MW:F,MY:R,MV:F,ML:R,MT:R,MH:F,MR:R,MU:F,MX:R,FM:F,MD:R,MN:A,ME:R,MA:R,MZ:A,MM:E,NA:R,NP:F,NL:R,NZ:E,NI:F,NE:R,NG:R,MK:R,NO:R,OM:E,PK:R,PW:F,PA:R,PG:R,PY:R,PE:R,PH:R,PL:R,PT:R,QA:A,RO:R,RU:E,RW:A,KN:F,LC:F,VC:F,WS:F,ST:A,SA:E,SN:F,RS:R,SC:F,SL:A,SG:R,SK:R,SI:R,SO:R,ZA:R,KR:R,SS:R,ES:R,LK:E,SD:R,SR:R,SE:R,CH:R,SY:R,TW:R,TJ:E,TZ:A,TH:A,TL:A,TG:A,TT:F,TN:R,TR:E,TM:R,UG:A,UA:R,AE:A,GB:R,US:R,UY:F,UZ:E,VU:F,VN:E,YE:R,ZM:F,ZW:A},
+ US:{AF:R,AL:F,DZ:R,AO:R,AG:F,AR:F,AM:F,AU:E,AT:F,AZ:E,BS:F,BH:F,BD:R,BB:F,BE:F,BZ:F,BJ:A,BT:R,BO:F,BA:F,BW:F,BR:F,BN:F,BG:F,BF:R,BI:R,KH:E,CM:R,CA:F,CV:F,CF:R,TD:R,CL:F,CN:R,CO:F,KM:A,CG:R,CR:F,HR:F,CU:R,CY:F,CZ:F,DK:F,DJ:R,DM:F,DO:F,EC:F,EG:A,SV:F,GQ:R,ER:R,EE:F,SZ:F,ET:E,FJ:F,FI:F,FR:F,GA:R,GM:R,GE:F,DE:F,GH:R,GR:F,GD:F,GT:F,GN:R,GW:R,GY:F,HT:F,HN:F,HU:F,IS:F,IN:R,ID:F,IR:N,IQ:R,IE:F,IL:F,IT:F,JM:F,JP:F,JO:A,KZ:F,KE:E,KW:R,KG:F,LA:A,LV:F,LB:R,LS:F,LR:F,LY:R,LI:F,LT:F,LU:F,MG:A,MW:F,MY:F,MV:F,ML:R,MT:F,MH:F,MR:R,MU:F,MX:F,FM:F,MD:F,MN:F,ME:F,MA:F,MZ:F,MM:E,NA:F,NP:R,NL:F,NZ:E,NI:F,NE:R,NG:R,MK:F,NO:F,OM:F,PK:R,PW:F,PA:F,PG:R,PY:F,PE:F,PH:F,PL:F,PT:F,QA:F,RO:F,RU:R,RW:A,KN:F,LC:F,VC:F,WS:F,ST:F,SA:R,SN:F,RS:F,SC:F,SL:R,SG:F,SK:F,SI:F,SO:R,ZA:F,KR:F,SS:R,ES:F,LK:E,SD:R,SR:F,SE:F,CH:F,SY:R,TW:F,TJ:R,TZ:F,TH:F,TL:A,TG:A,TT:F,TN:F,TR:F,TM:R,UG:A,UA:F,AE:F,GB:F,UY:F,UZ:F,VU:F,VN:E,YE:R,ZM:F,ZW:F},
+ GB:{AF:R,AL:F,DZ:R,AO:R,AG:F,AR:F,AM:F,AU:E,AT:F,AZ:E,BS:F,BH:F,BD:R,BB:F,BE:F,BZ:F,BJ:A,BT:R,BO:F,BA:F,BW:F,BR:F,BN:F,BG:F,BF:R,BI:R,KH:E,CM:R,CA:F,CV:F,CF:R,TD:R,CL:F,CN:R,CO:F,KM:A,CG:R,CR:F,HR:F,CU:R,CY:F,CZ:F,DK:F,DJ:R,DM:F,DO:F,EC:F,EG:A,SV:F,GQ:R,ER:R,EE:F,SZ:F,ET:E,FJ:F,FI:F,FR:F,GA:R,GM:F,GE:F,DE:F,GH:R,GR:F,GD:F,GT:F,GN:R,GW:R,GY:F,HT:F,HN:F,HU:F,IS:F,IN:R,ID:F,IR:R,IQ:R,IE:F,IL:F,IT:F,JM:F,JP:F,JO:A,KZ:F,KE:E,KW:R,KG:F,LA:A,LV:F,LB:R,LS:F,LR:F,LY:R,LI:F,LT:F,LU:F,MG:A,MW:F,MY:F,MV:F,ML:R,MT:F,MH:F,MR:R,MU:F,MX:F,FM:F,MD:F,MN:F,ME:F,MA:F,MZ:F,MM:E,NA:F,NP:R,NL:F,NZ:E,NI:F,NE:R,NG:R,MK:F,NO:F,OM:F,PK:R,PW:F,PA:F,PG:F,PY:F,PE:F,PH:F,PL:F,PT:F,QA:F,RO:F,RU:R,RW:A,KN:F,LC:F,VC:F,WS:F,ST:F,SA:R,SN:F,RS:F,SC:F,SL:F,SG:F,SK:F,SI:F,SO:R,ZA:F,KR:F,SS:R,ES:F,LK:E,SD:R,SR:F,SE:F,CH:F,SY:R,TW:F,TJ:R,TZ:F,TH:F,TL:A,TG:A,TT:F,TN:F,TR:F,TM:R,UG:A,UA:F,AE:F,US:F,UY:F,UZ:F,VU:F,VN:E,YE:R,ZM:F,ZW:F},
+ CA:{AF:R,AL:F,DZ:R,AO:R,AG:F,AR:F,AM:F,AU:E,AT:F,AZ:E,BS:F,BH:F,BD:R,BB:F,BE:F,BZ:F,BJ:A,BT:R,BO:F,BA:F,BW:F,BR:F,BN:F,BG:F,BF:R,BI:R,KH:E,CM:R,CV:F,CF:R,TD:R,CL:F,CN:R,CO:F,KM:A,CG:R,CR:F,HR:F,CU:R,CY:F,CZ:F,DK:F,DJ:R,DM:F,DO:F,EC:F,EG:A,SV:F,GQ:R,ER:R,EE:F,SZ:F,ET:E,FJ:F,FI:F,FR:F,GA:R,GM:F,GE:F,DE:F,GH:R,GR:F,GD:F,GT:F,GN:R,GW:R,GY:F,HT:F,HN:F,HU:F,IS:F,IN:R,ID:F,IR:R,IQ:R,IE:F,IL:F,IT:F,JM:F,JP:F,JO:A,KZ:F,KE:E,KW:R,KG:F,LA:A,LV:F,LB:R,LS:F,LR:F,LY:R,LI:F,LT:F,LU:F,MG:A,MW:F,MY:F,MV:F,ML:R,MT:F,MH:F,MR:R,MU:F,MX:F,FM:F,MD:F,MN:F,ME:F,MA:F,MZ:F,MM:E,NA:F,NP:R,NL:F,NZ:E,NI:F,NE:R,NG:R,MK:F,NO:F,OM:F,PK:R,PW:F,PA:F,PG:F,PY:F,PE:F,PH:F,PL:F,PT:F,QA:F,RO:F,RU:R,RW:A,KN:F,LC:F,VC:F,WS:F,ST:F,SA:R,SN:F,RS:F,SC:F,SL:F,SG:F,SK:F,SI:F,SO:R,ZA:F,KR:F,SS:R,ES:F,LK:E,SD:R,SR:F,SE:F,CH:F,SY:R,TW:F,TJ:R,TZ:F,TH:F,TL:A,TG:A,TT:F,TN:F,TR:F,TM:R,UG:A,UA:F,AE:F,GB:F,US:F,UY:F,UZ:F,VU:F,VN:E,YE:R,ZM:F,ZW:F},
+ DE:{AF:R,AL:F,DZ:R,AO:R,AG:F,AR:F,AM:F,AU:E,AT:F,AZ:E,BS:F,BH:F,BD:R,BB:F,BE:F,BZ:F,BJ:A,BT:R,BO:F,BA:F,BW:F,BR:F,BN:F,BG:F,BF:R,BI:R,KH:E,CM:R,CA:F,CV:F,CL:F,CN:R,CO:F,KM:A,CG:R,CR:F,HR:F,CU:R,CY:F,CZ:F,DK:F,DJ:R,DM:F,DO:F,EC:F,EG:A,SV:F,GQ:R,ER:R,EE:F,SZ:F,ET:E,FJ:F,FI:F,FR:F,GA:R,GM:F,GE:F,GH:R,GR:F,GD:F,GT:F,GN:R,GW:R,GY:F,HT:F,HN:F,HU:F,IS:F,IN:R,ID:F,IR:R,IQ:R,IE:F,IL:F,IT:F,JM:F,JP:F,JO:A,KZ:F,KE:E,KW:R,KG:F,LA:A,LV:F,LB:R,LS:F,LR:F,LY:R,LI:F,LT:F,LU:F,MG:A,MW:F,MY:F,MV:F,ML:R,MT:F,MH:F,MR:R,MU:F,MX:F,FM:F,MD:F,MN:F,ME:F,MA:F,MZ:F,MM:E,NA:F,NP:R,NL:F,NZ:E,NI:F,NE:R,NG:R,MK:F,NO:F,OM:F,PK:R,PW:F,PA:F,PG:F,PY:F,PE:F,PH:F,PL:F,PT:F,QA:F,RO:F,RU:R,RW:A,KN:F,LC:F,VC:F,WS:F,ST:F,SA:R,SN:F,RS:F,SC:F,SL:F,SG:F,SK:F,SI:F,SO:R,ZA:F,KR:F,SS:R,ES:F,LK:E,SD:R,SR:F,SE:F,CH:F,SY:R,TW:F,TJ:R,TZ:F,TH:F,TL:A,TG:A,TT:F,TN:F,TR:F,TM:R,UG:A,UA:F,AE:F,GB:F,US:F,UY:F,UZ:F,VU:F,VN:E,YE:R,ZM:F,ZW:F},
+ JP:{AF:R,AL:F,DZ:R,AO:R,AG:F,AR:F,AM:F,AU:F,AT:F,AZ:E,BS:F,BH:F,BD:R,BB:F,BE:F,BZ:F,BJ:A,BT:R,BO:F,BA:F,BW:F,BR:F,BN:F,BG:F,BF:R,BI:R,KH:F,CM:R,CA:F,CV:F,CL:F,CN:R,CO:F,KM:A,CG:R,CR:F,HR:F,CU:R,CY:F,CZ:F,DK:F,DJ:R,DM:F,DO:F,EC:F,EG:A,SV:F,GQ:R,ER:R,EE:F,SZ:F,ET:E,FJ:F,FI:F,FR:F,GA:R,GM:R,GE:F,DE:F,GH:R,GR:F,GD:F,GT:F,GN:R,GW:R,GY:F,HT:F,HN:F,HU:F,IS:F,IN:R,ID:F,IR:R,IQ:R,IE:F,IL:F,IT:F,JM:F,JO:F,KZ:R,KE:E,KW:R,KG:R,LA:F,LV:F,LB:R,LS:F,LR:R,LY:R,LI:F,LT:F,LU:F,MG:A,MW:F,MY:F,MV:F,ML:R,MT:F,MH:F,MR:R,MU:F,MX:F,FM:F,MD:F,MN:F,ME:F,MA:F,MZ:F,MM:F,NA:F,NP:R,NL:F,NZ:F,NI:F,NE:R,NG:R,MK:F,NO:F,OM:F,PK:R,PW:F,PA:F,PG:F,PY:F,PE:F,PH:F,PL:F,PT:F,QA:F,RO:F,RU:R,RW:A,KN:F,LC:F,VC:F,WS:F,ST:F,SA:R,SN:F,RS:F,SC:F,SL:F,SG:F,SK:F,SI:F,SO:R,ZA:F,KR:F,SS:R,ES:F,LK:E,SD:R,SR:F,SE:F,CH:F,SY:R,TW:F,TJ:R,TZ:F,TH:F,TL:A,TG:A,TT:F,TN:F,TR:F,TM:R,UG:A,UA:F,AE:F,GB:F,US:F,UY:F,UZ:R,VU:F,VN:E,YE:R,ZM:F,ZW:F},
+ AU:{AF:R,AL:F,DZ:R,AO:R,AG:F,AR:F,AM:F,AT:F,AZ:E,BS:F,BH:F,BD:R,BB:F,BE:F,BZ:F,BJ:A,BT:R,BO:F,BA:F,BW:F,BR:F,BN:F,BG:F,BF:R,BI:R,KH:E,CM:R,CA:F,CV:F,CF:R,TD:R,CL:F,CN:R,CO:F,KM:A,CG:R,CR:F,HR:F,CU:R,CY:F,CZ:F,DK:F,DJ:R,DM:F,DO:F,EC:F,EG:A,SV:F,GQ:R,ER:R,EE:F,SZ:F,ET:E,FJ:F,FI:F,FR:F,GA:R,GM:F,GE:F,DE:F,GH:R,GR:F,GD:F,GT:F,GN:R,GW:R,GY:F,HT:F,HN:F,HU:F,IS:F,IN:R,ID:F,IR:R,IQ:R,IE:F,IL:F,IT:F,JM:F,JP:F,JO:A,KZ:F,KE:E,KW:R,KG:F,LA:A,LV:F,LB:R,LS:F,LR:F,LY:R,LI:F,LT:F,LU:F,MG:A,MW:F,MY:F,MV:F,ML:R,MT:F,MH:F,MR:R,MU:F,MX:F,FM:F,MD:F,MN:F,ME:F,MA:F,MZ:F,MM:E,NA:F,NP:R,NL:F,NZ:F,NI:F,NE:R,NG:R,MK:F,NO:F,OM:F,PK:R,PW:F,PA:F,PG:F,PY:F,PE:F,PH:F,PL:F,PT:F,QA:F,RO:F,RU:R,RW:A,KN:F,LC:F,VC:F,WS:F,ST:F,SA:R,SN:F,RS:F,SC:F,SL:F,SG:F,SK:F,SI:F,SO:R,ZA:F,KR:F,SS:R,ES:F,LK:E,SD:R,SR:F,SE:F,CH:F,SY:R,TW:F,TJ:R,TZ:F,TH:F,TL:A,TG:A,TT:F,TN:F,TR:F,TM:R,UG:A,UA:F,AE:F,GB:F,US:F,UY:F,UZ:F,VU:F,VN:E,YE:R,ZM:F,ZW:F},
+ CN:{AF:R,AL:R,DZ:R,AO:A,AG:R,AR:R,AM:R,AU:R,AT:R,AZ:R,BS:R,BH:R,BD:R,BB:R,BE:R,BZ:R,BJ:A,BT:R,BO:R,BA:R,BW:R,BR:F,BN:R,BG:R,BF:R,BI:R,KH:F,CM:R,CA:R,CV:A,CF:R,TD:R,CL:R,CO:R,KM:A,CG:A,CR:R,HR:R,CU:A,CY:R,CZ:R,DK:R,DJ:A,DM:R,DO:R,EC:R,EG:A,SV:R,GQ:R,ER:R,EE:R,SZ:R,ET:R,FJ:F,FI:R,FR:R,GA:A,GM:R,GE:R,DE:R,GH:R,GR:R,GD:R,GT:R,GN:A,GW:R,GY:R,HT:R,HN:R,HU:R,IS:R,IN:R,ID:F,IR:A,IQ:R,IE:R,IL:R,IT:R,JM:R,JP:R,JO:R,KZ:F,KE:A,KW:R,KG:F,LA:A,LV:R,LB:R,LS:R,LR:A,LY:R,LI:R,LT:R,LU:R,MG:A,MW:R,MY:F,MV:F,ML:R,MT:R,MH:R,MR:R,MU:A,MX:R,FM:R,MD:R,MN:F,ME:R,MA:R,MZ:A,MM:F,NA:R,NP:R,NL:R,NZ:R,NI:R,NE:R,NG:R,MK:R,NO:R,OM:R,PK:F,PW:R,PA:R,PG:R,PY:R,PE:R,PH:F,PL:R,PT:R,QA:F,RO:R,RU:F,RW:A,KN:R,LC:R,VC:R,WS:R,ST:A,SA:R,SN:R,RS:R,SC:A,SL:A,SG:F,SK:R,SI:R,SO:R,ZA:R,KR:R,SS:R,ES:R,LK:A,SD:R,SR:R,SE:R,CH:R,SY:R,TJ:F,TZ:A,TH:F,TL:A,TG:A,TT:R,TN:R,TR:F,TM:R,UG:A,UA:R,AE:R,GB:R,US:R,UY:R,UZ:F,VU:R,VE:R,VN:F,YE:R,ZM:A,ZW:R},
+ PK:{AF:F,AL:R,DZ:R,AO:R,AG:R,AR:R,AM:R,AU:R,AT:R,AZ:E,BS:R,BH:A,BD:A,BB:R,BE:R,BZ:R,BJ:R,BT:R,BO:R,BA:R,BW:R,BR:R,BN:R,BG:R,BF:R,BI:R,KH:E,CM:R,CA:R,CV:R,CF:R,TD:R,CL:R,CN:R,CO:R,KM:A,CG:R,CR:R,HR:R,CU:R,CY:R,CZ:R,DK:R,DJ:A,DM:R,DO:R,EC:R,EG:A,SV:R,GQ:R,ER:R,EE:R,SZ:R,ET:A,FJ:F,FI:R,FR:R,GA:A,GM:R,GE:E,DE:R,GH:R,GR:R,GD:R,GT:R,GN:R,GW:A,GY:R,HT:R,HN:R,HU:R,IS:R,IN:R,ID:R,IR:F,IQ:R,IE:R,IL:N,IT:R,JM:R,JP:R,JO:A,KZ:R,KE:E,KW:R,KG:E,LA:A,LV:R,LB:R,LS:R,LR:A,LY:R,LI:R,LT:R,LU:R,MG:A,MW:R,MY:R,MV:F,ML:R,MT:R,MH:R,MR:R,MU:R,MX:R,FM:R,MD:R,MN:A,ME:R,MA:R,MZ:A,MM:R,NA:R,NP:R,NL:R,NZ:R,NI:R,NE:R,NG:R,MK:R,NO:R,OM:E,PW:R,PA:R,PG:R,PY:R,PE:R,PH:R,PL:R,PT:R,QA:R,RO:R,RU:E,RW:A,KN:R,LC:R,VC:R,WS:R,ST:A,SA:R,SN:R,RS:R,SC:R,SL:A,SG:R,SK:R,SI:R,SO:A,ZA:R,KR:R,SS:R,ES:R,LK:E,SD:R,SR:R,SE:R,CH:R,SY:R,TW:R,TJ:E,TZ:A,TH:R,TL:A,TG:A,TT:R,TN:R,TR:E,TM:R,UG:A,UA:R,AE:A,GB:R,US:R,UY:R,UZ:E,VU:R,VN:E,YE:R,ZM:R,ZW:A},
+ AE:{AF:R,AL:F,DZ:R,AO:R,AG:F,AR:F,AM:F,AU:F,AT:F,AZ:F,BS:F,BH:F,BD:R,BB:F,BE:F,BZ:F,BJ:A,BT:R,BO:F,BA:F,BW:R,BR:F,BN:F,BG:F,BF:R,BI:R,KH:E,CM:R,CA:F,CV:F,CL:F,CN:R,CO:F,KM:A,CG:R,CR:F,HR:F,CU:R,CY:F,CZ:F,DK:F,DJ:A,DM:F,DO:F,EC:F,EG:F,SV:F,GQ:R,ER:R,EE:F,SZ:F,ET:E,FJ:F,FI:F,FR:F,GA:R,GM:R,GE:F,DE:F,GH:R,GR:F,GD:F,GT:F,GN:R,GW:R,GY:F,HT:F,HN:F,HU:F,IS:F,IN:R,ID:F,IR:R,IQ:R,IE:F,IL:N,IT:F,JM:F,JP:F,JO:F,KZ:F,KE:E,KW:F,KG:F,LA:A,LV:F,LB:R,LS:R,LR:R,LY:R,LI:F,LT:F,LU:F,MG:A,MW:R,MY:F,MV:F,ML:R,MT:F,MH:F,MR:R,MU:F,MX:F,FM:F,MD:F,MN:F,ME:F,MA:F,MZ:F,MM:E,NA:R,NP:R,NL:F,NZ:E,NI:F,NE:R,NG:R,MK:F,NO:F,OM:F,PK:R,PW:F,PA:F,PG:R,PY:F,PE:F,PH:F,PL:F,PT:F,QA:F,RO:F,RU:F,RW:A,KN:F,LC:F,VC:F,WS:F,ST:F,SA:F,SN:F,RS:F,SC:F,SL:R,SG:F,SK:F,SI:F,SO:R,ZA:F,KR:F,SS:R,ES:F,LK:E,SD:R,SR:F,SE:F,CH:F,SY:R,TW:F,TJ:R,TZ:F,TH:F,TL:A,TG:A,TT:F,TN:F,TR:F,TM:R,UG:A,UA:F,GB:F,US:F,UY:F,UZ:F,VU:F,VN:E,YE:R,ZM:F,ZW:F},
+ SG:{AF:R,AL:F,DZ:R,AO:R,AG:F,AR:F,AM:F,AU:F,AT:F,AZ:E,BS:F,BH:F,BD:R,BB:F,BE:F,BZ:F,BJ:A,BT:R,BO:F,BA:F,BW:F,BR:F,BN:F,BG:F,BF:R,BI:R,KH:F,CM:R,CA:F,CV:F,CL:F,CN:F,CO:F,KM:A,CG:R,CR:F,HR:F,CU:R,CY:F,CZ:F,DK:F,DJ:R,DM:F,DO:F,EC:F,EG:A,SV:F,GQ:R,ER:R,EE:F,SZ:F,ET:E,FJ:F,FI:F,FR:F,GA:R,GM:R,GE:F,DE:F,GH:R,GR:F,GD:F,GT:F,GN:R,GW:R,GY:F,HT:F,HN:F,HU:F,IS:F,IN:R,ID:F,IR:R,IQ:R,IE:F,IL:F,IT:F,JM:F,JP:F,JO:F,KZ:F,KE:E,KW:F,KG:F,LA:F,LV:F,LB:R,LS:F,LR:F,LY:R,LI:F,LT:F,LU:F,MG:A,MW:F,MY:F,MV:F,ML:R,MT:F,MH:F,MR:R,MU:F,MX:F,FM:F,MD:F,MN:F,ME:F,MA:F,MZ:F,MM:F,NA:F,NP:R,NL:F,NZ:F,NI:F,NE:R,NG:R,MK:F,NO:F,OM:F,PK:R,PW:F,PA:F,PG:F,PY:F,PE:F,PH:F,PL:F,PT:F,QA:F,RO:F,RU:F,RW:A,KN:F,LC:F,VC:F,WS:F,ST:F,SA:R,SN:F,RS:F,SC:F,SL:F,SK:F,SI:F,SO:R,ZA:F,KR:F,SS:R,ES:F,LK:E,SD:R,SR:F,SE:F,CH:F,SY:R,TW:F,TJ:R,TZ:F,TH:F,TL:A,TG:A,TT:F,TN:F,TR:F,TM:R,UG:A,UA:F,AE:F,GB:F,US:F,UY:F,UZ:F,VU:F,VN:E,YE:R,ZM:F,ZW:F},
+ ZA:{AF:R,AL:F,DZ:R,AO:R,AG:F,AR:F,AM:R,AU:F,AT:F,AZ:R,BS:F,BH:R,BD:R,BB:F,BE:F,BZ:F,BJ:A,BT:R,BO:F,BA:F,BW:F,BR:F,BN:R,BG:F,BF:R,BI:R,KH:E,CM:R,CA:E,CV:F,CL:F,CN:R,CO:F,KM:A,CG:R,CR:F,HR:F,CU:A,CY:F,CZ:F,DK:F,DJ:R,DM:F,DO:F,EC:F,EG:A,SV:F,GQ:R,ER:R,EE:F,SZ:F,ET:A,FJ:F,FI:F,FR:F,GA:A,GM:F,GE:F,DE:F,GH:F,GR:F,GD:F,GT:F,GN:R,GW:F,GY:F,HT:F,HN:F,HU:F,IS:F,IN:R,ID:F,IR:R,IQ:R,IE:F,IL:F,IT:F,JM:F,JP:F,JO:A,KZ:R,KE:E,KW:R,KG:R,LA:A,LV:F,LB:R,LS:F,LR:F,LY:R,LI:F,LT:F,LU:F,MG:A,MW:F,MY:F,MV:F,ML:R,MT:F,MH:F,MR:R,MU:F,MX:F,FM:F,MD:F,MN:F,ME:F,MA:F,MZ:F,MM:E,NA:F,NP:R,NL:F,NZ:F,NI:F,NE:R,NG:R,MK:F,NO:F,OM:R,PK:R,PW:F,PA:F,PG:F,PY:F,PE:F,PH:F,PL:F,PT:F,QA:R,RO:F,RU:R,RW:A,KN:F,LC:F,VC:F,WS:F,ST:F,SA:R,SN:F,RS:F,SC:F,SL:F,SK:F,SI:F,SO:R,KR:F,SS:R,ES:F,LK:E,SD:R,SR:F,SE:F,CH:F,SY:R,TW:F,TJ:R,TZ:F,TH:F,TL:A,TG:A,TT:F,TN:F,TR:F,TM:R,UG:A,UA:F,AE:F,GB:F,US:F,UY:F,UZ:F,VU:F,VN:E,YE:R,ZM:F,ZW:F}
+};
+
+// Passport metadata
+const PP_META={
+ US:{n:'United States',f:'🇺🇸'},IN:{n:'India',f:'🇮🇳'},GB:{n:'United Kingdom',f:'🇬🇧'},
+ CA:{n:'Canada',f:'🇨🇦'},DE:{n:'Germany',f:'🇩🇪'},JP:{n:'Japan',f:'🇯🇵'},
+ AU:{n:'Australia',f:'🇦🇺'},CN:{n:'China',f:'🇨🇳'},PK:{n:'Pakistan',f:'🇵🇰'},
+ AE:{n:'UAE',f:'🇦🇪'},SG:{n:'Singapore',f:'🇸🇬'},ZA:{n:'South Africa',f:'🇿🇦'}
+};
+
+// Tips per status
+const TIPS={
+ free:"No visa required for tourism. Typically valid 30–90 days. Carry proof of onward travel and sufficient funds.",
+ arrival:"Visa on Arrival available. Bring passport photos, USD cash for fees, and proof of onward travel. Lines can be long — arrive prepared.",
+ evisa:"eVisa required. Apply online at least 72 hours before travel. Have passport scan and photo ready. Check processing time.",
+ required:"Visa required in advance. Apply at the nearest embassy or consulate. Processing can take 2–8 weeks — start early!",
+ noentry:"Entry not permitted for your passport at this time. Check with the destination's embassy for the latest information."
+};
+const COLORS={
+ free:{bg:'#ecfdf5',border:'#6ee7b7',dot:'#10b981',cls:'bf'},
+ arrival:{bg:'#fffbeb',border:'#fde68a',dot:'#f59e0b',cls:'ba'},
+ evisa:{bg:'#eff6ff',border:'#bfdbfe',dot:'#3b82f6',cls:'be'},
+ required:{bg:'#fff1f2',border:'#fecdd3',dot:'#ef4444',cls:'br2'},
+ noentry:{bg:'#f3f4f6',border:'#d1d5db',dot:'#9ca3af',cls:'bn2'}
+};
+const LABELS={free:'🎉 Visa Free',arrival:'✈️ Visa on Arrival',evisa:'💻 eVisa',required:'🛂 Visa Required',noentry:'🚫 No Entry'};
+
+function getStatus(pp,dest){
+  if(!VM[pp]) return null;
+  return VM[pp][dest]||null;
+}
+
+// Populate selects
+function populateSelects(){
+  const opts=COUNTRIES.map(c=>`<option value="${c.c}">${c.f} ${c.n}</option>`).join('');
+  const ppOpts=Object.keys(PP_META).map(k=>`<option value="${k}">${PP_META[k].f} ${PP_META[k].n}</option>`).join('');
+  document.getElementById('psel').innerHTML='<option value="">Select your passport...</option>'+ppOpts;
+  document.getElementById('dsel').innerHTML='<option value="">Select destination...</option>'+opts;
+  document.getElementById('exsel').innerHTML='<option value="">Select your passport...</option>'+ppOpts;
+  ['cmpa','cmpb'].forEach(id=>{
+    document.getElementById(id).innerHTML='<option value="">Select passport...</option>'+ppOpts;
+  });
+}
+
+function clearRes(){
+  document.getElementById('res-area').style.display='none';
+}
+
+function checkVisa(){
+  const pp=document.getElementById('psel').value;
+  const dest=document.getElementById('dsel').value;
+  if(!pp||!dest){alert('Please select both passport and destination.');return;}
+  const destObj=COUNTRIES.find(c=>c.c===dest);
+  const ppMeta=PP_META[pp];
+  if(!ppMeta){alert('Passport data not available yet. More passports coming soon!');return;}
+  const status=getStatus(pp,dest);
+  const area=document.getElementById('res-area');
+  const content=document.getElementById('res-content');
+  area.style.display='block';
+  if(!status||pp===dest){
+    content.innerHTML=`<div class="rc" style="background:#f0f9ff;border-color:#bae6fd">
+      <div class="rc-flag">${destObj.f}</div>
+      <div class="rc-info"><div class="rc-cname">${destObj.n}</div>
+      <div class="rc-detail">You are checking your home country or no data available for this combination.</div></div>
+    </div>`;
+    return;
+  }
+  const c=COLORS[status];
+  const lbl=LABELS[status];
+  const tip=TIPS[status];
+  content.innerHTML=`
+    <div class="rc" style="background:${c.bg};border-color:${c.border}">
+      <div class="rc-flag">${destObj.f}</div>
+      <div class="rc-info">
+        <div class="rc-cname">${destObj.n}</div>
+        <div class="rc-detail">${ppMeta.f} ${ppMeta.n} passport holder</div>
+      </div>
+      <span class="vb ${c.cls}">${lbl}</span>
+    </div>
+    <div class="tip-box" style="background:${c.bg};border:1px solid ${c.border}">
+      💡 ${tip}
+    </div>
+  `;
+  area.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// Explore
+function renderExplore(){
+  const pp=document.getElementById('exsel').value;
+  const srch=document.getElementById('exsrch').value.toLowerCase();
+  const flt=document.getElementById('exflt').value;
+  const grid=document.getElementById('exgrid');
+  const sum=document.getElementById('exsum');
+  if(!pp){
+    grid.innerHTML='<div class="es"><div class="ei">🌐</div><h3>Select your passport</h3><p>Choose a passport above to see visa requirements for all countries</p></div>';
+    sum.style.display='none';return;
+  }
+  const ppData=VM[pp]||{};
+  const counts={free:0,arrival:0,evisa:0,required:0,noentry:0};
+  let items=COUNTRIES.filter(c=>c.c!==pp);
+  items.forEach(c=>{const s=ppData[c.c];if(s&&counts[s]!==undefined)counts[s]++;});
+  // Summary
+  sum.style.display='flex';
+  sum.innerHTML=[
+    ['free','#d1fae5','#065f46',counts.free+' Visa Free'],
+    ['arrival','#fef3c7','#92400e',counts.arrival+' On Arrival'],
+    ['evisa','#dbeafe','#1e40af',counts.evisa+' eVisa'],
+    ['required','#fee2e2','#991b1b',counts.required+' Required'],
+    ['noentry','#f3f4f6','#374151',counts.noentry+' No Entry']
+  ].map(([s,bg,col,lbl])=>`<span class="sp" style="background:${bg};color:${col}">${lbl}</span>`).join('');
+  // Filter + search
+  let filtered=items;
+  if(flt) filtered=filtered.filter(c=>(ppData[c.c]||'required')===flt);
+  if(srch) filtered=filtered.filter(c=>c.n.toLowerCase().includes(srch));
+  if(!filtered.length){
+    grid.innerHTML='<div class="es"><div class="ei">🔍</div><h3>No results</h3><p>Try adjusting your search or filter</p></div>';
+    return;
+  }
+  grid.innerHTML=filtered.map(c=>{
+    const s=ppData[c.c]||R;
+    const col=COLORS[s];
+    return `<div class="cc"><span class="cf">${c.f}</span><span class="cn2">${c.n}</span><span class="cd" style="background:${col.dot}"></span></div>`;
+  }).join('');
+}
+
+// Compare
+function renderCompare(){
+  const pa=document.getElementById('cmpa').value;
+  const pb=document.getElementById('cmpb').value;
+  function renderList(pp,elId){
+    const el=document.getElementById(elId);
+    if(!pp){el.innerHTML='<div class="es" style="grid-column:unset;padding:32px"><div class="ei">🛂</div><h3>Select a passport</h3></div>';return;}
+    const data=VM[pp]||{};
+    el.innerHTML=COUNTRIES.filter(c=>c.c!==pp).map(c=>{
+      const s=data[c.c]||R;
+      const col=COLORS[s];
+      return `<div class="cmp-item"><span class="cmp-flag">${c.f}</span><span class="cmp-name">${c.n}</span><span class="vb ${col.cls}" style="font-size:11px;padding:4px 10px">${LABELS[s]}</span></div>`;
+    }).join('');
+  }
+  renderList(pa,'cmpl-a');
+  renderList(pb,'cmpl-b');
+}
+
+// Passport Power Index
+function renderPassports(){
+  const el=document.getElementById('pplist');
+  const ranked=Object.keys(PP_META).map(pp=>{
+    const data=VM[pp]||{};
+    const free=Object.values(data).filter(v=>v===F||v===A||v===E).length;
+    return{pp,free,...PP_META[pp]};
+  }).sort((a,b)=>b.free-a.free);
+  const max=ranked[0].free;
+  el.innerHTML=ranked.map((p,i)=>`
+    <div class="pr">
+      <div class="prk">#${i+1}</div>
+      <div class="prf">${p.f}</div>
+      <div class="pri">
+        <div class="prn">${p.n}</div>
+        <div class="pbar">
+          <div class="bt"><div class="bf2" style="width:${Math.round(p.free/max*100)}%"></div></div>
+          <span class="bc">${p.free}</span>
+          <span class="pra">visa-free destinations</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Blog
+function renderBlog(){
+  const posts=[
+    {bg:'#fef3c7',icon:'🇯🇵',tag:'Visa Guide',title:'Japan eVisa: Complete Guide for 2025',ex:'Everything you need to know about applying for a Japan eVisa — requirements, fees, and processing times.'},
+    {bg:'#d1fae5',icon:'🇪🇺',tag:'Schengen',title:'Schengen Zone Explained: 26 Countries, One Visa',ex:'How the Schengen Area works, which passports need a visa, and tips to get your application approved.'},
+    {bg:'#dbeafe',icon:'🇺🇸',tag:'ESTA',title:'US ESTA vs B1/B2 Visa: Which Do You Need?',ex:'If you hold an eligible passport, you may qualify for ESTA. Find out if you qualify and how to apply.'},
+    {bg:'#fce7f3',icon:'🌍',tag:'Africa',title:'Top 10 Visa-Free Countries for Indian Passport Holders',ex:'Where can Indian passport holders travel without a visa? Here are the best visa-free destinations in 2025.'},
+    {bg:'#ede9fe',icon:'🇦🇪',tag:'UAE',title:'UAE Visa on Arrival: Who Qualifies in 2025?',ex:'The UAE offers visa on arrival to passport holders from 50+ countries. Check if yours is on the list.'},
+    {bg:'#ecfdf5',icon:'🗺️',tag:'Tips',title:'7 Tips to Never Get Denied a Visa Again',ex:'From bank statements to travel history, these proven tips will significantly improve your visa approval odds.'}
+  ];
+  document.getElementById('blogrid').innerHTML=posts.map(p=>`
+    <div class="bc2">
+      <div class="bi" style="background:${p.bg}">${p.icon}</div>
+      <div class="bb">
+        <span class="btag">${p.tag}</span>
+        <div class="btl">${p.title}</div>
+        <div class="bex">${p.ex}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Page navigation
+function goPage(page){
+  document.querySelectorAll('.pv').forEach(el=>el.classList.remove('act'));
+  document.querySelectorAll('.nl').forEach(el=>el.classList.remove('act'));
+  document.getElementById('page-'+page).classList.add('act');
+  document.getElementById('nav-'+page).classList.add('act');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Init
+populateSelects();
+renderPassports();
+renderBlog();
+</script>
+
+</body>
+</html>
