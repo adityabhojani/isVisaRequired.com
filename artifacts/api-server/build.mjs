@@ -15,7 +15,14 @@ async function buildAll() {
   await rm(distDir, { recursive: true, force: true });
 
   await esbuild({
-    entryPoints: [path.resolve(artifactDir, "src/index.ts")],
+    entryPoints: [
+      // Standalone server (calls app.listen) — used on Replit / Node hosts.
+      path.resolve(artifactDir, "src/index.ts"),
+      // Handler-only export (no listen) — imported by the Vercel serverless
+      // function at /api. Self-contained bundle, so the function needs no
+      // workspace module resolution.
+      path.resolve(artifactDir, "src/serverless.ts"),
+    ],
     platform: "node",
     bundle: true,
     format: "esm",

@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install --filter @workspace/visa-checker... --filter @workspace/api-server...",
-  "buildCommand": "BASE_PATH=/ pnpm --filter @workspace/visa-checker build",
+  "buildCommand": "pnpm --filter @workspace/api-server build && BASE_PATH=/ pnpm --filter @workspace/visa-checker build",
   "outputDirectory": "artifacts/visa-checker/dist/public",
   "framework": null,
   "functions": {
