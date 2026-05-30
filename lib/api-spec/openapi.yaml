@@ -1,0 +1,495 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Visa requirement checker API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: visa
+    description: Visa requirement operations
+  - name: countries
+    description: Country listing operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /countries:
+    get:
+      operationId: listCountries
+      tags: [countries]
+      summary: List all countries
+      description: Returns a list of all countries with their codes and names
+      responses:
+        "200":
+          description: List of countries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Country"
+
+  /visa/check:
+    get:
+      operationId: checkVisa
+      tags: [visa]
+      summary: Check visa requirement
+      description: Check if a visa is required for a passport holder to travel to a destination
+      parameters:
+        - name: passport
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ISO 3166-1 alpha-2 passport country code (e.g. "US")
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ISO 3166-1 alpha-2 destination country code (e.g. "FR")
+      responses:
+        "200":
+          description: Visa requirement result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VisaResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /visa/check-multiple:
+    post:
+      operationId: checkVisaMultiple
+      tags: [visa]
+      summary: Check visa requirements for multiple destinations
+      description: Check visa requirements for a passport holder traveling to multiple destinations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckVisaMultipleBody"
+      responses:
+        "200":
+          description: Visa requirement results for all destinations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VisaResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /visa/check-all:
+    get:
+      operationId: checkVisaAll
+      tags: [visa]
+      summary: Check visa requirements for all countries
+      description: Returns visa requirements for a passport holder traveling to every country in the world
+      parameters:
+        - name: passport
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ISO 3166-1 alpha-2 passport country code
+      responses:
+        "200":
+          description: Visa requirements for all countries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VisaResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /countries/{code}/tourist-info:
+    get:
+      operationId: getCountryTouristInfo
+      tags: [countries]
+      summary: Get tourist info for a country
+      description: Returns tourist attractions, best time to visit, and travel highlights for a country
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ISO 3166-1 alpha-2 country code
+      responses:
+        "200":
+          description: Tourist information for the country
+          content:
+            application/json:
+              schema:
+                nullable: true
+                allOf:
+                  - $ref: "#/components/schemas/CountryTouristInfo"
+        "404":
+          description: Country not found or no tourist info available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /visa/destination-info:
+    get:
+      operationId: getDestinationInfo
+      tags: [visa]
+      summary: Get full destination info including visa details and attractions
+      description: Returns visa requirement details (cost, documents, process) and tourist attractions for a passport/destination pair
+      parameters:
+        - name: passport
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ISO 3166-1 alpha-2 passport country code
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ISO 3166-1 alpha-2 destination country code
+      responses:
+        "200":
+          description: Full destination information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationInfo"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /visa/popular-destinations:
+    get:
+      operationId: getPopularDestinations
+      tags: [visa]
+      summary: Get popular travel destinations
+      description: Returns a list of popular destination countries
+      responses:
+        "200":
+          description: List of popular destinations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Country"
+
+  /visa/stats:
+    get:
+      operationId: getVisaStats
+      tags: [visa]
+      summary: Get visa stats for a passport
+      description: Returns stats on how many countries require a visa, are visa-free, etc. for a given passport
+      parameters:
+        - name: passport
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ISO 3166-1 alpha-2 passport country code
+      responses:
+        "200":
+          description: Visa stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VisaStats"
+        "400":
+          description: Bad request
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Country:
+      type: object
+      properties:
+        code:
+          type: string
+          description: ISO 3166-1 alpha-2 country code
+        name:
+          type: string
+          description: Country name
+        flag:
+          type: string
+          description: Unicode flag emoji
+        region:
+          type: string
+          description: Geographic region
+      required:
+        - code
+        - name
+        - flag
+        - region
+
+    VisaRequirement:
+      type: string
+      enum:
+        - visa_free
+        - visa_on_arrival
+        - e_visa
+        - visa_required
+        - no_admission
+      description: The type of visa requirement
+
+    VisaResult:
+      type: object
+      properties:
+        passportCountry:
+          $ref: "#/components/schemas/Country"
+        destinationCountry:
+          $ref: "#/components/schemas/Country"
+        requirement:
+          $ref: "#/components/schemas/VisaRequirement"
+        maxStay:
+          type: string
+          nullable: true
+          description: Maximum allowed stay (e.g. "90 days")
+        notes:
+          type: string
+          nullable: true
+          description: Additional notes about entry requirements
+      required:
+        - passportCountry
+        - destinationCountry
+        - requirement
+
+    CheckVisaMultipleBody:
+      type: object
+      properties:
+        passport:
+          type: string
+          description: ISO 3166-1 alpha-2 passport country code
+        destinations:
+          type: array
+          items:
+            type: string
+          description: List of ISO 3166-1 alpha-2 destination country codes
+      required:
+        - passport
+        - destinations
+
+    VisaStats:
+      type: object
+      properties:
+        passportCountry:
+          $ref: "#/components/schemas/Country"
+        visaFree:
+          type: integer
+          description: Number of countries accessible visa-free
+        visaOnArrival:
+          type: integer
+          description: Number of countries accessible with visa on arrival
+        eVisa:
+          type: integer
+          description: Number of countries accessible with e-visa
+        visaRequired:
+          type: integer
+          description: Number of countries requiring a visa
+        noAdmission:
+          type: integer
+          description: Number of countries with no admission
+        total:
+          type: integer
+          description: Total countries in the index
+        powerRank:
+          type: integer
+          description: Passport power ranking (1 = strongest)
+      required:
+        - passportCountry
+        - visaFree
+        - visaOnArrival
+        - eVisa
+        - visaRequired
+        - noAdmission
+        - total
+        - powerRank
+
+    VisaDetail:
+      type: object
+      properties:
+        feeUSD:
+          type: number
+          nullable: true
+          description: Visa fee in US dollars (0 for free, null for not applicable)
+        processingDays:
+          type: string
+          description: How long processing takes
+        maxStay:
+          type: string
+          description: Maximum allowed stay
+        documents:
+          type: array
+          items:
+            type: string
+          description: List of required documents
+        process:
+          type: array
+          items:
+            type: string
+          description: Step-by-step application process
+        onlineApplyUrl:
+          type: string
+          nullable: true
+          description: URL to apply for visa online
+        notes:
+          type: string
+          nullable: true
+          description: Additional notes
+      required:
+        - feeUSD
+        - processingDays
+        - maxStay
+        - documents
+        - process
+
+    Attraction:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the attraction
+        description:
+          type: string
+          description: Brief description of the attraction
+        wikiTitle:
+          type: string
+          description: Wikipedia article title for fetching images
+        type:
+          type: string
+          enum: [landmark, nature, museum, beach, city, heritage, temple]
+          description: Type of attraction
+        visitDuration:
+          type: string
+          description: Suggested time to spend at this attraction
+      required:
+        - name
+        - description
+        - wikiTitle
+        - type
+        - visitDuration
+
+    CountryTouristInfo:
+      type: object
+      properties:
+        tagline:
+          type: string
+        bestTimeToVisit:
+          type: string
+        currency:
+          type: string
+        language:
+          type: string
+        capital:
+          type: string
+        timezone:
+          type: string
+        attractions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attraction"
+      required:
+        - tagline
+        - bestTimeToVisit
+        - currency
+        - language
+        - capital
+        - timezone
+        - attractions
+
+    OfficialLinks:
+      type: object
+      properties:
+        visaPortal:
+          type: string
+          description: Official government visa application portal URL for the destination country
+        embassyFinder:
+          type: string
+          description: Official MFA/embassy finder URL listing the destination country's missions abroad
+      required:
+        - visaPortal
+        - embassyFinder
+
+    DestinationInfo:
+      type: object
+      properties:
+        passportCountry:
+          $ref: "#/components/schemas/Country"
+        destinationCountry:
+          $ref: "#/components/schemas/Country"
+        requirement:
+          $ref: "#/components/schemas/VisaRequirement"
+        maxStay:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        visaDetail:
+          $ref: "#/components/schemas/VisaDetail"
+        touristInfo:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/CountryTouristInfo"
+        officialLinks:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/OfficialLinks"
+      required:
+        - passportCountry
+        - destinationCountry
+        - requirement
+        - visaDetail
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

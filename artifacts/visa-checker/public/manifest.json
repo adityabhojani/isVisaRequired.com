@@ -1,0 +1,28 @@
+{
+  "name": "Is Visa Required?",
+  "short_name": "Visa Checker",
+  "description": "Instant visa requirement checker for 199 countries. Find out if you need a visa, visa on arrival, or e-visa before you travel.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a5f",
+  "orientation": "any",
+  "lang": "en",
+  "categories": ["travel", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/opengraph.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "label": "Is Visa Required? – Visa Checker"
+    }
+  ]
+}
