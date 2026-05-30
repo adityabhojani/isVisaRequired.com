@@ -1,6 +1,6 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
-import { db } from "@workspace/db";
+import { db, isDatabaseConfigured } from "@workspace/db";
 import { sql } from "drizzle-orm";
 import { logger } from "../lib/logger";
 import { writeLimiter } from "../middleware/rateLimiter";
@@ -8,17 +8,20 @@ import { requireAdmin } from "../middleware/requireAdmin";
 
 const router: IRouter = Router();
 
-// Create table if it doesn't exist on startup
-db.execute(sql`
-  CREATE TABLE IF NOT EXISTS newsletter_subscribers (
-    id SERIAL PRIMARY KEY,
-    email TEXT NOT NULL UNIQUE,
-    passport_code TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-  )
-`).catch((err: unknown) => {
-  logger.error({ err }, "Failed to create newsletter_subscribers table");
-});
+// Create table if it doesn't exist on startup — only when a database is
+// configured. Without DATABASE_URL the newsletter feature is simply inactive.
+if (isDatabaseConfigured()) {
+  db.execute(sql`
+    CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+      id SERIAL PRIMARY KEY,
+      email TEXT NOT NULL UNIQUE,
+      passport_code TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `).catch((err: unknown) => {
+    logger.error({ err }, "Failed to create newsletter_subscribers table");
+  });
+}
 
 const subscribeSchema = z.object({
   email: z.string().email().max(254),

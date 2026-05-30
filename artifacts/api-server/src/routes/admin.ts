@@ -1,6 +1,6 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
-import { db } from "@workspace/db";
+import { db, isDatabaseConfigured } from "@workspace/db";
 import { sql } from "drizzle-orm";
 import { getAuth } from "@clerk/express";
 import { logger } from "../lib/logger";
@@ -10,46 +10,52 @@ import { writeLimiter } from "../middleware/rateLimiter";
 const router: IRouter = Router();
 
 // ─── Schema bootstrap ────────────────────────────────────────────────────────
+// Only when a database is configured. Without DATABASE_URL the admin/blog/
+// settings features are inactive and the core visa checker still runs.
 
-db.execute(sql`
-  CREATE TABLE IF NOT EXISTS blog_posts (
-    id          SERIAL PRIMARY KEY,
-    title       TEXT NOT NULL,
-    slug        TEXT NOT NULL UNIQUE,
-    excerpt     TEXT,
-    content     TEXT NOT NULL DEFAULT '',
-    cover_url   TEXT,
-    tags        TEXT[] DEFAULT '{}',
-    author      TEXT NOT NULL DEFAULT 'Admin',
-    published   BOOLEAN NOT NULL DEFAULT false,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-  )
-`).catch((err: unknown) => logger.error({ err }, "Failed to create blog_posts table"));
-
-// Create table and seed defaults (single promise chain — no duplicate CREATE)
-db.execute(sql`
-  CREATE TABLE IF NOT EXISTS site_settings (
-    key         TEXT PRIMARY KEY,
-    value       TEXT NOT NULL,
-    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-  )
-`).then(() =>
+if (isDatabaseConfigured()) {
   db.execute(sql`
-    INSERT INTO site_settings (key, value) VALUES
-      ('announcement_enabled', 'false'),
-      ('announcement_text', ''),
-      ('announcement_type', 'info'),
-      ('hero_title', 'Do you need a visa?'),
-      ('hero_subtitle', 'Check visa requirements for 199 countries instantly — no account needed.'),
-      ('seo_meta_description', 'Free visa requirement checker covering 199 countries. Instantly check if you need a visa, e-visa, or can enter visa-free.')
-    ON CONFLICT (key) DO NOTHING
-  `)
-).catch((err: unknown) => logger.error({ err }, "Failed to initialise site_settings"));
+    CREATE TABLE IF NOT EXISTS blog_posts (
+      id          SERIAL PRIMARY KEY,
+      title       TEXT NOT NULL,
+      slug        TEXT NOT NULL UNIQUE,
+      excerpt     TEXT,
+      content     TEXT NOT NULL DEFAULT '',
+      cover_url   TEXT,
+      tags        TEXT[] DEFAULT '{}',
+      author      TEXT NOT NULL DEFAULT 'Admin',
+      published   BOOLEAN NOT NULL DEFAULT false,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `).catch((err: unknown) => logger.error({ err }, "Failed to create blog_posts table"));
+
+  // Create table and seed defaults (single promise chain — no duplicate CREATE)
+  db.execute(sql`
+    CREATE TABLE IF NOT EXISTS site_settings (
+      key         TEXT PRIMARY KEY,
+      value       TEXT NOT NULL,
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `).then(() =>
+    db.execute(sql`
+      INSERT INTO site_settings (key, value) VALUES
+        ('announcement_enabled', 'false'),
+        ('announcement_text', ''),
+        ('announcement_type', 'info'),
+        ('hero_title', 'Do you need a visa?'),
+        ('hero_subtitle', 'Check visa requirements for 199 countries instantly — no account needed.'),
+        ('seo_meta_description', 'Free visa requirement checker covering 199 countries. Instantly check if you need a visa, e-visa, or can enter visa-free.')
+      ON CONFLICT (key) DO NOTHING
+    `)
+  ).catch((err: unknown) => logger.error({ err }, "Failed to initialise site_settings"));
+}
 
 // ─── Auth check endpoint ──────────────────────────────────────────────────────
 
 router.get("/admin/check", (req: Request, res: Response): void => {
+  // When Clerk auth is disabled, nobody is an admin (getAuth would throw).
+  if (!process.env.CLERK_SECRET_KEY) { res.json({ isAdmin: false }); return; }
   const auth = getAuth(req);
   const userId = auth?.userId;
   if (!userId) { res.json({ isAdmin: false }); return; }
@@ -216,6 +222,7 @@ router.put("/admin/settings", writeLimiter, requireAdmin, async (req: Request, r
 // ─── Public Blog endpoints ────────────────────────────────────────────────────
 
 router.get("/blog/posts", async (_req: Request, res: Response): Promise<void> => {
+  if (!isDatabaseConfigured()) { res.json({ posts: [] }); return; }
   try {
     const result = await db.execute(sql`
       SELECT id, title, slug, excerpt, cover_url, tags, author, created_at, updated_at
@@ -248,6 +255,7 @@ router.get("/blog/posts/:slug", async (req: Request, res: Response): Promise<voi
 // ─── Public site settings (non-sensitive only) ────────────────────────────────
 
 router.get("/site/settings", async (_req: Request, res: Response): Promise<void> => {
+  if (!isDatabaseConfigured()) { res.json({ settings: {} }); return; }
   try {
     const result = await db.execute(sql`
       SELECT key, value FROM site_settings

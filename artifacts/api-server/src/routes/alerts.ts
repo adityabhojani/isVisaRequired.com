@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { z } from "zod";
-import { db } from "@workspace/db";
+import { db, isDatabaseConfigured } from "@workspace/db";
 import { sql } from "drizzle-orm";
 import { getAuth } from "@clerk/express";
 import { logger } from "../lib/logger";
@@ -9,20 +9,24 @@ import { requireAdmin } from "../middleware/requireAdmin";
 
 const router: IRouter = Router();
 
-db.execute(sql`
-  CREATE TABLE IF NOT EXISTS visa_alerts (
-    id SERIAL PRIMARY KEY,
-    user_id TEXT,
-    email TEXT NOT NULL,
-    passport_code TEXT NOT NULL,
-    destination_code TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    is_active BOOLEAN DEFAULT TRUE,
-    UNIQUE(email, passport_code, destination_code)
-  )
-`).catch((err: unknown) => {
-  logger.error({ err }, "Failed to create visa_alerts table");
-});
+// Create table on startup only when a database is configured. Without
+// DATABASE_URL the visa-alerts feature is simply inactive.
+if (isDatabaseConfigured()) {
+  db.execute(sql`
+    CREATE TABLE IF NOT EXISTS visa_alerts (
+      id SERIAL PRIMARY KEY,
+      user_id TEXT,
+      email TEXT NOT NULL,
+      passport_code TEXT NOT NULL,
+      destination_code TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      is_active BOOLEAN DEFAULT TRUE,
+      UNIQUE(email, passport_code, destination_code)
+    )
+  `).catch((err: unknown) => {
+    logger.error({ err }, "Failed to create visa_alerts table");
+  });
+}
 
 router.post("/alerts", writeLimiter, async (req, res): Promise<void> => {
   const auth = getAuth(req);

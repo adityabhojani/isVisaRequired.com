@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { z } from "zod";
-import { db } from "@workspace/db";
+import { db, isDatabaseConfigured } from "@workspace/db";
 import { sql } from "drizzle-orm";
 import { getAuth } from "@clerk/express";
 import { logger } from "../lib/logger";
@@ -8,18 +8,20 @@ import { writeLimiter } from "../middleware/rateLimiter";
 
 const router: IRouter = Router();
 
-// Create table on startup
-db.execute(sql`
-  CREATE TABLE IF NOT EXISTS user_visited_countries (
-    id SERIAL PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    country_code TEXT NOT NULL,
-    visited_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(user_id, country_code)
-  )
-`).catch((err: unknown) => {
-  logger.error({ err }, "Failed to create user_visited_countries table");
-});
+// Create table on startup — only when a database is configured.
+if (isDatabaseConfigured()) {
+  db.execute(sql`
+    CREATE TABLE IF NOT EXISTS user_visited_countries (
+      id SERIAL PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      country_code TEXT NOT NULL,
+      visited_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(user_id, country_code)
+    )
+  `).catch((err: unknown) => {
+    logger.error({ err }, "Failed to create user_visited_countries table");
+  });
+}
 
 function requireAuth(req: Parameters<typeof getAuth>[0], res: { status: (n: number) => { json: (d: unknown) => void } }, next: () => void) {
   const auth = getAuth(req);
