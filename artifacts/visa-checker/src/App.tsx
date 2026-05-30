@@ -60,8 +60,14 @@ const queryClient = new QueryClient({
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-// Use env var directly — the publishableKeyFromHost internal API is production-only
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
+// Use env var directly — the publishableKeyFromHost internal API is production-only.
+// Falls back to the project's Clerk key (publishable keys are public, safe to embed)
+// so the app always has a ClerkProvider — Header and other components call useUser()
+// unconditionally and crash without one. Override with VITE_CLERK_PUBLISHABLE_KEY in
+// the deploy environment to point at a production Clerk instance.
+const clerkPubKey =
+  (import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined) ||
+  "pk_test_ZGFybGluZy1wZWdhc3VzLTQxLmNsZXJrLmFjY291bnRzLmRldiQ";
 
 // Only set proxy URL in production (it's auto-set by the platform, undefined in dev)
 const clerkProxyUrl = (import.meta.env.VITE_CLERK_PROXY_URL as string | undefined) || undefined;
