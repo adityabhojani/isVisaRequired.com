@@ -11,6 +11,10 @@
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/visa-requirements", "destination": "/api" },
+    { "source": "/visa-requirements/(.*)", "destination": "/api" },
+    { "source": "/sitemap.xml", "destination": "/api" },
+    { "source": "/sitemaps/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

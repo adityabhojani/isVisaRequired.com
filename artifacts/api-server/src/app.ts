@@ -11,6 +11,7 @@ import {
   getClerkProxyHost,
 } from "./middlewares/clerkProxyMiddleware";
 import router from "./routes";
+import seoRouter from "./routes/seo";
 import { logger } from "./lib/logger";
 import { apiLimiter } from "./middleware/rateLimiter";
 import { notFoundHandler, globalErrorHandler } from "./middleware/errorHandler";
@@ -81,6 +82,10 @@ if (clerkEnabled) {
 
 // Rate limiting on all /api routes
 app.use("/api", apiLimiter);
+
+// Programmatic-SEO pages + sitemaps (server-rendered HTML/XML at the root path,
+// routed here from vercel.json). Mounted before the API router; paths don't collide.
+app.use(seoRouter);
 
 // Routes
 app.use("/api", router);
