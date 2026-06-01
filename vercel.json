@@ -4,6 +4,14 @@
   "buildCommand": "pnpm --filter @workspace/api-server build && BASE_PATH=/ pnpm --filter @workspace/visa-checker build",
   "outputDirectory": "artifacts/visa-checker/dist/public",
   "framework": null,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "isvisarequired.com" }],
+      "destination": "https://www.isvisarequired.com/:path*",
+      "permanent": true
+    }
+  ],
   "functions": {
     "api/index.ts": {
       "includeFiles": "artifacts/api-server/src/data/passport-index.csv"

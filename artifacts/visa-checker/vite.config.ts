@@ -24,7 +24,9 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss({ optimize: false }),
-    runtimeErrorOverlay(),
+    // Dev-only error overlay (Replit tool). Excluded from production builds — it
+    // was the source of the noisy "sourcemap for reporting an error" warnings.
+    ...(process.env.NODE_ENV !== "production" ? [runtimeErrorOverlay()] : []),
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
       ? [
@@ -52,6 +54,18 @@ export default defineConfig({
     emptyOutDir: true,
     target: "es2020",
     rollupOptions: {
+      // Silence harmless noise: Radix UI ships "use client" directives (a
+      // Next.js-only hint Vite/Rollup correctly ignore) and the related
+      // sourcemap-location warnings. They are not build errors.
+      onwarn(warning, warn) {
+        if (
+          warning.code === "MODULE_LEVEL_DIRECTIVE" ||
+          warning.code === "SOURCEMAP_ERROR"
+        ) {
+          return;
+        }
+        warn(warning);
+      },
       output: {
         manualChunks: {
           "vendor-react": ["react", "react-dom"],
