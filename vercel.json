@@ -32,6 +32,7 @@
     { "source": "/travel-authorization", "destination": "/api" },
     { "source": "/travel-authorization/(.*)", "destination": "/api" },
     { "source": "/methodology", "destination": "/api" },
+    { "source": "/residence-permit-visa-benefits", "destination": "/api" },
     { "source": "/sitemap.xml", "destination": "/api" },
     { "source": "/sitemaps/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
