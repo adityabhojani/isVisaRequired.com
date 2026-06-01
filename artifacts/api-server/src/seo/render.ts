@@ -325,7 +325,7 @@ ${touristBlock}
   ${relatedDestinations}
 </section>
 </main>
-<footer class="site"><div class="wrap">© isvisarequired.com — General guidance only; always confirm with official government sources before booking travel. Data last reviewed ${esc(DATA_LAST_UPDATED)}.</div></footer>
+<footer class="site"><div class="wrap">© isvisarequired.com — General guidance only; always confirm with official government sources before booking travel. Data last reviewed ${esc(DATA_LAST_UPDATED)}. · <a href="/methodology" style="color:inherit">How we source our data</a></div></footer>
 </body>
 </html>`;
 }

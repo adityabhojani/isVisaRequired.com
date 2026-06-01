@@ -20,6 +20,7 @@ import { renderTransitHub, renderTransitGuide } from "../seo/transit";
 import { TRANSIT_GUIDES, getTransitGuide } from "../data/transitData";
 import { renderAuthHub, renderAuthGuide } from "../seo/auth";
 import { TRAVEL_AUTHS, getTravelAuth } from "../data/authData";
+import { renderMethodology } from "../seo/methodology";
 
 const router: IRouter = Router();
 
@@ -107,6 +108,12 @@ router.get("/transit-visa/:slug", (req: Request, res: Response): void => {
   res.type("html").send(renderTransitGuide(guide));
 });
 
+// ── methodology / how-we-source-data (E-E-A-T) ───────────────────────────────
+router.get("/methodology", (_req: Request, res: Response): void => {
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderMethodology());
+});
+
 // ── travel-authorization hub + guides (ETIAS / ESTA / ETA / eTA) ─────────────
 router.get("/travel-authorization", (_req: Request, res: Response): void => {
   res.setHeader("Cache-Control", HTML_CACHE);
@@ -156,7 +163,7 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   const staticPaths = [
     "/", "/compare", "/discover", "/stats", "/popular", "/map", "/trip-planner",
     "/schengen", "/tier-list", "/digital-nomad", "/reciprocity", "/blog", "/alerts",
-    "/visa-requirements", "/privacy", "/terms",
+    "/visa-requirements", "/methodology", "/privacy", "/terms",
   ];
   const urls: string[] = [];
   for (const p of staticPaths) urls.push(`${SITE_ORIGIN}${p}`);
