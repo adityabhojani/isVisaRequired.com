@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AdminGuard } from "@/components/AdminGuard";
 import { AdminLayout } from "@/components/AdminLayout";
-import { Users, FileText, Settings, TrendingUp, Globe, Plus } from "lucide-react";
+import { Users, FileText, Settings, TrendingUp, Globe, Plus, Mail } from "lucide-react";
 
 interface AdminStats {
   totalPosts: number;
@@ -65,7 +65,7 @@ export default function AdminDashboard() {
 
           {/* Quick actions */}
           <h3 className="font-semibold text-foreground mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <a href="/admin/blog/new"
               className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl hover:border-primary/30 hover:shadow-sm transition-all group">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
@@ -84,6 +84,16 @@ export default function AdminDashboard() {
               <div>
                 <p className="font-semibold text-sm text-foreground">Manage Posts</p>
                 <p className="text-xs text-muted-foreground">Edit, publish or delete</p>
+              </div>
+            </a>
+            <a href="/admin/newsletter"
+              className="flex items-center gap-3 p-4 bg-card border border-border rounded-2xl hover:border-primary/30 hover:shadow-sm transition-all group">
+              <div className="w-10 h-10 rounded-xl bg-cyan-50 flex items-center justify-center group-hover:bg-cyan-100 transition-colors">
+                <Mail className="h-5 w-5 text-cyan-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-sm text-foreground">Newsletter</p>
+                <p className="text-xs text-muted-foreground">Subscribers & CSV export</p>
               </div>
             </a>
             <a href="/admin/settings"

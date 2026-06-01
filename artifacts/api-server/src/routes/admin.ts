@@ -113,6 +113,14 @@ router.get("/admin/posts/:id", requireAdmin, async (req: Request, res: Response)
   }
 });
 
+// Serialise a JS string[] into a Postgres array literal (e.g. {"a","b"}).
+// Needed because drizzle's raw `sql` template spreads a bare JS array into a
+// SQL tuple ($1,$2) instead of a text[] — and an empty array into invalid `()`.
+// We bind the literal as a single param and cast it with ::text[] at the call site.
+function pgTextArray(values: string[]): string {
+  return `{${values.map((v) => `"${String(v).replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`).join(",")}}`;
+}
+
 const postSchema = z.object({
   title:     z.string().min(1).max(300),
   slug:      z.string().min(1).max(200).regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers and hyphens only"),
@@ -131,7 +139,7 @@ router.post("/admin/posts", writeLimiter, requireAdmin, async (req: Request, res
   try {
     const result = await db.execute(sql`
       INSERT INTO blog_posts (title, slug, excerpt, content, cover_url, tags, author, published)
-      VALUES (${title}, ${slug}, ${excerpt}, ${content}, ${cover_url ?? null}, ${tags as string[]}, ${author}, ${published})
+      VALUES (${title}, ${slug}, ${excerpt}, ${content}, ${cover_url ?? null}, ${pgTextArray(tags as string[])}::text[], ${author}, ${published})
       RETURNING id
     `);
     req.log.info({ slug }, "Blog post created");
@@ -154,7 +162,7 @@ router.put("/admin/posts/:id", writeLimiter, requireAdmin, async (req: Request, 
     const result = await db.execute(sql`
       UPDATE blog_posts
       SET title = ${title}, slug = ${slug}, excerpt = ${excerpt}, content = ${content},
-          cover_url = ${cover_url ?? null}, tags = ${tags as string[]}, author = ${author},
+          cover_url = ${cover_url ?? null}, tags = ${pgTextArray(tags as string[])}::text[], author = ${author},
           published = ${published}, updated_at = NOW()
       WHERE id = ${id}
       RETURNING id
