@@ -1,5 +1,6 @@
-import { Router, type IRouter, type Request, type Response } from "express";
+import express, { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
+import { put } from "@vercel/blob";
 import { db, isDatabaseConfigured } from "@workspace/db";
 import { sql } from "drizzle-orm";
 import { getAuth } from "@clerk/express";
@@ -259,6 +260,46 @@ router.get("/blog/posts/:slug", async (req: Request, res: Response): Promise<voi
     res.status(500).json({ error: "Failed to fetch post." });
   }
 });
+
+// ─── Media upload (images / short videos) ─────────────────────────────────────
+// Stores the file in Vercel Blob and returns its public URL. Larger videos
+// should be embedded from YouTube/Vimeo instead (no upload needed).
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (Vercel function body limit)
+
+router.post(
+  "/admin/upload",
+  requireAdmin,
+  express.raw({ type: () => true, limit: MAX_UPLOAD_BYTES }),
+  async (req: Request, res: Response): Promise<void> => {
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      res.status(503).json({ error: "File storage isn't set up yet. Enable Vercel Blob storage for this project." });
+      return;
+    }
+    const body = req.body as Buffer;
+    if (!Buffer.isBuffer(body) || body.length === 0) {
+      res.status(400).json({ error: "No file received." });
+      return;
+    }
+    const contentType = String(req.headers["content-type"] || "application/octet-stream");
+    if (!/^image\/|^video\//.test(contentType)) {
+      res.status(400).json({ error: "Only image or video files are allowed." });
+      return;
+    }
+    const safeName = String(req.query.filename || "file").replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80) || "file";
+    try {
+      const blob = await put(`blog/${Date.now()}-${safeName}`, body, {
+        access: "public",
+        contentType,
+        addRandomSuffix: true,
+      });
+      logger.info({ url: blob.url, size: body.length }, "Media uploaded");
+      res.json({ url: blob.url, contentType });
+    } catch (err) {
+      logger.error({ err }, "Blob upload failed");
+      res.status(500).json({ error: "Upload failed. Please try again." });
+    }
+  },
+);
 
 // ─── Public site settings (non-sensitive only) ────────────────────────────────
 

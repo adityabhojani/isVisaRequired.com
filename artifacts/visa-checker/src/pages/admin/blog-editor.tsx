@@ -1,10 +1,31 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { AdminGuard } from "@/components/AdminGuard";
 import { AdminLayout } from "@/components/AdminLayout";
-import { Save, Eye, EyeOff, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Save, Eye, EyeOff, ArrowLeft, Loader2, AlertCircle, CheckCircle2, Image as ImageIcon, Film, Youtube } from "lucide-react";
 import { marked } from "marked";
+
+async function uploadMedia(file: File): Promise<string> {
+  const res = await fetch(`/api/admin/upload?filename=${encodeURIComponent(file.name)}`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": file.type || "application/octet-stream" },
+    body: file,
+  });
+  let json: { url?: string; error?: string } = {};
+  try { json = (await res.json()) as typeof json; } catch { /* non-JSON */ }
+  if (!res.ok || !json.url) throw new Error(json.error || `Upload failed (${res.status})`);
+  return json.url;
+}
+
+function toVideoEmbed(url: string): string | null {
+  const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  const vimeo = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`;
+  return null;
+}
 
 interface PostForm {
   title: string;
@@ -72,6 +93,51 @@ export default function AdminBlogEditor() {
       return next;
     });
   }, [slugTouched]);
+
+  // ── media (image / video upload + embed) ───────────────────────────────────
+  const [uploading, setUploading] = useState(false);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
+  const insertIntoContent = useCallback((snippet: string) => {
+    const ta = contentRef.current;
+    const at = ta && typeof ta.selectionStart === "number" ? ta.selectionStart : null;
+    setForm((f) => {
+      const text = f.content;
+      const pos = at ?? text.length;
+      const before = text.slice(0, pos);
+      const after = text.slice(pos);
+      const lead = before && !before.endsWith("\n") ? "\n" : "";
+      const trail = after.startsWith("\n") ? "" : "\n";
+      return { ...f, content: `${before}${lead}${snippet}\n${trail}${after}` };
+    });
+  }, []);
+
+  const handleUpload = useCallback(async (file: File | undefined, kind: "image" | "video" | "cover") => {
+    if (!file) return;
+    setError("");
+    setUploading(true);
+    try {
+      const url = await uploadMedia(file);
+      if (kind === "cover") set("cover_url", url);
+      else if (kind === "image") insertIntoContent(`![${file.name.replace(/\.[^.]+$/, "")}](${url})`);
+      else insertIntoContent(`<video src="${url}" controls style="max-width:100%;border-radius:12px"></video>`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }, [set, insertIntoContent]);
+
+  const handleEmbed = useCallback(() => {
+    const url = window.prompt("Paste a YouTube or Vimeo video link:");
+    if (!url) return;
+    const embed = toVideoEmbed(url.trim());
+    if (!embed) { setError("That doesn't look like a YouTube or Vimeo link."); return; }
+    insertIntoContent(`<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin:1rem 0"><iframe src="${embed}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`);
+  }, [insertIntoContent]);
 
   const saveMutation = useMutation({
     mutationFn: async (publish?: boolean) => {
@@ -185,6 +251,32 @@ export default function AdminBlogEditor() {
                 <label className="block text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1.5">
                   Content * <span className="normal-case font-normal text-muted-foreground/70">(Markdown supported)</span>
                 </label>
+                {!preview && (
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <button type="button" onClick={() => imageInputRef.current?.click()} disabled={uploading}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent disabled:opacity-50">
+                      <ImageIcon className="h-3.5 w-3.5" /> Image
+                    </button>
+                    <button type="button" onClick={() => videoInputRef.current?.click()} disabled={uploading}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent disabled:opacity-50">
+                      <Film className="h-3.5 w-3.5" /> Video
+                    </button>
+                    <button type="button" onClick={handleEmbed} disabled={uploading}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent disabled:opacity-50">
+                      <Youtube className="h-3.5 w-3.5" /> Embed video
+                    </button>
+                    {uploading && (
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <Loader2 className="h-3 w-3 animate-spin" /> Uploading…
+                      </span>
+                    )}
+                    <span className="text-xs text-muted-foreground/70 ml-auto">Files up to 4&nbsp;MB · larger videos: use Embed</span>
+                    <input ref={imageInputRef} type="file" accept="image/*" className="hidden"
+                      onChange={(e) => { void handleUpload(e.target.files?.[0], "image"); e.target.value = ""; }} />
+                    <input ref={videoInputRef} type="file" accept="video/*" className="hidden"
+                      onChange={(e) => { void handleUpload(e.target.files?.[0], "video"); e.target.value = ""; }} />
+                  </div>
+                )}
                 {preview ? (
                   <div
                     className="min-h-[400px] p-5 rounded-xl border border-border bg-card prose prose-slate max-w-none"
@@ -192,6 +284,7 @@ export default function AdminBlogEditor() {
                   />
                 ) : (
                   <textarea
+                    ref={contentRef}
                     value={form.content}
                     onChange={(e) => set("content", e.target.value)}
                     placeholder={`Write your post content in Markdown...\n\n# Heading\n\n**Bold text** and *italic text*\n\n- List item\n- Another item\n\n> Blockquote`}
@@ -268,12 +361,20 @@ export default function AdminBlogEditor() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Cover Image URL</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-medium text-muted-foreground">Cover Image</label>
+                    <button type="button" onClick={() => coverInputRef.current?.click()} disabled={uploading}
+                      className="text-xs font-medium text-primary hover:underline disabled:opacity-50">
+                      Upload from computer
+                    </button>
+                  </div>
+                  <input ref={coverInputRef} type="file" accept="image/*" className="hidden"
+                    onChange={(e) => { void handleUpload(e.target.files?.[0], "cover"); e.target.value = ""; }} />
                   <input
                     type="url"
                     value={form.cover_url}
                     onChange={(e) => set("cover_url", e.target.value)}
-                    placeholder="https://..."
+                    placeholder="https://…  or click Upload above"
                     className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                   {form.cover_url && (
