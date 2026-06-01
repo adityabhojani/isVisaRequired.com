@@ -20,6 +20,9 @@
   "crons": [
     { "path": "/api/cron/check-alerts", "schedule": "0 8 * * *" }
   ],
+  "crons": [
+    { "path": "/api/cron/check-alerts", "schedule": "0 8 * * *" }
+  ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/visa-requirements", "destination": "/api" },
