@@ -31,6 +31,7 @@
     { "source": "/transit-visa/(.*)", "destination": "/api" },
     { "source": "/travel-authorization", "destination": "/api" },
     { "source": "/travel-authorization/(.*)", "destination": "/api" },
+    { "source": "/llms.txt", "destination": "/api" },
     { "source": "/methodology", "destination": "/api" },
     { "source": "/residence-permit-visa-benefits", "destination": "/api" },
     { "source": "/sitemap.xml", "destination": "/api" },

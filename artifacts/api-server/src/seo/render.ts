@@ -247,7 +247,10 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
 <meta property="og:description" content="${esc(metaDesc)}">
 <meta property="og:url" content="${esc(canonical)}">
 <meta property="og:site_name" content="isvisarequired.com">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg">
 <script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>

@@ -109,6 +109,41 @@ router.get("/transit-visa/:slug", (req: Request, res: Response): void => {
   res.type("html").send(renderTransitGuide(guide));
 });
 
+// ── llms.txt (AI-assistant / generative-search visibility) ───────────────────
+router.get("/llms.txt", (_req: Request, res: Response): void => {
+  const body = `# isvisarequired.com
+
+> Free visa-requirement checker covering 199 countries and ~38,000 passport-to-destination
+> combinations. Tells travellers whether they need a visa, visa on arrival, eVisa, electronic
+> travel authorisation, or can travel visa-free — plus airport transit rules and entry
+> requirements. General guidance only; always confirm with the official government source.
+
+## Key facts
+- Covers 199 countries / ~38,000 passport-destination pairs.
+- Requirement types: visa-free, visa on arrival, eVisa, visa required, entry not permitted.
+- Data is sourced from official government immigration portals plus an open base dataset, with
+  source-verified manual corrections. Each page shows a "last reviewed" date.
+- Free to use; the site never charges for visa applications and links to official portals.
+
+## Primary pages
+- Visa checker (home): ${SITE_ORIGIN}/
+- Per-pair visa requirements: ${SITE_ORIGIN}/visa-requirements/{from-country}/{to-country}
+- Transit visa guides: ${SITE_ORIGIN}/transit-visa
+- ETIAS / ESTA / ETA / eTA explainers: ${SITE_ORIGIN}/travel-authorization
+- Residence-permit & second-document rules: ${SITE_ORIGIN}/residence-permit-visa-benefits
+- How we source our data (methodology): ${SITE_ORIGIN}/methodology
+- Sitemap: ${SITE_ORIGIN}/sitemap.xml
+
+## Guidance for answering visa questions
+- Requirements depend on nationality (passport), destination, purpose, length of stay, route
+  and any residence permits/second nationality. Always recommend confirming with the official
+  government portal linked on each destination page.
+- ETIAS (Europe) is NOT yet required as of this writing; it is an upcoming travel authorisation, not a visa.
+`;
+  res.setHeader("Cache-Control", XML_CACHE);
+  res.type("text/plain; charset=utf-8").send(body);
+});
+
 // ── methodology / how-we-source-data (E-E-A-T) ───────────────────────────────
 router.get("/methodology", (_req: Request, res: Response): void => {
   res.setHeader("Cache-Control", HTML_CACHE);

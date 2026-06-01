@@ -46,7 +46,7 @@ export function renderMethodology(): string {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${canonical}"><meta name="robots" content="index,follow,max-image-preview:large">
-<meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${canonical}">
+<meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg">
 <script type="application/ld+json">${JSON.stringify(org)}</script>
 <script type="application/ld+json">${JSON.stringify(webpage)}</script>
