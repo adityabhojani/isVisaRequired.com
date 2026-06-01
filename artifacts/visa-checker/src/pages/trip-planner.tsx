@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import html2canvas from "html2canvas";
 import { useSEO } from "@/hooks/useSEO";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -10,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import {
   Route, Plus, Trash2, ChevronDown, CheckCircle2, Clock, Shield,
-  AlertCircle, XCircle, ArrowRight, MapPin, Plane, Save, Share2, Info, CalendarDays,
+  AlertCircle, XCircle, ArrowRight, MapPin, Plane, Save, Share2, Info, CalendarDays, Download,
 } from "lucide-react";
 
 const reqConfig: Record<VisaRequirement, { label: string; color: string; bg: string; border: string; icon: typeof CheckCircle2 }> = {
@@ -96,6 +97,15 @@ function loadSavedTrips(): { name: string; passport: string; stops: TripStop[] }
   try { return JSON.parse(localStorage.getItem(LS_KEY) ?? "[]"); } catch { return []; }
 }
 
+// Hex colors for the downloadable card (html2canvas can't parse Tailwind v4 oklch).
+const REQ_HEX: Record<VisaRequirement, { label: string; color: string }> = {
+  visa_free: { label: "Visa-free", color: "#10b981" },
+  visa_on_arrival: { label: "Visa on arrival", color: "#f59e0b" },
+  e_visa: { label: "eVisa", color: "#0DB5E8" },
+  visa_required: { label: "Visa required", color: "#ef4444" },
+  no_admission: { label: "Not permitted", color: "#6b7280" },
+};
+
 export default function TripPlannerPage() {
   useSEO({
     title: "Trip Planner — Plan Multi-Destination Travel with Visa Requirements",
@@ -170,6 +180,27 @@ export default function TripPlannerPage() {
     await navigator.clipboard.writeText(url).catch(() => {});
     setShareMsg("Link copied!");
     setTimeout(() => setShareMsg(""), 2000);
+  };
+
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
+  const downloadCard = async () => {
+    if (!cardRef.current || downloading) return;
+    setDownloading(true);
+    setShareMsg("Generating card…");
+    try {
+      const canvas = await html2canvas(cardRef.current, { scale: 2, backgroundColor: "#ffffff", useCORS: true, logging: false });
+      const link = document.createElement("a");
+      link.download = `${(tripName || "trip").replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-visa-card.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      setShareMsg("Card downloaded!");
+    } catch {
+      setShareMsg("Couldn't generate card — try again.");
+    } finally {
+      setDownloading(false);
+      setTimeout(() => setShareMsg(""), 2500);
+    }
   };
 
   // Load from URL
@@ -386,6 +417,11 @@ export default function TripPlannerPage() {
                   Share
                 </button>
               </div>
+              <button onClick={downloadCard} disabled={downloading || legVisas.length === 0}
+                className="w-full mt-2 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition disabled:opacity-40">
+                <Download className="h-3.5 w-3.5" />
+                {downloading ? "Generating…" : "Download visa card"}
+              </button>
               {shareMsg && <p className="text-xs text-green-600 text-center mt-2 font-medium">{shareMsg}</p>}
             </div>
 
@@ -468,6 +504,35 @@ export default function TripPlannerPage() {
           </div>
         </div>
       </main>
+
+      {/* Off-screen branded card captured by html2canvas (inline styles only — no Tailwind oklch). */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", top: 0 }}>
+        <div ref={cardRef} style={{ width: 560, fontFamily: "Inter, Arial, sans-serif", background: "#ffffff", padding: 28, boxSizing: "border-box", color: "#0f172a" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div style={{ fontWeight: 800, fontSize: 18, color: "#0A2FA1" }}>isvisarequired<span style={{ color: "#0DB5E8" }}>.com</span></div>
+            <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", letterSpacing: 1 }}>Trip Visa Card</div>
+          </div>
+          <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>{tripName || "My Trip"}</div>
+          <div style={{ fontSize: 14, color: "#475569", marginBottom: 14 }}>
+            Passport: <strong>{passportCountry?.flag} {passportCountry?.name}</strong> · {stops.filter((s) => s.countryCode).length} destinations · {totalDays} days
+          </div>
+          <div>
+            {legVisas.map((l) => {
+              const cfg = REQ_HEX[l.req];
+              return (
+                <div key={l.to} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 0", borderTop: "1px solid #e2e8f0" }}>
+                  <div style={{ fontSize: 15, fontWeight: 600 }}>{l.country.flag} {l.country.name}</div>
+                  <div style={{ background: cfg.color, color: "#ffffff", fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 999 }}>{cfg.label}</div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 16, paddingTop: 14, borderTop: "2px solid #0A2FA1", display: "flex", justifyContent: "space-between", fontSize: 12, color: "#64748b" }}>
+            <span>{visasNeeded} need a visa · {evisas} eVisa · {legVisas.filter((l) => l.req === "visa_free").length} visa-free</span>
+            <span>Plan yours free at isvisarequired.com</span>
+          </div>
+        </div>
+      </div>
 
       <Footer />
     </div>
