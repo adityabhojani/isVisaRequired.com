@@ -16,6 +16,8 @@ import {
   SITE_ORIGIN,
   DATA_LAST_UPDATED,
 } from "../seo/render";
+import { renderTransitHub, renderTransitGuide } from "../seo/transit";
+import { TRANSIT_GUIDES, getTransitGuide } from "../data/transitData";
 
 const router: IRouter = Router();
 
@@ -86,6 +88,23 @@ router.get("/visa-requirements/:from", (req: Request, res: Response): void => {
   );
 });
 
+// ── transit-visa hub + per-hub guides ────────────────────────────────────────
+router.get("/transit-visa", (_req: Request, res: Response): void => {
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderTransitHub());
+});
+
+router.get("/transit-visa/:slug", (req: Request, res: Response): void => {
+  const guide = getTransitGuide(req.params.slug);
+  if (!guide) {
+    res.status(404).setHeader("Cache-Control", "no-store");
+    res.type("html").send(renderPairNotFound());
+    return;
+  }
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderTransitGuide(guide));
+});
+
 // ── per-pair page ────────────────────────────────────────────────────────────
 router.get("/visa-requirements/:from/:to", (req: Request, res: Response): void => {
   const from = countryFromSlug(req.params.from);
@@ -122,6 +141,8 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   ];
   const urls: string[] = [];
   for (const p of staticPaths) urls.push(`${SITE_ORIGIN}${p}`);
+  urls.push(`${SITE_ORIGIN}/transit-visa`);
+  for (const g of TRANSIT_GUIDES) urls.push(`${SITE_ORIGIN}/transit-visa/${g.slug}`);
   for (const c of allCountries()) {
     urls.push(`${SITE_ORIGIN}/passport/${c.code}`);
     urls.push(`${SITE_ORIGIN}/destination/${c.code}`);
