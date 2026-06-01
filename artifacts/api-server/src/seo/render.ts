@@ -10,6 +10,7 @@ import { countries, type CountryData } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
 import { getVisaDetail, getCountryTouristInfo } from "../data/countryDetails";
 import { officialLinks } from "../data/officialLinks";
+import { getEntryRules } from "../data/entryRequirements";
 
 // Canonical host (matches existing sitemap/robots). Keep in sync with robots.txt.
 export const SITE_ORIGIN = "https://www.isvisarequired.com";
@@ -118,12 +119,14 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
   const metaDesc = `${answer} Visa type: ${reqLabel}. Max stay: ${maxStay}. Fee: ${fee}. Processing: ${processing}. Documents, costs and official links — updated ${DATA_LAST_UPDATED}.`;
 
   // FAQ (kept identical between visible content and JSON-LD)
+  const rules = getEntryRules(to.code);
   const faqs: FaqItem[] = [
     { q: `Do ${from.name} citizens need a visa to visit ${to.name}?`, a: answer },
     { q: `How long can ${from.name} passport holders stay in ${to.name}?`, a: `Maximum stay: ${maxStay}.` },
     { q: `How much does a ${to.name} visa cost for ${from.name} citizens?`, a: `Typical fee: ${fee}. Fees can change — confirm on the official portal before applying.` },
     { q: `How long does it take to get a ${to.name} visa?`, a: `Processing time: ${processing}.` },
     { q: `What documents do ${from.name} citizens need for ${to.name}?`, a: detail.documents.length ? detail.documents.join("; ") + "." : "Check the official portal for the current document checklist." },
+    { q: `How long must my passport be valid to enter ${to.name}?`, a: rules.passportValidity },
   ];
   if (links?.visaPortal) {
     faqs.push({ q: `Where do ${from.name} citizens apply for a ${to.name} visa?`, a: `Apply via the official portal: ${links.visaPortal}` });
@@ -177,6 +180,35 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
           <li><a href="${esc(links.embassyFinder)}" rel="nofollow noopener" target="_blank">${esc(to.name)} embassies &amp; consulates ↗</a></li>
         </ul></section>`
     : "";
+
+  // "Things that strand travelers" — entry requirements beyond the visa itself.
+  const levelBadge = (lvl: string): string => {
+    const map: Record<string, [string, string]> = {
+      required: ["#ef4444", "Required"],
+      recommended: ["#f59e0b", "Recommended"],
+      none: ["#10b981", "Not required"],
+    };
+    const [color, label] = map[lvl] ?? ["#64748b", lvl];
+    return `<span style="display:inline-block;background:${color};color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px">${label}</span>`;
+  };
+  const reqRow = (label: string, lvl: string, note?: string): string =>
+    `<li style="padding:6px 0;border-top:1px solid var(--line)"><strong>${esc(label)}</strong> ${levelBadge(lvl)}${note ? `<br><span style="color:#475569;font-size:14px">${esc(note)}</span>` : ""}</li>`;
+  const vaxList = rules.vaccinations
+    .map((v) => `<li style="padding:6px 0;border-top:1px solid var(--line)"><strong>${esc(v.name)}</strong> ${levelBadge(v.level)}${v.detail ? `<br><span style="color:#475569;font-size:14px">${esc(v.detail)}</span>` : ""}</li>`)
+    .join("");
+  const notesList = (rules.notes ?? []).map((n) => `<li>${esc(n)}</li>`).join("");
+  const entryBlock = `<section class="card"><h2>Entry requirements for ${esc(to.name)}</h2>
+      <p>Beyond the visa itself, these are the things travelers most often get turned away for — have them ready:</p>
+      <ul class="facts" style="list-style:none;padding:0;margin:0">
+        <li style="padding:6px 0"><strong>Passport validity:</strong> ${esc(rules.passportValidity)}</li>
+        ${reqRow("Onward / return ticket", rules.returnTicket, rules.returnTicketNote)}
+        ${reqRow("Proof of funds", rules.proofOfFunds, rules.proofOfFundsNote)}
+        ${reqRow("Travel insurance", rules.travelInsurance, rules.travelInsuranceNote)}
+        ${vaxList}
+      </ul>
+      ${notesList ? `<ul style="margin-top:10px">${notesList}</ul>` : ""}
+      <p style="color:#64748b;font-size:13px;margin-top:10px">Requirements can vary by nationality and change without notice — confirm with the official sources above before you travel.</p>
+    </section>`;
 
   const touristBlock = tourist
     ? `<section class="card"><h2>About ${esc(to.name)}</h2>
@@ -274,6 +306,7 @@ footer.site{color:var(--muted);font-size:13px;padding:28px 0;text-align:center}
 
 ${detail.documents.length ? `<section class="card"><h2>Documents you'll typically need</h2><ul>${docsList}</ul></section>` : ""}
 ${detail.process.length ? `<section class="card"><h2>How to apply / enter</h2><ol>${processList}</ol></section>` : ""}
+${entryBlock}
 ${officialBlock}
 ${touristBlock}
 
