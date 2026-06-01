@@ -118,7 +118,11 @@ export function Footer() {
                   { href: "/alerts", label: "Visa Alerts" },
                   { href: "/stats", label: "Passport Power Index" },
                   { href: "/popular", label: "Popular Destinations" },
+                  { href: "/transit-visa", label: "Transit Visa Guides" },
+                  { href: "/travel-authorization", label: "ETIAS, ESTA & ETA" },
+                  { href: "/residence-permit-visa-benefits", label: "Residence Permit Travel" },
                   { href: "/blog", label: "Travel Blog" },
+                  { href: "/methodology", label: "How We Source Our Data" },
                 ].map(({ href, label }) => (
                   <a key={href} href={href} className="text-sm text-muted-foreground hover:text-foreground hover:translate-x-0.5 transition-all inline-block">
                     {label}
