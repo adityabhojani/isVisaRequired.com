@@ -1,6 +1,6 @@
-import express, { Router, type IRouter, type Request, type Response } from "express";
+import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
-import { put } from "@vercel/blob";
+import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { db, isDatabaseConfigured } from "@workspace/db";
 import { sql } from "drizzle-orm";
 import { getAuth } from "@clerk/express";
@@ -261,45 +261,56 @@ router.get("/blog/posts/:slug", async (req: Request, res: Response): Promise<voi
   }
 });
 
-// ─── Media upload (images / short videos) ─────────────────────────────────────
-// Stores the file in Vercel Blob and returns its public URL. Larger videos
-// should be embedded from YouTube/Vimeo instead (no upload needed).
-const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (Vercel function body limit)
+// ─── Media upload (images / videos) ───────────────────────────────────────────
+// Uses Vercel Blob CLIENT uploads: the browser uploads the file DIRECTLY to Blob
+// storage, so we bypass the 4.5 MB serverless request-body limit (large photos
+// and videos work). This endpoint only (a) issues a short-lived upload token for
+// authenticated admins, and (b) receives Blob's completion webhook.
+const UPLOAD_CONTENT_TYPES = [
+  "image/jpeg", "image/png", "image/webp", "image/gif", "image/avif", "image/svg+xml",
+  "video/mp4", "video/webm", "video/quicktime", "video/ogg",
+];
 
-router.post(
-  "/admin/upload",
-  requireAdmin,
-  express.raw({ type: () => true, limit: MAX_UPLOAD_BYTES }),
-  async (req: Request, res: Response): Promise<void> => {
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      res.status(503).json({ error: "File storage isn't set up yet. Enable Vercel Blob storage for this project." });
-      return;
-    }
-    const body = req.body as Buffer;
-    if (!Buffer.isBuffer(body) || body.length === 0) {
-      res.status(400).json({ error: "No file received." });
-      return;
-    }
-    const contentType = String(req.headers["content-type"] || "application/octet-stream");
-    if (!/^image\/|^video\//.test(contentType)) {
-      res.status(400).json({ error: "Only image or video files are allowed." });
-      return;
-    }
-    const safeName = String(req.query.filename || "file").replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80) || "file";
-    try {
-      const blob = await put(`blog/${Date.now()}-${safeName}`, body, {
-        access: "public",
-        contentType,
-        addRandomSuffix: true,
-      });
-      logger.info({ url: blob.url, size: body.length }, "Media uploaded");
-      res.json({ url: blob.url, contentType });
-    } catch (err) {
-      logger.error({ err }, "Blob upload failed");
-      res.status(500).json({ error: "Upload failed. Please try again." });
-    }
-  },
-);
+router.post("/admin/upload", async (req: Request, res: Response): Promise<void> => {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    res.status(503).json({ error: "File storage isn't set up yet. Enable Vercel Blob storage for this project." });
+    return;
+  }
+  // Reconstruct a Web-Request-like object (handleUpload reads request.headers).
+  const headers = new Headers();
+  for (const [k, v] of Object.entries(req.headers)) {
+    if (typeof v === "string") headers.set(k, v);
+    else if (Array.isArray(v)) headers.set(k, v.join(", "));
+  }
+  const webRequest = { headers, url: req.url, method: req.method } as unknown as Request;
+
+  try {
+    const result = await handleUpload({
+      body: req.body as HandleUploadBody,
+      request: webRequest,
+      // Runs only for the browser's token request (not the completion webhook),
+      // so this is where we enforce admin auth.
+      onBeforeGenerateToken: async () => {
+        const auth = getAuth(req);
+        if (!auth?.userId || !isAdminUser(auth.userId)) {
+          throw new Error("Admin authentication required.");
+        }
+        return {
+          allowedContentTypes: UPLOAD_CONTENT_TYPES,
+          maximumSizeInBytes: 100 * 1024 * 1024, // 100 MB
+          addRandomSuffix: true,
+        };
+      },
+      onUploadCompleted: async ({ blob }) => {
+        logger.info({ url: blob.url }, "Media uploaded to Blob");
+      },
+    });
+    res.json(result);
+  } catch (err) {
+    logger.error({ err }, "Blob client upload failed");
+    res.status(400).json({ error: err instanceof Error ? err.message : "Upload failed." });
+  }
+});
 
 // ─── Public site settings (non-sensitive only) ────────────────────────────────
 

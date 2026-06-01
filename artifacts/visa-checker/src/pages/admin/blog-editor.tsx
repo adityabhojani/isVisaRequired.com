@@ -5,18 +5,17 @@ import { AdminGuard } from "@/components/AdminGuard";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Save, Eye, EyeOff, ArrowLeft, Loader2, AlertCircle, CheckCircle2, Image as ImageIcon, Film, Youtube } from "lucide-react";
 import { marked } from "marked";
+import { upload } from "@vercel/blob/client";
 
 async function uploadMedia(file: File): Promise<string> {
-  const res = await fetch(`/api/admin/upload?filename=${encodeURIComponent(file.name)}`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": file.type || "application/octet-stream" },
-    body: file,
+  // Browser uploads directly to Vercel Blob (no 4.5 MB function limit). The
+  // /api/admin/upload endpoint only issues the token (admin-gated server-side).
+  const blob = await upload(file.name, file, {
+    access: "public",
+    handleUploadUrl: "/api/admin/upload",
+    contentType: file.type || undefined,
   });
-  let json: { url?: string; error?: string } = {};
-  try { json = (await res.json()) as typeof json; } catch { /* non-JSON */ }
-  if (!res.ok || !json.url) throw new Error(json.error || `Upload failed (${res.status})`);
-  return json.url;
+  return blob.url;
 }
 
 function toVideoEmbed(url: string): string | null {
@@ -270,7 +269,7 @@ export default function AdminBlogEditor() {
                         <Loader2 className="h-3 w-3 animate-spin" /> Uploading…
                       </span>
                     )}
-                    <span className="text-xs text-muted-foreground/70 ml-auto">Files up to 4&nbsp;MB · larger videos: use Embed</span>
+                    <span className="text-xs text-muted-foreground/70 ml-auto">Images &amp; videos up to 100&nbsp;MB</span>
                     <input ref={imageInputRef} type="file" accept="image/*" className="hidden"
                       onChange={(e) => { void handleUpload(e.target.files?.[0], "image"); e.target.value = ""; }} />
                     <input ref={videoInputRef} type="file" accept="video/*" className="hidden"
