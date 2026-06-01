@@ -137,6 +137,7 @@ export function Footer() {
               <nav className="flex flex-col gap-2">
                 <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</a>
                 <a href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Terms of Service</a>
+                <a href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contact &amp; Corrections</a>
               </nav>
               <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3 mt-6">Embed</p>
               <a href="/widget" target="_blank" rel="noopener noreferrer"

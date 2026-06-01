@@ -85,7 +85,7 @@ export function renderMethodology(): string {
 <p>The main checker covers tourist/short-stay entry. Airport <a href="/transit-visa">transit rules</a> and <a href="/travel-authorization">electronic travel authorisations</a> are handled on their own pages, because they follow different rules. Residence permits and second documents can also change your requirement — check the official source for your situation.</p>
 
 <h2>Spotted something wrong?</h2>
-<p>We genuinely want to fix errors quickly. If a page looks out of date against an official source, please let us know and we'll review it against the government source and update our corrections.</p>
+<p>We genuinely want to fix errors quickly. If a page looks out of date against an official source, <a href="/contact">tell us here</a> and we'll review it against the government source and update our corrections.</p>
 
 <h2>Who we are</h2>
 <p>isvisarequired.com is an independent travel-information service. We are not affiliated with any government, embassy or visa-processing company, and we never charge for visa applications — we only ever point you to the official portal.</p>

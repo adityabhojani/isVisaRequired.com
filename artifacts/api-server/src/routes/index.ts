@@ -7,6 +7,7 @@ import userTravelsRouter from "./userTravels";
 import alertsRouter from "./alerts";
 import adminRouter from "./admin";
 import cronRouter from "./cron";
+import correctionsRouter from "./corrections";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(userTravelsRouter);
 router.use(alertsRouter);
 router.use(adminRouter);
 router.use(cronRouter);
+router.use(correctionsRouter);
 
 export default router;

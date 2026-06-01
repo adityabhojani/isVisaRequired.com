@@ -18,6 +18,7 @@ const PassportsRedirect = () => { window.location.replace("/stats"); return null
 const PopularPage    = lazy(() => import("@/pages/popular"));
 const PrivacyPage    = lazy(() => import("@/pages/privacy"));
 const TermsPage      = lazy(() => import("@/pages/terms"));
+const ContactPage    = lazy(() => import("@/pages/contact"));
 const ComparePage    = lazy(() => import("@/pages/compare"));
 const DiscoverPage   = lazy(() => import("@/pages/discover"));
 const PassportPage   = lazy(() => import("@/pages/passport"));
@@ -35,6 +36,7 @@ const AdminBlogList       = lazy(() => import("@/pages/admin/blog-list"));
 const AdminBlogEditor     = lazy(() => import("@/pages/admin/blog-editor"));
 const AdminSettings       = lazy(() => import("@/pages/admin/settings"));
 const AdminNewsletterPage = lazy(() => import("@/pages/admin/newsletter"));
+const AdminCorrections    = lazy(() => import("@/pages/admin/corrections"));
 const AlertsPage        = lazy(() => import("@/pages/alerts"));
 const DigitalNomadPage  = lazy(() => import("@/pages/digital-nomad"));
 const ReciprocityPage   = lazy(() => import("@/pages/reciprocity"));
@@ -188,6 +190,7 @@ function AppRoutes() {
           <Route path="/widget"            component={wrap(WidgetPage)} />
           <Route path="/privacy"           component={wrap(PrivacyPage)} />
           <Route path="/terms"             component={wrap(TermsPage)} />
+          <Route path="/contact"           component={wrap(ContactPage)} />
           <Route path="/sign-in/*?"        component={wrap(SignInPage)} />
           <Route path="/sign-up/*?"        component={wrap(SignUpPage)} />
           <Route path="/blog"              component={wrap(BlogPage)} />
@@ -198,6 +201,7 @@ function AppRoutes() {
           <Route path="/admin/blog/:id"    component={wrap(AdminBlogEditor)} />
           <Route path="/admin/settings"    component={wrap(AdminSettings)} />
           <Route path="/admin/newsletter"  component={wrap(AdminNewsletterPage)} />
+          <Route path="/admin/corrections" component={wrap(AdminCorrections)} />
           <Route path="/alerts"            component={wrap(AlertsPage)} />
           <Route path="/digital-nomad"     component={wrap(DigitalNomadPage)} />
           <Route path="/reciprocity"       component={wrap(ReciprocityPage)} />

@@ -3,13 +3,14 @@ import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { UserButton } from "@clerk/react";
 import {
   LayoutDashboard, FileText, Settings, Globe, Menu, X,
-  ChevronRight, LogOut, Mail,
+  ChevronRight, LogOut, Mail, MessageSquare,
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/admin",              label: "Dashboard",    icon: LayoutDashboard },
   { href: "/admin/blog",         label: "Blog Posts",   icon: FileText        },
   { href: "/admin/newsletter",   label: "Newsletter",   icon: Mail            },
+  { href: "/admin/corrections",  label: "Corrections",  icon: MessageSquare   },
   { href: "/admin/settings",     label: "Settings",     icon: Settings        },
 ];
 
