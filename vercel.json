@@ -26,6 +26,8 @@
     { "source": "/visa-requirements/(.*)", "destination": "/api" },
     { "source": "/transit-visa", "destination": "/api" },
     { "source": "/transit-visa/(.*)", "destination": "/api" },
+    { "source": "/travel-authorization", "destination": "/api" },
+    { "source": "/travel-authorization/(.*)", "destination": "/api" },
     { "source": "/sitemap.xml", "destination": "/api" },
     { "source": "/sitemaps/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }

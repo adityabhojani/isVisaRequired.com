@@ -18,6 +18,8 @@ import {
 } from "../seo/render";
 import { renderTransitHub, renderTransitGuide } from "../seo/transit";
 import { TRANSIT_GUIDES, getTransitGuide } from "../data/transitData";
+import { renderAuthHub, renderAuthGuide } from "../seo/auth";
+import { TRAVEL_AUTHS, getTravelAuth } from "../data/authData";
 
 const router: IRouter = Router();
 
@@ -105,6 +107,23 @@ router.get("/transit-visa/:slug", (req: Request, res: Response): void => {
   res.type("html").send(renderTransitGuide(guide));
 });
 
+// ── travel-authorization hub + guides (ETIAS / ESTA / ETA / eTA) ─────────────
+router.get("/travel-authorization", (_req: Request, res: Response): void => {
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderAuthHub());
+});
+
+router.get("/travel-authorization/:slug", (req: Request, res: Response): void => {
+  const guide = getTravelAuth(req.params.slug);
+  if (!guide) {
+    res.status(404).setHeader("Cache-Control", "no-store");
+    res.type("html").send(renderPairNotFound());
+    return;
+  }
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderAuthGuide(guide));
+});
+
 // ── per-pair page ────────────────────────────────────────────────────────────
 router.get("/visa-requirements/:from/:to", (req: Request, res: Response): void => {
   const from = countryFromSlug(req.params.from);
@@ -143,6 +162,8 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   for (const p of staticPaths) urls.push(`${SITE_ORIGIN}${p}`);
   urls.push(`${SITE_ORIGIN}/transit-visa`);
   for (const g of TRANSIT_GUIDES) urls.push(`${SITE_ORIGIN}/transit-visa/${g.slug}`);
+  urls.push(`${SITE_ORIGIN}/travel-authorization`);
+  for (const a of TRAVEL_AUTHS) urls.push(`${SITE_ORIGIN}/travel-authorization/${a.slug}`);
   for (const c of allCountries()) {
     urls.push(`${SITE_ORIGIN}/passport/${c.code}`);
     urls.push(`${SITE_ORIGIN}/destination/${c.code}`);
