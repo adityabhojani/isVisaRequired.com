@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import type { VisaEntry, VisaRequirement } from "./visaData.js";
+import { VISA_OVERRIDES } from "./visa-overrides.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -293,6 +294,17 @@ export function getPassportIndexLookup(): VisaLookup {
     }
 
     _lookup.set(passportCode, destMap);
+  }
+
+  // Layer source-verified manual corrections (visa-overrides.ts) on top of the
+  // base dataset. Overrides always win and survive a base-CSV refresh.
+  for (const o of VISA_OVERRIDES) {
+    let destMap = _lookup.get(o.passport);
+    if (!destMap) {
+      destMap = new Map<string, VisaEntry>();
+      _lookup.set(o.passport, destMap);
+    }
+    destMap.set(o.destination, parseValue(o.value));
   }
 
   return _lookup;

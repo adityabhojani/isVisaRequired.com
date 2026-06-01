@@ -1,0 +1,63 @@
+name: Refresh visa data
+
+# Keeps the base visa dataset from silently going stale. Every week this pulls
+# the latest upstream Passport Index dataset, and if anything changed it opens a
+# Pull Request with a table of exactly what changed — so a human can review and
+# merge (merging to main auto-deploys via Vercel). Manual corrections in
+# visa-overrides.ts are applied on top of the base and are never touched here.
+#
+# Free: GitHub Actions is free for public repositories.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # every Monday at 06:00 UTC
+  workflow_dispatch: {} # allows running it manually from the Actions tab
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: refresh-visa-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Pull latest upstream data and summarise changes
+        run: node scripts/refresh-visa-data.mjs | tee refresh-summary.txt
+
+      - name: Open a Pull Request if the base data changed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CSV="artifacts/api-server/src/data/passport-index.csv"
+          if git diff --quiet -- "$CSV"; then
+            echo "No upstream changes — nothing to do."
+            exit 0
+          fi
+
+          BRANCH="bot/visa-data-refresh"
+          git config user.name "visa-data-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add "$CSV"
+          git commit -m "Visa data: sync base dataset from upstream (automated)"
+          git push --force origin "$BRANCH"
+
+          if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
+            gh pr create \
+              --base main \
+              --head "$BRANCH" \
+              --title "Visa data: upstream changes detected" \
+              --body-file refresh-summary.txt
+          else
+            echo "An open PR already exists for $BRANCH; its branch has been updated."
+          fi
