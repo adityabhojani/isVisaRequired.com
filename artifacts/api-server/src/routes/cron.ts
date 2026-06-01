@@ -3,12 +3,14 @@
 // has changed since last check. First time an alert is seen, we just record a
 // baseline (no email). Protected by CRON_SECRET when set.
 import { Router, type IRouter, type Request, type Response } from "express";
+import { getAuth } from "@clerk/express";
 import { db, isDatabaseConfigured } from "@workspace/db";
 import { sql } from "drizzle-orm";
 import { getDefaultEntry } from "../data/visaData";
 import { countries } from "../data/countries";
 import { sendEmail, isEmailConfigured } from "../lib/email";
 import { alertUnsubUrl } from "../lib/alertToken";
+import { isAdminUser } from "../middleware/requireAdmin";
 import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
@@ -49,6 +51,32 @@ function changeEmailHtml(a: AlertRow, oldReq: string, newReq: string): string {
 
 router.get("/cron/check-alerts", async (req: Request, res: Response): Promise<void> => {
   const cronSecret = process.env.CRON_SECRET;
+
+  // Admin-only test send: /api/cron/check-alerts?test=you@email.com sends one
+  // sample alert email so you can confirm the Resend pipeline works.
+  const testTo = typeof req.query["test"] === "string" ? (req.query["test"] as string) : null;
+  if (testTo) {
+    const auth = getAuth(req);
+    const okAdmin = Boolean(auth?.userId && isAdminUser(auth.userId));
+    const okSecret = Boolean(cronSecret && req.headers.authorization === `Bearer ${cronSecret}`);
+    if (!okAdmin && !okSecret) {
+      res.status(401).json({ error: "Sign in as admin to send a test email." });
+      return;
+    }
+    if (!isEmailConfigured()) {
+      res.status(503).json({ error: "Set RESEND_API_KEY in Vercel first, then redeploy." });
+      return;
+    }
+    const sample: AlertRow = { id: 0, email: testTo, passport_code: "IN", destination_code: "GB", last_requirement: "visa_required" };
+    const ok = await sendEmail({
+      to: testTo,
+      subject: "Test — this is what a visa alert looks like",
+      html: changeEmailHtml(sample, "visa_required", "e_visa"),
+    });
+    res.json({ ok, sentTo: testTo, note: ok ? "Sent — check your inbox/spam." : "Send failed — check RESEND_API_KEY and sender domain." });
+    return;
+  }
+
   if (cronSecret && req.headers.authorization !== `Bearer ${cronSecret}`) {
     res.status(401).json({ error: "Unauthorized." });
     return;
