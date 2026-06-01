@@ -6,6 +6,7 @@ import newsletterRouter from "./newsletter";
 import userTravelsRouter from "./userTravels";
 import alertsRouter from "./alerts";
 import adminRouter from "./admin";
+import cronRouter from "./cron";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(newsletterRouter);
 router.use(userTravelsRouter);
 router.use(alertsRouter);
 router.use(adminRouter);
+router.use(cronRouter);
 
 export default router;

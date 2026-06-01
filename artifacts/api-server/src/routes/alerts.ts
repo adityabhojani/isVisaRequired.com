@@ -6,6 +6,7 @@ import { getAuth } from "@clerk/express";
 import { logger } from "../lib/logger";
 import { writeLimiter } from "../middleware/rateLimiter";
 import { requireAdmin } from "../middleware/requireAdmin";
+import { verifyUnsubToken } from "../lib/alertToken";
 
 const router: IRouter = Router();
 
@@ -23,10 +24,34 @@ if (isDatabaseConfigured()) {
       is_active BOOLEAN DEFAULT TRUE,
       UNIQUE(email, passport_code, destination_code)
     )
-  `).catch((err: unknown) => {
-    logger.error({ err }, "Failed to create visa_alerts table");
-  });
+  `)
+    .then(() =>
+      // Snapshot of the last-known requirement, used to detect changes (cron).
+      db.execute(sql`ALTER TABLE visa_alerts ADD COLUMN IF NOT EXISTS last_requirement TEXT`),
+    )
+    .catch((err: unknown) => {
+      logger.error({ err }, "Failed to create/upgrade visa_alerts table");
+    });
 }
+
+// One-click unsubscribe from an alert email (signed token, no login required).
+router.get("/alerts/unsubscribe", async (req, res): Promise<void> => {
+  const id = Number(req.query["id"]);
+  const token = String(req.query["token"] ?? "");
+  if (!id || isNaN(id) || !token || !verifyUnsubToken(id, token)) {
+    res.status(400).type("html").send("<p>Invalid or expired unsubscribe link.</p>");
+    return;
+  }
+  try {
+    await db.execute(sql`UPDATE visa_alerts SET is_active = FALSE WHERE id = ${id}`);
+    res.type("html").send(
+      "<div style=\"font-family:Arial,sans-serif;text-align:center;padding:48px\"><h2>You're unsubscribed</h2><p>You won't get further emails for this visa alert.</p><p><a href=\"https://www.isvisarequired.com\">Back to isvisarequired.com</a></p></div>",
+    );
+  } catch (err) {
+    req.log.error({ err }, "Unsubscribe failed");
+    res.status(500).type("html").send("<p>Something went wrong. Please try again later.</p>");
+  }
+});
 
 router.post("/alerts", writeLimiter, async (req, res): Promise<void> => {
   const auth = getAuth(req);
