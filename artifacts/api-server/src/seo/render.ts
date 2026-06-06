@@ -251,7 +251,7 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.svg">
+<link rel="icon" href="/favicon.svg"><script defer src="/_vercel/insights/script.js"></script>
 <script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(webpageJsonLd)}</script>

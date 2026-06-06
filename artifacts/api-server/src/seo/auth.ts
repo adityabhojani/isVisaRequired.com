@@ -48,7 +48,7 @@ export function renderAuthHub(): string {
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${canonical}"><meta name="robots" content="index,follow,max-image-preview:large">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.svg"><style>${STYLE}</style></head>
+<link rel="icon" href="/favicon.svg"><script defer src="/_vercel/insights/script.js"></script><style>${STYLE}</style></head>
 <body>${HEADER}<main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › Travel authorisations</nav>
 <h1>ETIAS, ESTA, ETA & eTA — what they are and who needs them</h1>
@@ -97,7 +97,7 @@ export function renderAuthGuide(a: TravelAuth): string {
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${canonical}"><meta name="robots" content="index,follow,max-image-preview:large">
 <meta property="og:type" content="article"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.svg">
+<link rel="icon" href="/favicon.svg"><script defer src="/_vercel/insights/script.js"></script>
 <script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>
 <style>${STYLE}</style></head>

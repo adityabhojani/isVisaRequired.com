@@ -1,5 +1,6 @@
 import { lazy, Suspense, useRef, useEffect } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { Analytics } from "@vercel/analytics/react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ClerkProvider, useClerk } from "@clerk/react";
 import { shadcn } from "@clerk/themes";
@@ -263,6 +264,7 @@ function App() {
       <WouterRouter base={basePath}>
         <ClerkProviderWithRoutes />
       </WouterRouter>
+      <Analytics />
     </ErrorBoundary>
   );
 }
