@@ -22,6 +22,7 @@ import { renderAuthHub, renderAuthGuide } from "../seo/auth";
 import { TRAVEL_AUTHS, getTravelAuth } from "../data/authData";
 import { renderMethodology } from "../seo/methodology";
 import { renderResidence } from "../seo/residence";
+import { ROUTE_SEO, renderAppRoute, loadShell } from "../seo/appShell";
 
 const router: IRouter = Router();
 
@@ -242,5 +243,23 @@ router.get("/sitemaps/pairs-:code.xml", (req: Request, res: Response): void => {
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>`,
   );
 });
+
+// ── SPA marketing/tool routes: serve the index.html shell with route-specific
+// SEO content injected into #root (React takes over on load). Falls back to the
+// raw shell so the page never breaks.
+for (const [routePath, seo] of Object.entries(ROUTE_SEO)) {
+  router.get(routePath, (_req: Request, res: Response): void => {
+    try {
+      const html = renderAppRoute(routePath, seo) ?? loadShell();
+      if (!html) { res.status(503).type("html").send("Temporarily unavailable. Please refresh."); return; }
+      res.setHeader("Cache-Control", HTML_CACHE);
+      res.type("html").send(html);
+    } catch {
+      const shell = loadShell();
+      if (shell) { res.type("html").send(shell); return; }
+      res.status(503).type("html").send("Temporarily unavailable. Please refresh.");
+    }
+  });
+}
 
 export default router;
