@@ -16,7 +16,7 @@ import { getEntryRules } from "../data/entryRequirements";
 export const SITE_ORIGIN = "https://www.isvisarequired.com";
 
 // Date the visa dataset was last reviewed. Bump when data is refreshed.
-export const DATA_LAST_UPDATED = "2026-05-30";
+export const DATA_LAST_UPDATED = "2026-06-07";
 
 // ── slug helpers ─────────────────────────────────────────────────────────────
 export function slugify(name: string): string {

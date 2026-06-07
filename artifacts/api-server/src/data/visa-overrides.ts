@@ -55,6 +55,59 @@ const CHINA_VISA_FREE_30 = [
   "SE", // Sweden, effective Nov 2025
 ];
 
+// --- US Presidential Proclamation 10998 – travel ban effective Jan 1 2026 ----
+// Full suspension (Sections 2 & 4): ALL immigrant and nonimmigrant entry suspended —
+// nationals cannot obtain any US visa or enter as nonimmigrants (including tourists).
+// Source: travel.state.gov/content/travel/en/News/visas-news/
+//         suspension-of-visa-issuance-to-foreign-nationals-to-protect-the-security-of-the-united-states.html
+const US_TRAVEL_BAN_FULL = [
+  "AF", // Afghanistan
+  "BF", // Burkina Faso
+  "MM", // Burma / Myanmar
+  "TD", // Chad
+  "CG", // Republic of the Congo
+  "GQ", // Equatorial Guinea
+  "ER", // Eritrea
+  "HT", // Haiti
+  "IR", // Iran
+  "LA", // Laos
+  "LY", // Libya
+  "ML", // Mali
+  "NE", // Niger
+  "SL", // Sierra Leone
+  "SO", // Somalia
+  "SS", // South Sudan
+  "SD", // Sudan
+  "SY", // Syria
+  "YE", // Yemen
+];
+
+// Partial suspension (Section 3): immigrant + B-1/B-2 tourist + F/M/J visas
+// suspended. Tourist entry is not possible; "no admission" is the correct
+// answer for any traveller checking whether they can visit the US.
+// Note: Turkmenistan has immigrant-only suspension and is intentionally excluded.
+const US_TRAVEL_BAN_PARTIAL = [
+  "AO", // Angola
+  "AG", // Antigua and Barbuda
+  "BJ", // Benin
+  "BI", // Burundi
+  "CI", // Côte d'Ivoire
+  "CU", // Cuba
+  "DM", // Dominica
+  "GA", // Gabon
+  "GM", // Gambia
+  "MW", // Malawi
+  "MR", // Mauritania
+  "NG", // Nigeria
+  "SN", // Senegal
+  "TZ", // Tanzania
+  "TG", // Togo
+  "TO", // Tonga
+  "VE", // Venezuela
+  "ZM", // Zambia
+  "ZW", // Zimbabwe
+];
+
 export const VISA_OVERRIDES: VisaOverride[] = [
   ...UK_ETA_EUROPE.map((passport): VisaOverride => ({
     passport,
@@ -81,4 +134,39 @@ export const VISA_OVERRIDES: VisaOverride[] = [
     source: "Brazil VFSeVisa portal / Fragomen advisory",
     verifiedOn: "2026-05-31",
   })),
+
+  // --- US travel ban – full suspension (Proclamation 10998, Jan 1 2026) -------
+  // All nonimmigrant and immigrant entry suspended; tourist visas cannot be issued.
+  ...US_TRAVEL_BAN_FULL.map((passport): VisaOverride => ({
+    passport,
+    destination: "US",
+    value: "no admission",
+    source: "U.S. Presidential Proclamation 10998 — travel.state.gov",
+    verifiedOn: "2026-06-07",
+    note: "Full suspension: all immigrant and nonimmigrant entry suspended.",
+  })),
+
+  // --- US travel ban – partial suspension (B-1/B-2 tourist visas suspended) ---
+  // Entry as a tourist (B-1/B-2) is suspended; travellers cannot visit the US.
+  ...US_TRAVEL_BAN_PARTIAL.map((passport): VisaOverride => ({
+    passport,
+    destination: "US",
+    value: "no admission",
+    source: "U.S. Presidential Proclamation 10998 — travel.state.gov",
+    verifiedOn: "2026-06-07",
+    note: "Partial suspension: B-1/B-2 tourist and F/M/J visas suspended.",
+  })),
+
+  // --- Russia → China 30-day visa-free (added after Jan-2025 CSV snapshot) ----
+  // Russia joined China's unilateral visa-free scheme. The Jan-2025 base CSV
+  // still shows "visa required"; this override corrects it.
+  // The arrangement runs until ~14 Sep 2026 (shorter window than most countries).
+  {
+    passport: "RU",
+    destination: "CN",
+    value: "30",
+    source: "China National Immigration Administration — en.nia.gov.cn",
+    verifiedOn: "2026-06-07",
+    note: "30-day visa-free under China's unilateral scheme; valid through ~14 Sep 2026.",
+  },
 ];
