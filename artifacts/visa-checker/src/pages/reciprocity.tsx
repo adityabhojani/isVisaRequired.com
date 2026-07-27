@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSEO } from "@/hooks/useSEO";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -97,6 +97,15 @@ export default function ReciprocityPage() {
 
   const [passportA, setPassportA] = useState("US");
   const [passportB, setPassportB] = useState("CN");
+
+  // Honour deep links, e.g. /reciprocity?passportA=JP&passportB=US
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const a = params.get("passportA");
+    const b = params.get("passportB");
+    if (a) setPassportA(a.toUpperCase());
+    if (b) setPassportB(b.toUpperCase());
+  }, []);
 
   const { data: countries = [], isLoading: countriesLoading } = useListCountries();
 

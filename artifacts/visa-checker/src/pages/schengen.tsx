@@ -60,21 +60,16 @@ export default function SchengenPage() {
     const used = countDaysInWindow(trips, anchor);
     const remaining = Math.max(0, 90 - used);
 
-    // Find next date when you'll have a full day free (oldest day exits the 180-day window)
+    // Earliest date you can re-enter: the first future day on which the rolling
+    // 180-day window has freed up at least one day (used < 90). Advancing the
+    // anchor forward naturally drops old in-window days off; out-of-window trips
+    // never count, so they can't skew the result.
     let earliestReEntry: Date | null = null;
     if (remaining === 0) {
-      const sortedEntries = trips
-        .filter((t) => t.entry && t.exit)
-        .flatMap((t) => {
-          const days: Date[] = [];
-          let d = new Date(t.entry);
-          const exit = new Date(t.exit);
-          while (d <= exit) { days.push(new Date(d)); d = addDays(d, 1); }
-          return days;
-        })
-        .sort((a, b) => a.getTime() - b.getTime());
-      if (sortedEntries.length > 0) {
-        earliestReEntry = addDays(sortedEntries[0], 181);
+      let d = addDays(anchor, 1);
+      for (let i = 0; i < 400; i++) {
+        if (countDaysInWindow(trips, d) < 90) { earliestReEntry = d; break; }
+        d = addDays(d, 1);
       }
     }
 

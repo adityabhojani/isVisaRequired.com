@@ -84,7 +84,7 @@ function StatBox({ label, value, winner }: { label: string; value: number; winne
     <div className={`text-center p-3 rounded-xl border ${isWinner ? "bg-primary/5 border-primary/30" : "bg-muted/40 border-border"}`}>
       <div className={`text-2xl font-bold ${isWinner ? "text-primary" : "text-foreground"}`}>{value}</div>
       <div className="text-xs text-muted-foreground mt-0.5">{label}</div>
-      {isWinner && <div className="text-xs text-primary font-semibold mt-1">▲ More</div>}
+      {isWinner && <div className="text-xs text-primary font-semibold mt-1">✓ Better</div>}
     </div>
   );
 }

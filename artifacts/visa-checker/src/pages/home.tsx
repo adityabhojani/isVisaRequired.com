@@ -507,7 +507,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
               <CountryCombobox
                 value={passport}
-                onChange={(code) => { setPassport(code); setResults(null); setDestinations([]); setHighlightedCode(undefined); window.history.replaceState({}, "", window.location.pathname); }}
+                onChange={(code) => { setPassport(code); setResults(null); setHighlightedCode(undefined); window.history.replaceState({}, "", window.location.pathname); }}
                 countries={countries}
                 placeholder="Select your passport..."
                 label="Your Passport"
