@@ -44,7 +44,7 @@ export interface RouteSeo {
 // Shared crawlable link block (internal links boost crawl + relevance).
 const POPULAR = [
   ["united-states", "Japan", "japan"], ["india", "Thailand", "thailand"],
-  ["united-kingdom", "USA", "usa"], ["germany", "United States", "united-states"],
+  ["united-kingdom", "USA", "united-states"], ["germany", "United States", "united-states"],
   ["nigeria", "United Kingdom", "united-kingdom"], ["china", "Singapore", "singapore"],
 ];
 function linkBlock(): string {

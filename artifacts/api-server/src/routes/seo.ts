@@ -72,7 +72,7 @@ router.get("/visa-requirements", (_req: Request, res: Response): void => {
 
 // ── hub: one passport → all destinations ─────────────────────────────────────
 router.get("/visa-requirements/:from", (req: Request, res: Response): void => {
-  const from = countryFromSlug(req.params.from);
+  const from = countryFromSlug(req.params.from as string);
   if (!from) {
     res.status(404).setHeader("Cache-Control", "no-store");
     res.type("html").send(renderPairNotFound());
@@ -100,7 +100,7 @@ router.get("/transit-visa", (_req: Request, res: Response): void => {
 });
 
 router.get("/transit-visa/:slug", (req: Request, res: Response): void => {
-  const guide = getTransitGuide(req.params.slug);
+  const guide = getTransitGuide(req.params.slug as string);
   if (!guide) {
     res.status(404).setHeader("Cache-Control", "no-store");
     res.type("html").send(renderPairNotFound());
@@ -163,7 +163,7 @@ router.get("/travel-authorization", (_req: Request, res: Response): void => {
 });
 
 router.get("/travel-authorization/:slug", (req: Request, res: Response): void => {
-  const guide = getTravelAuth(req.params.slug);
+  const guide = getTravelAuth(req.params.slug as string);
   if (!guide) {
     res.status(404).setHeader("Cache-Control", "no-store");
     res.type("html").send(renderPairNotFound());
@@ -175,8 +175,8 @@ router.get("/travel-authorization/:slug", (req: Request, res: Response): void =>
 
 // ── per-pair page ────────────────────────────────────────────────────────────
 router.get("/visa-requirements/:from/:to", (req: Request, res: Response): void => {
-  const from = countryFromSlug(req.params.from);
-  const to = countryFromSlug(req.params.to);
+  const from = countryFromSlug(req.params.from as string);
+  const to = countryFromSlug(req.params.to as string);
   if (!from || !to || from.code === to.code) {
     res.status(404).setHeader("Cache-Control", "no-store");
     res.type("html").send(renderPairNotFound());
