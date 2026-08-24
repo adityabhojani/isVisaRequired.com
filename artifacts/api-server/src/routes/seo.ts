@@ -24,6 +24,8 @@ import { renderMethodology } from "../seo/methodology";
 import { renderResidence } from "../seo/residence";
 import { renderPassportHub } from "../seo/passportHub";
 import { renderDestinationHub } from "../seo/destinationHub";
+import { GUIDES, getGuide } from "../data/guidesData";
+import { renderGuidesHub, renderGuide } from "../seo/guides";
 
 const router: IRouter = Router();
 
@@ -193,6 +195,23 @@ router.get("/travel-authorization/:slug", (req: Request, res: Response): void =>
   res.type("html").send(renderAuthGuide(guide));
 });
 
+// ── editorial cornerstone guides ─────────────────────────────────────────────
+router.get("/guides", (_req: Request, res: Response): void => {
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderGuidesHub());
+});
+
+router.get("/guides/:slug", (req: Request, res: Response): void => {
+  const guide = getGuide(req.params.slug);
+  if (!guide) {
+    res.status(404).setHeader("Cache-Control", "no-store");
+    res.type("html").send(renderPairNotFound());
+    return;
+  }
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderGuide(guide));
+});
+
 // ── per-pair page ────────────────────────────────────────────────────────────
 router.get("/visa-requirements/:from/:to", (req: Request, res: Response): void => {
   const from = countryFromSlug(req.params.from);
@@ -233,6 +252,8 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   for (const g of TRANSIT_GUIDES) urls.push(`${SITE_ORIGIN}/transit-visa/${g.slug}`);
   urls.push(`${SITE_ORIGIN}/travel-authorization`);
   for (const a of TRAVEL_AUTHS) urls.push(`${SITE_ORIGIN}/travel-authorization/${a.slug}`);
+  urls.push(`${SITE_ORIGIN}/guides`);
+  for (const g of GUIDES) urls.push(`${SITE_ORIGIN}/guides/${g.slug}`);
   // Canonical passport & destination hubs (server-rendered). The SPA
   // /passport/{code} and /destination/{code} routes canonicalise here, so they
   // are deliberately kept OUT of the sitemap to avoid duplicate-URL signals.

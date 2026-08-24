@@ -123,6 +123,7 @@ export function Footer() {
                   { href: "/transit-visa", label: "Transit Visa Guides" },
                   { href: "/travel-authorization", label: "ETIAS, ESTA & ETA" },
                   { href: "/residence-permit-visa-benefits", label: "Residence Permit Travel" },
+                  { href: "/guides", label: "Visa & Travel Guides" },
                   { href: "/blog", label: "Travel Blog" },
                   { href: "/methodology", label: "How We Source Our Data" },
                 ].map(({ href, label }) => (
