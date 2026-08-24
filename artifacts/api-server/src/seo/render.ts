@@ -147,7 +147,7 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: SITE_ORIGIN + "/" },
-      { "@type": "ListItem", position: 2, name: "Visa requirements", item: SITE_ORIGIN + "/visa-requirements" },
+      { "@type": "ListItem", position: 2, name: `${from.name} passport`, item: `${SITE_ORIGIN}/visa-requirements/${slugify(from.name)}` },
       { "@type": "ListItem", position: 3, name: `${from.name} to ${to.name}`, item: canonical },
     ],
   };
@@ -291,7 +291,7 @@ footer.site{color:var(--muted);font-size:13px;padding:28px 0;text-align:center}
 <body>
 <header class="site"><div class="wrap"><a class="logo" href="/">isvisarequired<span>.com</span></a><a href="/" style="font-size:14px;text-decoration:none">Visa checker →</a></div></header>
 <main class="wrap">
-<nav class="crumbs"><a href="/">Home</a> › <a href="/visa-requirements">Visa requirements</a> › ${esc(from.name)} → ${esc(to.name)}</nav>
+<nav class="crumbs"><a href="/">Home</a> › <a href="/visa-requirements/${slugify(from.name)}">${esc(from.name)} passport</a> › ${esc(from.name)} → ${esc(to.name)}</nav>
 <h1>Do ${esc(from.name)} citizens need a visa for ${esc(to.name)}?</h1>
 <div class="updated">Last updated: ${esc(DATA_LAST_UPDATED)}</div>
 
@@ -322,7 +322,10 @@ ${touristBlock}
 </section>
 
 <section class="card related">
-  <h2>Other passports for ${esc(to.name)}</h2>
+  <h2>Explore full guides</h2>
+  <a href="/visa-requirements/${slugify(from.name)}"><strong>${esc(from.flag)} ${esc(from.name)} passport</strong> — visa requirements for every country</a>
+  <a href="/countries/${slugify(to.name)}"><strong>${esc(to.flag)} ${esc(to.name)} visa requirements</strong> — which nationalities need a visa</a>
+  <h2 style="margin-top:14px">Other passports for ${esc(to.name)}</h2>
   ${relatedPassports}
   <h2 style="margin-top:14px">${esc(from.name)} to other destinations</h2>
   ${relatedDestinations}

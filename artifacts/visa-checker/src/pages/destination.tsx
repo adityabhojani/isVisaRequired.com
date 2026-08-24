@@ -4,6 +4,7 @@ import { MapPin, DollarSign, MessageSquare, Users, Maximize2, CheckCircle2, Cloc
 import { useSEO } from "@/hooks/useSEO";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { slugify } from "@/lib/slug";
 import { useListCountries, useCheckVisaAll, getCheckVisaAllQueryKey, useGetCountryTouristInfo, getGetCountryTouristInfoQueryKey } from "@workspace/api-client-react";
 import type { VisaResult, VisaRequirement } from "@workspace/api-client-react";
 import { countryMeta } from "@/data/countryMeta";
@@ -128,13 +129,16 @@ export default function DestinationPage() {
   const accessible = vfCount + voaCount + evCount;
 
   const siteUrl = "https://www.isvisarequired.com";
+  // Canonical points at the rich, server-rendered destination hub so the
+  // client-only /destination/{code} page doesn't compete as a duplicate.
+  const hubUrl = country ? `${siteUrl}/countries/${slugify(country.name)}` : `${siteUrl}/countries`;
 
   useSEO({
     title: country ? `${country.name} — Country Profile, Visa Info & Travel Facts` : "Country Profile",
     description: meta
       ? `${meta.description} Capital: ${meta.capital}. Currency: ${meta.currency}. Language: ${meta.language}.`
       : `Travel information and visa requirements for ${country?.name ?? "this country"}.`,
-    canonical: `${siteUrl}/destination/${code}`,
+    canonical: hubUrl,
     jsonLd: country ? [
       {
         "@context": "https://schema.org",
@@ -142,7 +146,7 @@ export default function DestinationPage() {
         "itemListElement": [
           { "@type": "ListItem", "position": 1, "name": "Home", "item": siteUrl },
           { "@type": "ListItem", "position": 2, "name": "Discover", "item": `${siteUrl}/discover` },
-          { "@type": "ListItem", "position": 3, "name": country.name, "item": `${siteUrl}/destination/${code}` },
+          { "@type": "ListItem", "position": 3, "name": country.name, "item": hubUrl },
         ],
       },
       {

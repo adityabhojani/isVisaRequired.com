@@ -106,6 +106,8 @@ export function Footer() {
               <nav className="flex flex-col gap-2">
                 {[
                   { href: "/", label: "Check Visa Requirements" },
+                  { href: "/visa-requirements", label: "Visa Requirements by Passport" },
+                  { href: "/countries", label: "Visa Requirements by Country" },
                   { href: "/compare", label: "Compare Two Passports" },
                   { href: "/discover", label: "Discover Destinations" },
                   { href: "/map", label: "World Visa Map" },

@@ -24,6 +24,8 @@
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/visa-requirements", "destination": "/api" },
     { "source": "/visa-requirements/(.*)", "destination": "/api" },
+    { "source": "/countries", "destination": "/api" },
+    { "source": "/countries/(.*)", "destination": "/api" },
     { "source": "/transit-visa", "destination": "/api" },
     { "source": "/transit-visa/(.*)", "destination": "/api" },
     { "source": "/travel-authorization", "destination": "/api" },

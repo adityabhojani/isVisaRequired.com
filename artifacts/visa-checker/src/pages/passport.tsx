@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { PassportPowerCard } from "@/components/PassportPowerCard";
 import { useSEO } from "@/hooks/useSEO";
 import { Footer } from "@/components/Footer";
+import { slugify } from "@/lib/slug";
 import { useListCountries, useCheckVisaAll, getCheckVisaAllQueryKey } from "@workspace/api-client-react";
 import type { VisaResult, VisaRequirement } from "@workspace/api-client-react";
 
@@ -113,7 +114,7 @@ export default function PassportPage() {
     description: country
       ? `Complete visa requirements for ${country.name} passport holders. Visa-free access to ${vfCount} countries, visa on arrival for ${voaCount}, eVisa for ${evCount}. Check all 199 destinations.`
       : "Check visa requirements for this passport across all 199 countries.",
-    canonical: `https://www.isvisarequired.com/passport/${code}`,
+    canonical: country ? `https://www.isvisarequired.com/visa-requirements/${slugify(country.name)}` : `https://www.isvisarequired.com/visa-requirements`,
     jsonLd: country && results.length > 0 ? {
       "@context": "https://schema.org",
       "@type": "Dataset",

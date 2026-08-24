@@ -22,6 +22,8 @@ import { renderAuthHub, renderAuthGuide } from "../seo/auth";
 import { TRAVEL_AUTHS, getTravelAuth } from "../data/authData";
 import { renderMethodology } from "../seo/methodology";
 import { renderResidence } from "../seo/residence";
+import { renderPassportHub } from "../seo/passportHub";
+import { renderDestinationHub } from "../seo/destinationHub";
 
 const router: IRouter = Router();
 
@@ -32,12 +34,12 @@ function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function hubShell(title: string, h1: string, intro: string, body: string): string {
+function hubShell(title: string, h1: string, intro: string, body: string, canonical: string = SITE_ORIGIN): string {
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(intro)}">
-<link rel="canonical" href="${esc(SITE_ORIGIN)}">
+<link rel="canonical" href="${esc(canonical)}">
 <meta name="robots" content="index,follow">
 <link rel="icon" href="/favicon.svg">
 <style>:root{--navy:#0A2FA1;--accent:#0DB5E8;--bg:#F7F9FC;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0}
@@ -65,11 +67,12 @@ router.get("/visa-requirements", (_req: Request, res: Response): void => {
       "Visa requirements by passport",
       "Pick your passport to see visa requirements for every destination country.",
       `<div class="cols">${links}</div>`,
+      `${SITE_ORIGIN}/visa-requirements`,
     ),
   );
 });
 
-// ── hub: one passport → all destinations ─────────────────────────────────────
+// ── hub: one passport → all destinations (rich passport hub) ─────────────────
 router.get("/visa-requirements/:from", (req: Request, res: Response): void => {
   const from = countryFromSlug(req.params.from);
   if (!from) {
@@ -77,19 +80,37 @@ router.get("/visa-requirements/:from", (req: Request, res: Response): void => {
     res.type("html").send(renderPairNotFound());
     return;
   }
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderPassportHub(from));
+});
+
+// ── hub: all destinations index ──────────────────────────────────────────────
+router.get("/countries", (_req: Request, res: Response): void => {
   const links = allCountries()
-    .filter((c) => c.code !== from.code)
-    .map((c) => `<a href="${pairPath(from, c)}">${esc(from.name)} → ${esc(c.flag)} ${esc(c.name)}</a>`)
+    .map((c) => `<a href="/countries/${slugify(c.name)}">${esc(c.flag)} ${esc(c.name)} visa requirements</a>`)
     .join("");
   res.setHeader("Cache-Control", HTML_CACHE);
   res.type("html").send(
     hubShell(
-      `${from.name} passport visa requirements — all countries`,
-      `${from.name} passport: visa requirements for every country`,
-      `Where can ${from.name} passport holders travel? Select a destination for detailed visa requirements, costs, documents and official links.`,
+      "Visa requirements by country — isvisarequired.com",
+      "Visa requirements by destination country",
+      "Pick a destination to see which nationalities need a visa, who can enter visa-free, and the country's entry requirements.",
       `<div class="cols">${links}</div>`,
+      `${SITE_ORIGIN}/countries`,
     ),
   );
+});
+
+// ── hub: one destination → who needs a visa (rich destination hub) ───────────
+router.get("/countries/:slug", (req: Request, res: Response): void => {
+  const to = countryFromSlug(req.params.slug);
+  if (!to) {
+    res.status(404).setHeader("Cache-Control", "no-store");
+    res.type("html").send(renderPairNotFound());
+    return;
+  }
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderDestinationHub(to));
 });
 
 // ── transit-visa hub + per-hub guides ────────────────────────────────────────
@@ -204,7 +225,7 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   const staticPaths = [
     "/", "/compare", "/discover", "/stats", "/popular", "/map", "/trip-planner",
     "/schengen", "/tier-list", "/digital-nomad", "/reciprocity", "/blog", "/alerts",
-    "/visa-requirements", "/methodology", "/residence-permit-visa-benefits", "/privacy", "/terms",
+    "/visa-requirements", "/countries", "/methodology", "/residence-permit-visa-benefits", "/privacy", "/terms",
   ];
   const urls: string[] = [];
   for (const p of staticPaths) urls.push(`${SITE_ORIGIN}${p}`);
@@ -212,10 +233,12 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   for (const g of TRANSIT_GUIDES) urls.push(`${SITE_ORIGIN}/transit-visa/${g.slug}`);
   urls.push(`${SITE_ORIGIN}/travel-authorization`);
   for (const a of TRAVEL_AUTHS) urls.push(`${SITE_ORIGIN}/travel-authorization/${a.slug}`);
+  // Canonical passport & destination hubs (server-rendered). The SPA
+  // /passport/{code} and /destination/{code} routes canonicalise here, so they
+  // are deliberately kept OUT of the sitemap to avoid duplicate-URL signals.
   for (const c of allCountries()) {
-    urls.push(`${SITE_ORIGIN}/passport/${c.code}`);
-    urls.push(`${SITE_ORIGIN}/destination/${c.code}`);
     urls.push(`${SITE_ORIGIN}/visa-requirements/${slugify(c.name)}`);
+    urls.push(`${SITE_ORIGIN}/countries/${slugify(c.name)}`);
   }
   const body = urls
     .map((loc) => `  <url><loc>${loc}</loc><lastmod>${DATA_LAST_UPDATED}</lastmod></url>`)
