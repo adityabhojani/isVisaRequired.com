@@ -80,6 +80,26 @@ export const GUIDES: Guide[] = [
     tips: SHARED_TIPS("Filipino"),
   },
   {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-bangladeshi-citizens",
+    code: "BD",
+    nationality: "Bangladeshi citizens",
+    adjective: "Bangladeshi",
+    intro:
+      "Bangladeshi passport holders need a visa for most of the world, which makes the destinations that waive it — or grant one at the border — genuinely worth knowing. This guide lists every country a Bangladeshi citizen can enter visa-free or on a visa on arrival, plus the growing set reachable with an online eVisa, each with its permitted stay.",
+    tips: SHARED_TIPS("Bangladeshi"),
+  },
+  {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-kenyan-citizens",
+    code: "KE",
+    nationality: "Kenyan citizens",
+    adjective: "Kenyan",
+    intro:
+      "Kenyan passport holders benefit from strong access across Africa and the Caribbean, including broad visa-free travel within the East African Community and beyond. This guide sets out every destination open to Kenyan citizens without a prior embassy visa — visa-free, visa on arrival, or a simple eVisa — with the maximum stay for each.",
+    tips: SHARED_TIPS("Kenyan"),
+  },
+  {
     kind: "article",
     slug: "visa-on-arrival-vs-evisa-vs-eta",
     title: "Visa on Arrival vs eVisa vs ETA — What's the Difference? (2026)",

@@ -81,4 +81,72 @@ export const VISA_OVERRIDES: VisaOverride[] = [
     source: "Brazil VFSeVisa portal / Fragomen advisory",
     verifiedOn: "2026-05-31",
   })),
+
+  // --- Thailand e-visa now open to Bangladeshi citizens ----------------------
+  // Bangladeshis are NOT eligible for Thai visa on arrival, but the Thai e-visa
+  // (thaievisa.go.th) is available to them — e-visa centres opened in Dhaka,
+  // Sylhet and Chittagong from 26 Dec 2024. Base dataset says "visa required".
+  {
+    passport: "BD",
+    destination: "TH",
+    value: "e-visa",
+    source: "Thai e-Visa portal (thaievisa.go.th) / Wikipedia: Visa requirements for Bangladeshi citizens",
+    verifiedOn: "2026-08-24",
+  },
+
+  // --- Kenya eTA exemption for African nationals -----------------------------
+  // Kenya's 2025 immigration regulations exempt citizens of almost every African
+  // country from the eTA entirely (Somalia and Libya are the exceptions). Three
+  // tiers by permitted stay: EAC partner states 180 days; a middle group 90
+  // days; the rest 60 days. The base dataset (Jan 2025 snapshot) still shows
+  // these as eTA/e-visa, which would wrongly tell African travellers to buy an
+  // eTA they do not need.
+  ...["BI", "CD", "RW", "SS", "TZ", "UG"].map((passport): VisaOverride => ({
+    passport,
+    destination: "KE",
+    value: "180",
+    source: "Kenya Immigration (eTA exemption, 2025 regulations) — EAC partner states",
+    verifiedOn: "2026-08-24",
+  })),
+  ...["BW", "SZ", "ET", "GH", "LS", "MW", "MU", "MZ", "NA", "SC", "ZA", "ZM", "ZW", "GM", "SL"].map((passport): VisaOverride => ({
+    passport,
+    destination: "KE",
+    value: "90",
+    source: "Kenya Immigration (eTA exemption, 2025 regulations) — 90-day tier",
+    verifiedOn: "2026-08-24",
+  })),
+  ...["DZ", "AO", "BJ", "BF", "CV", "CM", "CF", "TD", "CI", "DJ", "EG", "GQ", "GA", "GN", "GW", "LR", "MG", "ML", "MR", "MA", "NE", "NG", "ST", "SN", "SD", "TG", "TN", "KM", "ER", "CG"].map((passport): VisaOverride => ({
+    passport,
+    destination: "KE",
+    value: "60",
+    source: "Kenya Immigration (eTA exemption, 2025 regulations) — 60-day tier",
+    verifiedOn: "2026-08-24",
+  })),
+
+  // Somalia and Libya are explicitly EXCLUDED from Kenya's African eTA
+  // exemption on security grounds — they still need an eTA. The base dataset
+  // wrongly shows Somalia as visa-free for Kenya, which would tell Somali
+  // travellers they need nothing when they can be denied boarding without an
+  // eTA. Libya is already correct in the base data; pinned here so a future
+  // upstream refresh cannot silently reintroduce the error.
+  ...["SO", "LY"].map((passport): VisaOverride => ({
+    passport,
+    destination: "KE",
+    value: "eta",
+    source: "Fragomen advisory / Wikipedia: Visa policy of Kenya — Somalia & Libya excluded from AU eTA exemption",
+    verifiedOn: "2026-08-24",
+  })),
+
+  // --- Sri Lanka free ETA for Indian citizens --------------------------------
+  // Sri Lanka's free 30-day tourist ETA scheme (40 nationalities incl. India)
+  // took effect 25 May 2026. Visa on arrival still exists, but the ETA applied
+  // for online beforehand is now the standard route, so we show it as an
+  // electronic authorisation rather than plain visa on arrival.
+  {
+    passport: "IN",
+    destination: "LK",
+    value: "eta",
+    source: "Sri Lanka Dept. of Immigration & Emigration (eta.gov.lk); free-ETA scheme effective 25 May 2026",
+    verifiedOn: "2026-08-24",
+  },
 ];

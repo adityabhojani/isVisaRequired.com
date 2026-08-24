@@ -7,6 +7,7 @@ import { countries } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
 import { slugify, pairPath } from "./render";
 import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED, REQ_LABEL, REQ_COLOR } from "./hubLayout";
+import { GUIDES } from "../data/guidesData";
 
 const YEAR = "2026";
 const CATS: { key: string; heading: string; blurb: (n: string) => string }[] = [
@@ -87,6 +88,12 @@ export function renderPassportHub(from: CountryData): string {
     },
   ];
 
+  // If we have a written guide for this passport, surface it prominently.
+  const guide = GUIDES.find((g) => g.kind === "passport-roundup" && g.code === from.code);
+  const guideCta = guide
+    ? `<div class="card" style="border-color:#bfdbfe;background:#eff6ff"><strong>Read the full guide:</strong> <a href="/guides/${guide.slug}">Visa-free countries for ${esc(from.name)} passport holders (${YEAR})</a> — with practical tips, stay limits and how each category works.</div>`
+    : "";
+
   const body = `
 <nav class="crumbs"><a href="/">Home</a> › <a href="/visa-requirements">Passports</a> › ${esc(from.name)}</nav>
 <h1>${esc(from.flag)} ${esc(from.name)} passport visa requirements</h1>
@@ -94,6 +101,7 @@ export function renderPassportHub(from: CountryData): string {
 <p class="lead">Where can ${esc(from.name)} passport holders travel in ${YEAR}? This page lists the visa requirement for every country — ${vf} visa-free, ${voa} visa on arrival, ${ev} eVisa and ${vr} requiring a visa in advance. Select any destination for full details: visa type, permitted stay, fees, required documents and the official application link.</p>
 <div class="stats">${statCards}</div>
 <p><a class="cta" href="/?passport=${from.code}">Check a specific destination in the visa tool →</a></p>
+${guideCta}
 ${sections}
 <h2>Frequently asked questions</h2>
 ${faqHtml}
