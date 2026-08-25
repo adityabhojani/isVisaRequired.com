@@ -55,6 +55,13 @@ const CHINA_VISA_FREE_30 = [
   "SE", // Sweden, effective Nov 2025
 ];
 
+// Namibia ended visa-free entry for these 33 nationalities on 1 April 2025.
+const NAMIBIA_VISA_NOW_REQUIRED = [
+  "AM", "AU", "AT", "AZ", "BY", "BE", "CA", "DK", "FI", "FR", "DE", "IS", "IE",
+  "IT", "JP", "KZ", "KG", "LI", "LU", "MD", "NL", "NZ", "NO", "PT", "ES", "SE",
+  "CH", "TJ", "TM", "UA", "UZ", "GB", "US",
+];
+
 export const VISA_OVERRIDES: VisaOverride[] = [
   ...UK_ETA_EUROPE.map((passport): VisaOverride => ({
     passport,
@@ -147,6 +154,85 @@ export const VISA_OVERRIDES: VisaOverride[] = [
     destination: "LK",
     value: "eta",
     source: "Sri Lanka Dept. of Immigration & Emigration (eta.gov.lk); free-ETA scheme effective 25 May 2026",
+    verifiedOn: "2026-08-24",
+  },
+
+  // --- Namibia revoked visa-free entry for 33 nationalities ------------------
+  // Effective 1 April 2025, Namibia ended visa exemption for 33 countries
+  // (cabinet decision July 2024, citing lack of reciprocity). Affected
+  // travellers now obtain a visa on arrival (N$1,600) or an e-Visa beforehand.
+  // The Jan-2025 base snapshot still shows these as visa-free for 90 days —
+  // the single largest stale cluster we have found.
+  ...NAMIBIA_VISA_NOW_REQUIRED.map((passport): VisaOverride => ({
+    passport,
+    destination: "NA",
+    value: "visa on arrival",
+    source: "Embassy of Namibia (missionofnamibia.ch) 'New VISA Requirements 1 April 2025'; corroborated by BAL and ATTA immigration alerts",
+    verifiedOn: "2026-08-24",
+  })),
+
+  // --- Qatar suspended visa on arrival for Pakistani nationals ---------------
+  // Suspended with immediate effect on 31 March 2026; travellers must hold a
+  // visa before departure or risk being refused at immigration.
+  {
+    passport: "PK",
+    destination: "QA",
+    value: "visa required",
+    source: "EY immigration alert + Embassy of Pakistan in Doha advisory (31 Mar 2026)",
+    verifiedOn: "2026-08-24",
+  },
+
+  // --- Uzbekistan visa-free for US citizens ----------------------------------
+  // Presidential decree signed 3 Nov 2025; in force from 1 January 2026 for all
+  // US citizens (previously only travellers aged 55+).
+  {
+    passport: "US",
+    destination: "UZ",
+    value: "30",
+    source: "Uzbek presidential decree (3 Nov 2025), gov.uz; effective 1 Jan 2026",
+    verifiedOn: "2026-08-24",
+  },
+
+  // --- China–Russia mutual visa exemption ------------------------------------
+  // Trial from 15 Sep 2025, extended during Putin's May 2026 state visit and
+  // now reciprocal through 31 December 2027.
+  {
+    passport: "RU",
+    destination: "CN",
+    value: "30",
+    source: "State Council of the PRC (english.www.gov.cn); extended to 31 Dec 2027",
+    verifiedOn: "2026-08-24",
+  },
+
+  // --- Saudi Arabia–Russia mutual visa exemption -----------------------------
+  // In force 11 May 2026 — Saudi Arabia's first mutual exemption covering
+  // ordinary passports. 90 days per visit; excludes work, study and Hajj.
+  {
+    passport: "RU",
+    destination: "SA",
+    value: "90",
+    source: "Saudi Press Agency (spa.gov.sa/en/N2582764); effective 11 May 2026",
+    verifiedOn: "2026-08-24",
+  },
+
+  // --- Oman added the Philippines to its visa-exemption list ------------------
+  // Filipino tourists get 14 days visa-free (announced 2026), replacing the
+  // previous eVisa requirement.
+  {
+    passport: "PH",
+    destination: "OM",
+    value: "14",
+    source: "Oman Ministry of Foreign Affairs (fm.gov.om) visa-exemption announcement, 2026",
+    verifiedOn: "2026-08-24",
+  },
+
+  // --- Malaysia visa-free stay length for Indian nationals --------------------
+  // Requirement was already correct (visa-free); this adds the permitted stay.
+  {
+    passport: "IN",
+    destination: "MY",
+    value: "30",
+    source: "EY Global immigration alert, 'Malaysia extends visa exemption period for India and China nationals' (3 Jan 2025)",
     verifiedOn: "2026-08-24",
   },
 ];
