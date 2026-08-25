@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useSEO } from "@/hooks/useSEO";
-import { marked } from "marked";
+import { renderMarkdown } from "@/lib/markdown";
 import { Calendar, User, Tag, ArrowLeft, Share2 } from "lucide-react";
 
 interface BlogPost {
@@ -128,7 +128,7 @@ export default function BlogPostPage() {
     );
   }
 
-  const html = marked.parse(post.content) as string;
+  const html = renderMarkdown(post.content);
 
   return (
     <div className="min-h-screen bg-background">

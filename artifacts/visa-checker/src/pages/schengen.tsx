@@ -73,17 +73,7 @@ export default function SchengenPage() {
       }
     }
 
-    // Max consecutive days you can stay now
-    let maxStay = 0;
-    if (remaining > 0) {
-      maxStay = remaining;
-      const lastExitDate = addDays(anchor, remaining);
-      const daysAfterWindow = countDaysInWindow(trips, addDays(lastExitDate, 1));
-      maxStay = Math.min(remaining, 90 - daysAfterWindow + remaining);
-      maxStay = remaining;
-    }
-
-    return { used, remaining, maxStay, earliestReEntry };
+    return { used, remaining, earliestReEntry };
   }, [trips, checkDate]);
 
   const status = analysis.used >= 90 ? "exceeded" : analysis.used >= 75 ? "warning" : "ok";

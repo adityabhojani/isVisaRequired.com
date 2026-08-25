@@ -293,9 +293,11 @@ function ShareButtons({ passport, passportFlag, passportName, destinations, resu
 export default function HomePage() {
   const [initialParams] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    const p = params.get("passport") ?? "";
-    const d = params.get("destinations")?.split(",").filter(Boolean) ?? [];
-    return { passport: p, destinations: d };
+    // `from`/`to` are legacy aliases used by older server-rendered pair-page
+    // CTAs (and anything Google has cached with those links) — honor both.
+    const p = params.get("passport") ?? params.get("from") ?? "";
+    const d = (params.get("destinations") ?? params.get("to"))?.split(",").filter(Boolean) ?? [];
+    return { passport: p.toUpperCase(), destinations: d.map((c) => c.toUpperCase()) };
   });
   const hasAutoChecked = useRef(false);
 

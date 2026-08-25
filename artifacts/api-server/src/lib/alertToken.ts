@@ -2,7 +2,15 @@
 import crypto from "crypto";
 
 function secret(): string {
-  return process.env.CRON_SECRET || process.env.ALERT_SECRET || "isvisarequired-alert-fallback";
+  // Prefer an explicit secret. Otherwise derive one from DATABASE_URL (which
+  // contains the DB password and is always set when alerts exist — alerts live
+  // in the DB). The old hardcoded fallback lived in a public repo, so anyone
+  // could forge unsubscribe tokens for sequential alert ids.
+  const explicit = process.env.CRON_SECRET || process.env.ALERT_SECRET;
+  if (explicit) return explicit;
+  const dbUrl = process.env.DATABASE_URL;
+  if (dbUrl) return crypto.createHash("sha256").update(`ivr-alert:${dbUrl}`).digest("hex");
+  return "isvisarequired-alert-fallback"; // dev-only: no DB → no alerts → tokens are moot
 }
 
 export function alertUnsubToken(id: number): string {

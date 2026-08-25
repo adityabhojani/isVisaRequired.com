@@ -15,7 +15,11 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
     return;
   }
 
-  if (adminUserIds.length > 0 && !adminUserIds.includes(userId)) {
+  // Fail CLOSED: if no admin ids are configured, nobody is an admin. (The old
+  // check skipped the test when the list was empty, which made every signed-in
+  // user an admin whenever ADMIN_USER_IDS was unset — a privilege-escalation
+  // footgun. isAdminUser() below always failed closed; now both agree.)
+  if (!adminUserIds.includes(userId)) {
     res.status(403).json({ error: "Access denied. Admin privileges required." });
     return;
   }

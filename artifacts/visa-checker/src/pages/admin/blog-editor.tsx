@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { AdminGuard } from "@/components/AdminGuard";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Save, Eye, EyeOff, ArrowLeft, Loader2, AlertCircle, CheckCircle2, Image as ImageIcon, Film, Youtube } from "lucide-react";
-import { marked } from "marked";
+import { renderMarkdown } from "@/lib/markdown";
 import { upload } from "@vercel/blob/client";
 
 async function uploadMedia(file: File): Promise<string> {
@@ -169,7 +169,7 @@ export default function AdminBlogEditor() {
   });
 
   const previewHtml = preview
-    ? (marked.parse(form.content) as string)
+    ? renderMarkdown(form.content)
     : "";
 
   const title = isNew ? "New Post" : "Edit Post";

@@ -61,8 +61,31 @@ app.use(
   }),
 );
 
-// CORS — allow credentials for Clerk session cookies
-app.use(cors({ credentials: true, origin: true }));
+// CORS — allow credentials for Clerk session cookies, but only for our own
+// origins (reflecting every origin with credentials lets any website make
+// credentialed requests to the API). Same-origin requests send no Origin
+// header and are unaffected.
+const CORS_ALLOWED = new Set([
+  "https://www.isvisarequired.com",
+  "https://isvisarequired.com",
+]);
+app.use(
+  cors({
+    credentials: true,
+    origin: (origin, cb) => {
+      if (
+        !origin ||
+        CORS_ALLOWED.has(origin) ||
+        origin.endsWith(".vercel.app") || // preview deployments
+        origin.startsWith("http://localhost") // local dev
+      ) {
+        cb(null, true);
+        return;
+      }
+      cb(null, false);
+    },
+  }),
+);
 
 // Body parsing with sane size limits
 app.use(express.json({ limit: "16kb" }));

@@ -298,6 +298,23 @@ export function getPassportIndexLookup(): VisaLookup {
 
   // Layer source-verified manual corrections (visa-overrides.ts) on top of the
   // base dataset. Overrides always win and survive a base-CSV refresh.
+  // Guard the override layer: parseValue() maps any UNKNOWN string to
+  // "visa required", so a typo'd value (e.g. "visa-free") would silently turn
+  // a visa-free rule into visa-required. Also catch duplicate (passport,
+  // destination) pairs, where the later entry silently wins.
+  const OVERRIDE_VOCAB = new Set(["visa free", "visa on arrival", "e-visa", "eta", "visa required", "no admission"]);
+  const seenOverride = new Set<string>();
+  for (const o of VISA_OVERRIDES) {
+    const key = `${o.passport}>${o.destination}`;
+    if (seenOverride.has(key)) {
+      console.warn(`[visa-overrides] DUPLICATE override for ${key} — the later entry wins; remove one.`);
+    }
+    seenOverride.add(key);
+    const v = o.value.toLowerCase().trim();
+    if (!OVERRIDE_VOCAB.has(v) && !/^\d+$/.test(v)) {
+      console.warn(`[visa-overrides] INVALID value "${o.value}" for ${key} — parseValue will treat it as "visa required". Use: ${[...OVERRIDE_VOCAB].join(" | ")} | <days>.`);
+    }
+  }
   for (const o of VISA_OVERRIDES) {
     let destMap = _lookup.get(o.passport);
     if (!destMap) {

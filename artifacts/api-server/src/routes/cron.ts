@@ -103,15 +103,22 @@ router.get("/cron/check-alerts", async (req: Request, res: Response): Promise<vo
       }
       if (a.last_requirement !== current) {
         changed++;
+        let sent = false;
         if (isEmailConfigured()) {
-          const ok = await sendEmail({
+          sent = await sendEmail({
             to: a.email,
             subject: `Visa update: ${nameOf(a.passport_code)} → ${nameOf(a.destination_code)}`,
             html: changeEmailHtml(a, a.last_requirement, current),
           });
-          if (ok) emailed++;
+          if (sent) emailed++;
         }
-        await db.execute(sql`UPDATE visa_alerts SET last_requirement = ${current} WHERE id = ${a.id}`);
+        // Only mark the change as seen once the subscriber has actually been
+        // notified. If the send failed (or email isn't configured yet), leave
+        // last_requirement so the next run retries instead of silently
+        // swallowing the notification.
+        if (sent) {
+          await db.execute(sql`UPDATE visa_alerts SET last_requirement = ${current} WHERE id = ${a.id}`);
+        }
       }
     }
     logger.info({ checked, baselined, changed, emailed }, "Visa alert check complete");

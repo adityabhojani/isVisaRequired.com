@@ -319,7 +319,7 @@ ${touristBlock}
 <section class="card">
   <h2>Check your own trip</h2>
   <p>Requirements depend on your exact passport and itinerary. Use the free interactive checker for live results, multi-country trips and transit.</p>
-  <a class="cta" href="/?from=${esc(from.code)}&to=${esc(to.code)}">Open the visa checker →</a>
+  <a class="cta" href="/?passport=${esc(from.code)}&destinations=${esc(to.code)}">Open the visa checker →</a>
 </section>
 
 <section class="card related">
