@@ -17,8 +17,13 @@ let _shellTried = false;
 export function loadShell(): string | null {
   if (_shellTried) return _shell;
   _shellTried = true;
+  // On Vercel the build renames index.html → shell.html so the filesystem
+  // no longer beats the "/" rewrite (static files are served before rewrites,
+  // which silently disabled homepage SSR). index.html kept for local dev.
   const candidates = [
+    path.join(process.cwd(), "artifacts/visa-checker/dist/public/shell.html"),
     path.join(process.cwd(), "artifacts/visa-checker/dist/public/index.html"),
+    path.join(process.cwd(), "shell.html"),
     path.join(process.cwd(), "index.html"),
     path.join(process.cwd(), "public/index.html"),
   ];

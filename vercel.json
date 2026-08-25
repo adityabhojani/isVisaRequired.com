@@ -1,54 +1,149 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install --filter @workspace/visa-checker... --filter @workspace/api-server...",
-  "buildCommand": "pnpm --filter @workspace/api-server build && BASE_PATH=/ pnpm --filter @workspace/visa-checker build",
+  "buildCommand": "pnpm --filter @workspace/api-server build && BASE_PATH=/ pnpm --filter @workspace/visa-checker build && node -e \"const fs=require('fs');const d='artifacts/visa-checker/dist/public/';fs.copyFileSync(d+'index.html',d+'shell.html');fs.unlinkSync(d+'index.html')\"",
   "outputDirectory": "artifacts/visa-checker/dist/public",
   "framework": null,
   "redirects": [
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "isvisarequired.com" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "isvisarequired.com"
+        }
+      ],
       "destination": "https://www.isvisarequired.com/:path*",
       "permanent": true
     }
   ],
   "functions": {
     "api/index.ts": {
-      "includeFiles": "artifacts/{api-server/src/data/passport-index.csv,visa-checker/dist/public/index.html}"
+      "includeFiles": "artifacts/{api-server/src/data/passport-index.csv,visa-checker/dist/public/shell.html}"
     }
   },
   "crons": [
-    { "path": "/api/cron/check-alerts", "schedule": "0 8 * * *" }
+    {
+      "path": "/api/cron/check-alerts",
+      "schedule": "0 8 * * *"
+    }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api" },
-    { "source": "/visa-requirements", "destination": "/api" },
-    { "source": "/visa-requirements/(.*)", "destination": "/api" },
-    { "source": "/countries", "destination": "/api" },
-    { "source": "/countries/(.*)", "destination": "/api" },
-    { "source": "/guides", "destination": "/api" },
-    { "source": "/guides/(.*)", "destination": "/api" },
-    { "source": "/transit-visa", "destination": "/api" },
-    { "source": "/transit-visa/(.*)", "destination": "/api" },
-    { "source": "/travel-authorization", "destination": "/api" },
-    { "source": "/travel-authorization/(.*)", "destination": "/api" },
-    { "source": "/llms.txt", "destination": "/api" },
-    { "source": "/methodology", "destination": "/api" },
-    { "source": "/residence-permit-visa-benefits", "destination": "/api" },
-    { "source": "/sitemap.xml", "destination": "/api" },
-    { "source": "/sitemaps/(.*)", "destination": "/api" },
-    { "source": "/", "destination": "/api" },
-    { "source": "/compare", "destination": "/api" },
-    { "source": "/discover", "destination": "/api" },
-    { "source": "/schengen", "destination": "/api" },
-    { "source": "/tier-list", "destination": "/api" },
-    { "source": "/digital-nomad", "destination": "/api" },
-    { "source": "/reciprocity", "destination": "/api" },
-    { "source": "/map", "destination": "/api" },
-    { "source": "/stats", "destination": "/api" },
-    { "source": "/popular", "destination": "/api" },
-    { "source": "/blog", "destination": "/api" },
-    { "source": "/blog/(.*)", "destination": "/api" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/visa-requirements",
+      "destination": "/api"
+    },
+    {
+      "source": "/visa-requirements/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/countries",
+      "destination": "/api"
+    },
+    {
+      "source": "/countries/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/guides",
+      "destination": "/api"
+    },
+    {
+      "source": "/guides/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/transit-visa",
+      "destination": "/api"
+    },
+    {
+      "source": "/transit-visa/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/travel-authorization",
+      "destination": "/api"
+    },
+    {
+      "source": "/travel-authorization/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/llms.txt",
+      "destination": "/api"
+    },
+    {
+      "source": "/methodology",
+      "destination": "/api"
+    },
+    {
+      "source": "/residence-permit-visa-benefits",
+      "destination": "/api"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api"
+    },
+    {
+      "source": "/sitemaps/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/",
+      "destination": "/api"
+    },
+    {
+      "source": "/compare",
+      "destination": "/api"
+    },
+    {
+      "source": "/discover",
+      "destination": "/api"
+    },
+    {
+      "source": "/schengen",
+      "destination": "/api"
+    },
+    {
+      "source": "/tier-list",
+      "destination": "/api"
+    },
+    {
+      "source": "/digital-nomad",
+      "destination": "/api"
+    },
+    {
+      "source": "/reciprocity",
+      "destination": "/api"
+    },
+    {
+      "source": "/map",
+      "destination": "/api"
+    },
+    {
+      "source": "/stats",
+      "destination": "/api"
+    },
+    {
+      "source": "/popular",
+      "destination": "/api"
+    },
+    {
+      "source": "/blog",
+      "destination": "/api"
+    },
+    {
+      "source": "/blog/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/shell.html"
+    }
   ]
 }
