@@ -293,12 +293,13 @@ footer.site{color:var(--muted);font-size:13px;padding:28px 0;text-align:center}
 <main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › <a href="/visa-requirements/${slugify(from.name)}">${esc(from.name)} passport</a> › ${esc(from.name)} → ${esc(to.name)}</nav>
 <h1>Do ${esc(from.name)} citizens need a visa for ${esc(to.name)}?</h1>
-<div class="updated">Last updated: ${esc(DATA_LAST_UPDATED)}</div>
+<div class="updated">Last updated: ${esc(entry.verifiedOn || DATA_LAST_UPDATED)}</div>
 
 <div class="answer">
   <span class="badge">${esc(reqLabel)}</span>
   <p>${esc(answer)}</p>
 </div>
+${entry.verifiedSource ? `<p style="color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;font-size:14px;margin:0 0 14px">✓ <strong>Individually verified.</strong> This rule was checked against ${esc(entry.verifiedSource)}${entry.verifiedOn ? ` on ${esc(entry.verifiedOn)}` : ""}.</p>` : ""}
 
 <div class="grid">
   <div class="stat"><div class="k">Visa type</div><div class="v">${esc(reqLabel)}</div></div>

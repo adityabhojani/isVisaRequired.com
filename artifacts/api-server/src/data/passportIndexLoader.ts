@@ -304,7 +304,9 @@ export function getPassportIndexLookup(): VisaLookup {
       destMap = new Map<string, VisaEntry>();
       _lookup.set(o.passport, destMap);
     }
-    destMap.set(o.destination, parseValue(o.value));
+    // Keep the provenance so pages can show "verified against <source> on <date>"
+    // for manually corrected cells, instead of only the dataset-wide date.
+    destMap.set(o.destination, { ...parseValue(o.value), verifiedSource: o.source, verifiedOn: o.verifiedOn });
   }
 
   return _lookup;

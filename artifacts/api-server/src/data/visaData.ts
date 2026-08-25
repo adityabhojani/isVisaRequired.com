@@ -11,6 +11,14 @@ export interface VisaEntry {
   requirement: VisaRequirement;
   maxStay?: string;
   notes?: string;
+  /**
+   * Provenance, present only when this cell came from our manually verified
+   * override layer (visa-overrides.ts) rather than the base dataset snapshot.
+   * Surfaced to users so they can tell a freshly-verified rule from one
+   * inherited from the older base data.
+   */
+  verifiedSource?: string;
+  verifiedOn?: string;
 }
 
 type VisaMatrix = Record<string, Record<string, VisaEntry>>;
