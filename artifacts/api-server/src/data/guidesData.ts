@@ -100,6 +100,56 @@ export const GUIDES: Guide[] = [
     tips: SHARED_TIPS("Kenyan"),
   },
   {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-vietnamese-citizens",
+    code: "VN",
+    nationality: "Vietnamese citizens",
+    adjective: "Vietnamese",
+    intro:
+      "Vietnamese passport holders can travel across much of Southeast Asia without a visa thanks to ASEAN agreements, and a growing list of countries further afield offer entry on arrival or with a simple online eVisa. This guide lists every destination open to Vietnamese citizens without an embassy visit, with the permitted stay for each.",
+    tips: SHARED_TIPS("Vietnamese"),
+  },
+  {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-indonesian-citizens",
+    code: "ID",
+    nationality: "Indonesian citizens",
+    adjective: "Indonesian",
+    intro:
+      "Indonesian passport holders enjoy some of the widest visa-free access in Southeast Asia — the whole ASEAN region plus a long list of destinations across Asia, Africa and the Americas. Below is every country Indonesian citizens can enter visa-free, on a visa on arrival, or with an online eVisa, each with its maximum stay.",
+    tips: SHARED_TIPS("Indonesian"),
+  },
+  {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-egyptian-citizens",
+    code: "EG",
+    nationality: "Egyptian citizens",
+    adjective: "Egyptian",
+    intro:
+      "Egyptian passport holders can reach a meaningful set of destinations across Africa, Asia and the Middle East without arranging a visa in advance. This guide breaks down every country open to Egyptian citizens visa-free, on arrival, or via eVisa — with the permitted stay and a link to the full requirements for each.",
+    tips: SHARED_TIPS("Egyptian"),
+  },
+  {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-sri-lankan-citizens",
+    code: "LK",
+    nationality: "Sri Lankan citizens",
+    adjective: "Sri Lankan",
+    intro:
+      "Sri Lankan passport holders need a visa for much of the world, which makes the exceptions worth knowing precisely. This guide lists every destination a Sri Lankan citizen can enter visa-free or with a visa granted at the border, plus the growing number of countries reachable with an online eVisa.",
+    tips: SHARED_TIPS("Sri Lankan"),
+  },
+  {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-nepali-citizens",
+    code: "NP",
+    nationality: "Nepali citizens",
+    adjective: "Nepali",
+    intro:
+      "Nepali passport holders have open-border access to India and visa-free or on-arrival entry to a modest but useful set of destinations across Asia, Africa and beyond. This guide lists all of them — visa-free, visa on arrival and eVisa — with the maximum stay for each and links to full requirements.",
+    tips: SHARED_TIPS("Nepali"),
+  },
+  {
     kind: "article",
     slug: "visa-on-arrival-vs-evisa-vs-eta",
     title: "Visa on Arrival vs eVisa vs ETA — What's the Difference? (2026)",

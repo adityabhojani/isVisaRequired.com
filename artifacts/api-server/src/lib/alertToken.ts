@@ -27,3 +27,20 @@ export function verifyUnsubToken(id: number, token: string): boolean {
 export function alertUnsubUrl(id: number, origin: string): string {
   return `${origin}/api/alerts/unsubscribe?id=${id}&token=${alertUnsubToken(id)}`;
 }
+
+// ── confirmation (double-opt-in) tokens ──────────────────────────────────────
+// Distinct message prefix so confirm and unsubscribe tokens are never
+// interchangeable.
+export function alertConfirmToken(id: number): string {
+  return crypto.createHmac("sha256", secret()).update(`confirm:${id}`).digest("hex").slice(0, 32);
+}
+
+export function verifyConfirmToken(id: number, token: string): boolean {
+  const expected = alertConfirmToken(id);
+  if (token.length !== expected.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(token), Buffer.from(expected));
+}
+
+export function alertConfirmUrl(id: number, origin: string): string {
+  return `${origin}/api/alerts/confirm?id=${id}&token=${alertConfirmToken(id)}`;
+}

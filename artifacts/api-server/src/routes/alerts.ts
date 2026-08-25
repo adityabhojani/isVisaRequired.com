@@ -6,7 +6,23 @@ import { getAuth } from "@clerk/express";
 import { logger } from "../lib/logger";
 import { writeLimiter } from "../middleware/rateLimiter";
 import { requireAdmin } from "../middleware/requireAdmin";
-import { verifyUnsubToken } from "../lib/alertToken";
+import { verifyUnsubToken, verifyConfirmToken, alertConfirmUrl } from "../lib/alertToken";
+import { sendEmail, isEmailConfigured } from "../lib/email";
+import { countries } from "../data/countries";
+
+const SITE_ORIGIN = "https://www.isvisarequired.com";
+const countryName = (code: string): string => countries.find((c) => c.code === code)?.name ?? code;
+
+function confirmEmailHtml(id: number, passport: string, destination: string): string {
+  const url = alertConfirmUrl(id, SITE_ORIGIN);
+  return `<div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a">
+    <h2 style="color:#0A2FA1">Confirm your visa alert</h2>
+    <p>You (or someone using your email) asked to be notified when the visa requirement for
+    <strong>${countryName(passport)}</strong> passport holders travelling to <strong>${countryName(destination)}</strong> changes.</p>
+    <p><a href="${url}" style="display:inline-block;background:#0A2FA1;color:#fff;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:700">Confirm this alert →</a></p>
+    <p style="color:#64748b;font-size:13px;margin-top:24px">If you didn't request this, simply ignore this email — no alerts will be sent unless you confirm.</p>
+  </div>`;
+}
 
 const router: IRouter = Router();
 
@@ -29,6 +45,13 @@ if (isDatabaseConfigured()) {
       // Snapshot of the last-known requirement, used to detect changes (cron).
       db.execute(sql`ALTER TABLE visa_alerts ADD COLUMN IF NOT EXISTS last_requirement TEXT`),
     )
+    .then(() =>
+      // Double-opt-in: new alerts need email confirmation before the cron
+      // emails them. Existing rows predate the column (NULL) and are
+      // grandfathered as confirmed by the backfill below.
+      db.execute(sql`ALTER TABLE visa_alerts ADD COLUMN IF NOT EXISTS confirmed BOOLEAN`),
+    )
+    .then(() => db.execute(sql`UPDATE visa_alerts SET confirmed = TRUE WHERE confirmed IS NULL`))
     .catch((err: unknown) => {
       logger.error({ err }, "Failed to create/upgrade visa_alerts table");
     });
@@ -53,6 +76,25 @@ router.get("/alerts/unsubscribe", async (req, res): Promise<void> => {
   }
 });
 
+// One-click confirmation from the double-opt-in email (signed token, no login).
+router.get("/alerts/confirm", async (req, res): Promise<void> => {
+  const id = Number(req.query["id"]);
+  const token = String(req.query["token"] ?? "");
+  if (!id || isNaN(id) || !token || !verifyConfirmToken(id, token)) {
+    res.status(400).type("html").send("<p>Invalid or expired confirmation link.</p>");
+    return;
+  }
+  try {
+    await db.execute(sql`UPDATE visa_alerts SET confirmed = TRUE, is_active = TRUE WHERE id = ${id}`);
+    res.type("html").send(
+      "<div style=\"font-family:Arial,sans-serif;text-align:center;padding:48px\"><h2>✓ Alert confirmed</h2><p>We'll email you if this visa requirement changes. You can unsubscribe from any alert email.</p><p><a href=\"https://www.isvisarequired.com\">Back to isvisarequired.com</a></p></div>",
+    );
+  } catch (err) {
+    req.log.error({ err }, "Alert confirmation failed");
+    res.status(500).type("html").send("<p>Something went wrong. Please try again later.</p>");
+  }
+});
+
 router.post("/alerts", writeLimiter, async (req, res): Promise<void> => {
   const auth = getAuth(req);
   const userId = auth?.userId ?? null;
@@ -72,11 +114,32 @@ router.post("/alerts", writeLimiter, async (req, res): Promise<void> => {
   const { email, passport_code, destination_code } = parsed.data;
 
   try {
-    await db.execute(sql`
-      INSERT INTO visa_alerts (user_id, email, passport_code, destination_code)
-      VALUES (${userId}, ${email}, ${passport_code}, ${destination_code})
+    // Double-opt-in: while email sending is configured, a new alert stays
+    // unconfirmed until the address owner clicks the emailed link — otherwise
+    // anyone could sign someone else's inbox up for alerts. Without email
+    // configured nothing is ever sent, so alerts activate immediately (and
+    // will be grandfathered as confirmed).
+    const emailGate = isEmailConfigured();
+    const result = await db.execute(sql`
+      INSERT INTO visa_alerts (user_id, email, passport_code, destination_code, confirmed)
+      VALUES (${userId}, ${email}, ${passport_code}, ${destination_code}, ${!emailGate})
       ON CONFLICT (email, passport_code, destination_code) DO UPDATE SET is_active = TRUE
+      RETURNING id, confirmed
     `);
+    const row = result.rows[0] as unknown as { id: number; confirmed: boolean | null };
+    if (emailGate && row && !row.confirmed) {
+      const sent = await sendEmail({
+        to: email,
+        subject: `Confirm your visa alert: ${countryName(passport_code)} → ${countryName(destination_code)}`,
+        html: confirmEmailHtml(row.id, passport_code, destination_code),
+      });
+      if (!sent) {
+        res.status(502).json({ error: "Couldn't send the confirmation email. Please try again shortly." });
+        return;
+      }
+      res.json({ success: true, needsConfirmation: true });
+      return;
+    }
     res.json({ success: true });
   } catch (err) {
     req.log.error({ err }, "Failed to create visa alert");
@@ -96,7 +159,7 @@ router.get("/alerts", async (req, res): Promise<void> => {
     const result = await db.execute(sql`
       SELECT id, passport_code, destination_code, created_at
       FROM visa_alerts
-      WHERE user_id = ${userId} AND is_active = TRUE
+      WHERE user_id = ${userId} AND is_active = TRUE AND (confirmed IS NULL OR confirmed = TRUE)
       ORDER BY created_at DESC
     `);
     res.setHeader("Cache-Control", "no-store");

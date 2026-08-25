@@ -24,6 +24,7 @@ export function AlertSubscribeWidget({
   const { user, isLoaded } = useUser();
   const [email, setEmail] = useState(user?.primaryEmailAddress?.emailAddress ?? "");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "dismissed">("idle");
+  const [needsConfirm, setNeedsConfirm] = useState(false);
   const [error, setError] = useState("");
 
   if (status === "dismissed") return null;
@@ -44,8 +45,9 @@ export function AlertSubscribeWidget({
           destination_code: destinationCode,
         }),
       });
-      const data = await res.json() as { success?: boolean; error?: string };
+      const data = await res.json() as { success?: boolean; needsConfirmation?: boolean; error?: string };
       if (data.success) {
+        setNeedsConfirm(Boolean(data.needsConfirmation));
         setStatus("success");
       } else {
         setStatus("error");
@@ -61,7 +63,9 @@ export function AlertSubscribeWidget({
     return (
       <div className="flex items-center gap-2 text-green-700 bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm font-medium">
         <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-        <span>Alert set! We'll email you if the requirement for {destinationFlag} {destinationName} changes.</span>
+        <span>{needsConfirm
+          ? `Almost done — check your inbox and click the confirmation link to activate your ${destinationName} alert.`
+          : `Alert set! We'll email you if the requirement for ${destinationFlag} ${destinationName} changes.`}</span>
       </div>
     );
   }
@@ -159,6 +163,7 @@ export function MultiAlertSubscribeWidget({ passportCode, passportFlag, passport
   const { user, isLoaded } = useUser();
   const [email, setEmail] = useState(user?.primaryEmailAddress?.emailAddress ?? "");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "dismissed">("idle");
+  const [needsConfirm, setNeedsConfirm] = useState(false);
   const [error, setError] = useState("");
 
   if (status === "dismissed" || destinations.length === 0) return null;
@@ -188,6 +193,8 @@ export function MultiAlertSubscribeWidget({ passportCode, passportFlag, passport
       );
       const allOk = results.every((r) => r.ok);
       if (allOk) {
+        const bodies = await Promise.all(results.map((r) => r.json().catch(() => ({})) as Promise<{ needsConfirmation?: boolean }>));
+        setNeedsConfirm(bodies.some((b) => b.needsConfirmation));
         setStatus("success");
       } else {
         setStatus("error");
@@ -204,7 +211,9 @@ export function MultiAlertSubscribeWidget({ passportCode, passportFlag, passport
       <div className="flex items-center gap-2 text-green-700 bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm font-medium">
         <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
         <span>
-          Alerts set for {destinations.length} destination{destinations.length > 1 ? "s" : ""}! We'll email you when requirements change.
+          {needsConfirm
+            ? `Almost done — check your inbox and confirm to activate your ${destinations.length} alert${destinations.length > 1 ? "s" : ""}.`
+            : `Alerts set for ${destinations.length} destination${destinations.length > 1 ? "s" : ""}! We'll email you when requirements change.`}
         </span>
       </div>
     );

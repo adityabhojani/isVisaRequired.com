@@ -90,7 +90,7 @@ router.get("/cron/check-alerts", async (req: Request, res: Response): Promise<vo
   try {
     const result = await db.execute(sql`
       SELECT id, email, passport_code, destination_code, last_requirement
-      FROM visa_alerts WHERE is_active = TRUE LIMIT 2000
+      FROM visa_alerts WHERE is_active = TRUE AND (confirmed IS NULL OR confirmed = TRUE) LIMIT 2000
     `);
     const rows = result.rows as unknown as AlertRow[];
     for (const a of rows) {
