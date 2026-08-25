@@ -26,6 +26,7 @@ import { renderPassportHub } from "../seo/passportHub";
 import { renderDestinationHub } from "../seo/destinationHub";
 import { GUIDES, getGuide } from "../data/guidesData";
 import { renderGuidesHub, renderGuide } from "../seo/guides";
+import { ROUTE_SEO, renderAppRoute, loadShell } from "../seo/appShell";
 
 const router: IRouter = Router();
 
@@ -76,7 +77,7 @@ router.get("/visa-requirements", (_req: Request, res: Response): void => {
 
 // ── hub: one passport → all destinations (rich passport hub) ─────────────────
 router.get("/visa-requirements/:from", (req: Request, res: Response): void => {
-  const from = countryFromSlug(req.params.from);
+  const from = countryFromSlug(req.params.from as string);
   if (!from) {
     res.status(404).setHeader("Cache-Control", "no-store");
     res.type("html").send(renderPairNotFound());
@@ -105,7 +106,7 @@ router.get("/countries", (_req: Request, res: Response): void => {
 
 // ── hub: one destination → who needs a visa (rich destination hub) ───────────
 router.get("/countries/:slug", (req: Request, res: Response): void => {
-  const to = countryFromSlug(req.params.slug);
+  const to = countryFromSlug(req.params.slug as string);
   if (!to) {
     res.status(404).setHeader("Cache-Control", "no-store");
     res.type("html").send(renderPairNotFound());
@@ -122,7 +123,7 @@ router.get("/transit-visa", (_req: Request, res: Response): void => {
 });
 
 router.get("/transit-visa/:slug", (req: Request, res: Response): void => {
-  const guide = getTransitGuide(req.params.slug);
+  const guide = getTransitGuide(req.params.slug as string);
   if (!guide) {
     res.status(404).setHeader("Cache-Control", "no-store");
     res.type("html").send(renderPairNotFound());
@@ -185,7 +186,7 @@ router.get("/travel-authorization", (_req: Request, res: Response): void => {
 });
 
 router.get("/travel-authorization/:slug", (req: Request, res: Response): void => {
-  const guide = getTravelAuth(req.params.slug);
+  const guide = getTravelAuth(req.params.slug as string);
   if (!guide) {
     res.status(404).setHeader("Cache-Control", "no-store");
     res.type("html").send(renderPairNotFound());
@@ -202,7 +203,7 @@ router.get("/guides", (_req: Request, res: Response): void => {
 });
 
 router.get("/guides/:slug", (req: Request, res: Response): void => {
-  const guide = getGuide(req.params.slug);
+  const guide = getGuide(req.params.slug as string);
   if (!guide) {
     res.status(404).setHeader("Cache-Control", "no-store");
     res.type("html").send(renderPairNotFound());
@@ -214,8 +215,8 @@ router.get("/guides/:slug", (req: Request, res: Response): void => {
 
 // ── per-pair page ────────────────────────────────────────────────────────────
 router.get("/visa-requirements/:from/:to", (req: Request, res: Response): void => {
-  const from = countryFromSlug(req.params.from);
-  const to = countryFromSlug(req.params.to);
+  const from = countryFromSlug(req.params.from as string);
+  const to = countryFromSlug(req.params.to as string);
   if (!from || !to || from.code === to.code) {
     res.status(404).setHeader("Cache-Control", "no-store");
     res.type("html").send(renderPairNotFound());
@@ -286,5 +287,23 @@ router.get("/sitemaps/pairs-:code.xml", (req: Request, res: Response): void => {
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>`,
   );
 });
+
+// ── SPA marketing/tool routes: serve the index.html shell with route-specific
+// SEO content injected into #root (React takes over on load). Falls back to the
+// raw shell so the page never breaks.
+for (const [routePath, seo] of Object.entries(ROUTE_SEO)) {
+  router.get(routePath, (_req: Request, res: Response): void => {
+    try {
+      const html = renderAppRoute(routePath, seo) ?? loadShell();
+      if (!html) { res.status(503).type("html").send("Temporarily unavailable. Please refresh."); return; }
+      res.setHeader("Cache-Control", HTML_CACHE);
+      res.type("html").send(html);
+    } catch {
+      const shell = loadShell();
+      if (shell) { res.type("html").send(shell); return; }
+      res.status(503).type("html").send("Temporarily unavailable. Please refresh.");
+    }
+  });
+}
 
 export default router;

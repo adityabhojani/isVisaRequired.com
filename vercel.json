@@ -14,7 +14,7 @@
   ],
   "functions": {
     "api/index.ts": {
-      "includeFiles": "artifacts/api-server/src/data/passport-index.csv"
+      "includeFiles": "artifacts/{api-server/src/data/passport-index.csv,visa-checker/dist/public/index.html}"
     }
   },
   "crons": [
@@ -37,6 +37,17 @@
     { "source": "/residence-permit-visa-benefits", "destination": "/api" },
     { "source": "/sitemap.xml", "destination": "/api" },
     { "source": "/sitemaps/(.*)", "destination": "/api" },
+    { "source": "/", "destination": "/api" },
+    { "source": "/compare", "destination": "/api" },
+    { "source": "/discover", "destination": "/api" },
+    { "source": "/schengen", "destination": "/api" },
+    { "source": "/tier-list", "destination": "/api" },
+    { "source": "/digital-nomad", "destination": "/api" },
+    { "source": "/reciprocity", "destination": "/api" },
+    { "source": "/map", "destination": "/api" },
+    { "source": "/stats", "destination": "/api" },
+    { "source": "/popular", "destination": "/api" },
+    { "source": "/blog", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
