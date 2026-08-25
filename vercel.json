@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install --filter @workspace/visa-checker... --filter @workspace/api-server...",
-  "buildCommand": "pnpm --filter @workspace/api-server build && BASE_PATH=/ pnpm --filter @workspace/visa-checker build && node -e \"const fs=require('fs');const d='artifacts/visa-checker/dist/public/';fs.copyFileSync(d+'index.html',d+'shell.html');fs.unlinkSync(d+'index.html')\"",
+  "buildCommand": "pnpm --filter @workspace/api-server build && BASE_PATH=/ pnpm --filter @workspace/visa-checker build && node scripts/rename-shell.mjs",
   "outputDirectory": "artifacts/visa-checker/dist/public",
   "framework": null,
   "redirects": [
