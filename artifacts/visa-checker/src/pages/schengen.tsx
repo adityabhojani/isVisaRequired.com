@@ -56,7 +56,10 @@ export default function SchengenPage() {
     setTrips((t) => t.map((x) => x.id === id ? { ...x, [field]: val } : x));
 
   const analysis = useMemo(() => {
-    const anchor = new Date(checkDate);
+    // Guard against a cleared date input ("" → Invalid Date → "until Invalid
+    // Date" in the summary). Fall back to today.
+    const parsed = new Date(checkDate);
+    const anchor = isNaN(parsed.getTime()) ? new Date() : parsed;
     const used = countDaysInWindow(trips, anchor);
     const remaining = Math.max(0, 90 - used);
 
@@ -73,7 +76,7 @@ export default function SchengenPage() {
       }
     }
 
-    return { used, remaining, earliestReEntry };
+    return { used, remaining, earliestReEntry, anchor };
   }, [trips, checkDate]);
 
   const status = analysis.used >= 90 ? "exceeded" : analysis.used >= 75 ? "warning" : "ok";
@@ -157,7 +160,7 @@ export default function SchengenPage() {
           )}
           {analysis.remaining > 0 && (
             <p className="mt-3 text-sm text-muted-foreground">
-              <strong>Maximum stay from check date:</strong> {analysis.remaining} days (until {addDays(new Date(checkDate), analysis.remaining - 1).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })})
+              <strong>Maximum stay from check date:</strong> {analysis.remaining} days (until {addDays(analysis.anchor, analysis.remaining - 1).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })})
             </p>
           )}
         </div>
