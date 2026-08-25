@@ -235,4 +235,65 @@ export const VISA_OVERRIDES: VisaOverride[] = [
     source: "EY Global immigration alert, 'Malaysia extends visa exemption period for India and China nationals' (3 Jan 2025)",
     verifiedOn: "2026-08-24",
   },
+
+  // --- Batch 2: individually web-verified corrections (2026-08-25) -----------
+  // South Korea has a separate BILATERAL 90-day treaty with Thailand, so the
+  // pending rollback of Thailand's unilateral 60-day scheme does not apply.
+  {
+    passport: "KR",
+    destination: "TH",
+    value: "90",
+    source: "Thai MFA visa-exemption table (image.mfa.go.th VOA.pdf); bilateral agreement, 90 days",
+    verifiedOn: "2026-08-25",
+  },
+
+  // Brunei moved from the old 15-day ASEAN trial to China's full 30-day
+  // unilateral visa-exemption list.
+  {
+    passport: "BN",
+    destination: "CN",
+    value: "30",
+    source: "China NIA unilateral visa-exemption list (en.nia.gov.cn/n147418/n147463/c183390/content.html)",
+    verifiedOn: "2026-08-25",
+  },
+
+  // Saudi visitor eVisa covers Azerbaijan, Georgia and Uzbekistan (Aug 2023
+  // expansion). Uzbekistan's eVisa was suspended only for the 2025 Hajj season
+  // (23 Apr–9 Jun 2025) and restored in June 2025.
+  ...["AZ", "GE", "UZ"].map((passport): VisaOverride => ({
+    passport,
+    destination: "SA",
+    value: "e-visa",
+    source: "Saudi Tourism Authority / Deloitte 'KSA expands the visitor eVisa'; UZ restoration reported 19 Jun 2025 (kun.uz)",
+    verifiedOn: "2026-08-25",
+  })),
+
+  // Qatar suspended visa on arrival for Lebanese nationals (1 Apr 2026);
+  // a pre-approved Hayya visa is now required before departure.
+  {
+    passport: "LB",
+    destination: "QA",
+    value: "visa required",
+    source: "Embassy of Lebanon in Doha advisory (1 Apr 2026); EY global immigration alert 2026-0813",
+    verifiedOn: "2026-08-25",
+  },
+
+  // Georgia: Pakistani nationals are not eVisa-eligible; a visa from the
+  // embassy is required (visa-free only with qualifying Gulf residence).
+  {
+    passport: "PK",
+    destination: "GE",
+    value: "visa required",
+    source: "Envoy Global 'Georgia Updates Visa-Free Entry Rules'; Georgian embassy application guidance",
+    verifiedOn: "2026-08-25",
+  },
+
+  // Oman's visa-exemption list (100+ nationalities, 14 days) includes Armenia.
+  {
+    passport: "AM",
+    destination: "OM",
+    value: "14",
+    source: "Oman Ministry of Foreign Affairs entry-visa list (fm.gov.om)",
+    verifiedOn: "2026-08-25",
+  },
 ];
