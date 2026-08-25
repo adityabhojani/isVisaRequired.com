@@ -48,6 +48,7 @@
     { "source": "/stats", "destination": "/api" },
     { "source": "/popular", "destination": "/api" },
     { "source": "/blog", "destination": "/api" },
+    { "source": "/blog/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

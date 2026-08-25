@@ -27,6 +27,9 @@ import { renderDestinationHub } from "../seo/destinationHub";
 import { GUIDES, getGuide } from "../data/guidesData";
 import { renderGuidesHub, renderGuide } from "../seo/guides";
 import { ROUTE_SEO, renderAppRoute, loadShell } from "../seo/appShell";
+import { renderBlogPostShell, type BlogPostRow } from "../seo/blogSeo";
+import { db, isDatabaseConfigured } from "@workspace/db";
+import { sql } from "drizzle-orm";
 
 const router: IRouter = Router();
 
@@ -230,6 +233,7 @@ router.get("/visa-requirements/:from/:to", (req: Request, res: Response): void =
 router.get("/sitemap.xml", (_req: Request, res: Response): void => {
   const sitemaps = [
     `${SITE_ORIGIN}/sitemaps/core.xml`,
+    `${SITE_ORIGIN}/sitemaps/blog.xml`,
     ...allCountries().map((c) => `${SITE_ORIGIN}/sitemaps/pairs-${c.code}.xml`),
   ];
   const body = sitemaps
@@ -283,6 +287,61 @@ router.get("/sitemaps/pairs-:code.xml", (req: Request, res: Response): void => {
     .map((to) => `  <url><loc>${SITE_ORIGIN}${pairPath(from, to)}</loc><lastmod>${DATA_LAST_UPDATED}</lastmod><changefreq>monthly</changefreq></url>`)
     .join("\n");
   res.setHeader("Cache-Control", XML_CACHE);
+  res.type("application/xml").send(
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>`,
+  );
+});
+
+// ── blog posts: server-rendered into the SPA shell (crawlable editorial) ─────
+router.get("/blog/:slug", async (req: Request, res: Response): Promise<void> => {
+  const slug = String(req.params.slug ?? "").toLowerCase().trim();
+  const shell = loadShell();
+  if (!isDatabaseConfigured() || !slug) {
+    if (shell) { res.type("html").send(shell); return; }
+    res.status(503).type("html").send("Temporarily unavailable.");
+    return;
+  }
+  try {
+    const result = await db.execute(sql`
+      SELECT title, slug, excerpt, content, cover_url, author, created_at, updated_at
+      FROM blog_posts WHERE slug = ${slug} AND published = true
+    `);
+    const post = result.rows[0] as unknown as BlogPostRow | undefined;
+    if (!post) {
+      // Real 404 for crawlers; React still renders its own not-found UI.
+      res.status(404).setHeader("Cache-Control", "no-store");
+      if (shell) { res.type("html").send(shell); return; }
+      res.type("html").send(renderPairNotFound());
+      return;
+    }
+    const html = renderBlogPostShell(post) ?? shell;
+    if (!html) { res.status(503).type("html").send("Temporarily unavailable."); return; }
+    res.setHeader("Cache-Control", "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400");
+    res.type("html").send(html);
+  } catch {
+    if (shell) { res.type("html").send(shell); return; }
+    res.status(503).type("html").send("Temporarily unavailable.");
+  }
+});
+
+// ── blog sitemap (dynamic, from the DB) ──────────────────────────────────────
+router.get("/sitemaps/blog.xml", async (_req: Request, res: Response): Promise<void> => {
+  let body = "";
+  if (isDatabaseConfigured()) {
+    try {
+      const result = await db.execute(sql`
+        SELECT slug, updated_at, created_at FROM blog_posts WHERE published = true ORDER BY created_at DESC LIMIT 5000
+      `);
+      body = (result.rows as { slug: string; updated_at?: string; created_at?: string }[])
+        .map((p) => {
+          const d = new Date(p.updated_at ?? p.created_at ?? Date.now());
+          const lastmod = isNaN(d.getTime()) ? DATA_LAST_UPDATED : d.toISOString().slice(0, 10);
+          return `  <url><loc>${SITE_ORIGIN}/blog/${p.slug}</loc><lastmod>${lastmod}</lastmod></url>`;
+        })
+        .join("\n");
+    } catch { /* empty sitemap on DB error */ }
+  }
+  res.setHeader("Cache-Control", "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400");
   res.type("application/xml").send(
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>`,
   );
