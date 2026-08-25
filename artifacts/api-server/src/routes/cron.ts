@@ -11,6 +11,7 @@ import { countries } from "../data/countries";
 import { sendEmail, isEmailConfigured } from "../lib/email";
 import { alertUnsubUrl } from "../lib/alertToken";
 import { isAdminUser } from "../middleware/requireAdmin";
+import { ensureAlertsSchema } from "./alerts";
 import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
@@ -88,6 +89,7 @@ router.get("/cron/check-alerts", async (req: Request, res: Response): Promise<vo
 
   let checked = 0, baselined = 0, changed = 0, emailed = 0;
   try {
+    await ensureAlertsSchema();
     const result = await db.execute(sql`
       SELECT id, email, passport_code, destination_code, last_requirement
       FROM visa_alerts WHERE is_active = TRUE AND (confirmed IS NULL OR confirmed = TRUE) LIMIT 2000

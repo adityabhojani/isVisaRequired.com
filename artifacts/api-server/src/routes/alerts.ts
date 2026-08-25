@@ -26,36 +26,44 @@ function confirmEmailHtml(id: number, passport: string, destination: string): st
 
 const router: IRouter = Router();
 
-// Create table on startup only when a database is configured. Without
-// DATABASE_URL the visa-alerts feature is simply inactive.
-if (isDatabaseConfigured()) {
-  db.execute(sql`
-    CREATE TABLE IF NOT EXISTS visa_alerts (
-      id SERIAL PRIMARY KEY,
-      user_id TEXT,
-      email TEXT NOT NULL,
-      passport_code TEXT NOT NULL,
-      destination_code TEXT NOT NULL,
-      created_at TIMESTAMPTZ DEFAULT NOW(),
-      is_active BOOLEAN DEFAULT TRUE,
-      UNIQUE(email, passport_code, destination_code)
-    )
-  `)
-    .then(() =>
+// Schema migration for visa_alerts. On serverless a fire-and-forget startup
+// DDL races the first request (a handler referencing a new column 500s until
+// the ALTER lands), so handlers AWAIT this memoized promise instead. A failed
+// attempt clears the memo so the next request retries.
+let _schemaReady: Promise<void> | null = null;
+export function ensureAlertsSchema(): Promise<void> {
+  if (!isDatabaseConfigured()) return Promise.resolve();
+  if (!_schemaReady) {
+    _schemaReady = (async () => {
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS visa_alerts (
+          id SERIAL PRIMARY KEY,
+          user_id TEXT,
+          email TEXT NOT NULL,
+          passport_code TEXT NOT NULL,
+          destination_code TEXT NOT NULL,
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          is_active BOOLEAN DEFAULT TRUE,
+          UNIQUE(email, passport_code, destination_code)
+        )
+      `);
       // Snapshot of the last-known requirement, used to detect changes (cron).
-      db.execute(sql`ALTER TABLE visa_alerts ADD COLUMN IF NOT EXISTS last_requirement TEXT`),
-    )
-    .then(() =>
+      await db.execute(sql`ALTER TABLE visa_alerts ADD COLUMN IF NOT EXISTS last_requirement TEXT`);
       // Double-opt-in: new alerts need email confirmation before the cron
-      // emails them. Existing rows predate the column (NULL) and are
-      // grandfathered as confirmed by the backfill below.
-      db.execute(sql`ALTER TABLE visa_alerts ADD COLUMN IF NOT EXISTS confirmed BOOLEAN`),
-    )
-    .then(() => db.execute(sql`UPDATE visa_alerts SET confirmed = TRUE WHERE confirmed IS NULL`))
-    .catch((err: unknown) => {
+      // emails them. Pre-existing rows (NULL) are grandfathered as confirmed;
+      // new inserts always set the column explicitly.
+      await db.execute(sql`ALTER TABLE visa_alerts ADD COLUMN IF NOT EXISTS confirmed BOOLEAN`);
+      await db.execute(sql`UPDATE visa_alerts SET confirmed = TRUE WHERE confirmed IS NULL`);
+    })().catch((err: unknown) => {
+      _schemaReady = null;
       logger.error({ err }, "Failed to create/upgrade visa_alerts table");
+      throw err;
     });
+  }
+  return _schemaReady;
 }
+// Warm up eagerly (failures surface via the log; handlers re-await).
+void ensureAlertsSchema().catch(() => {});
 
 // One-click unsubscribe from an alert email (signed token, no login required).
 router.get("/alerts/unsubscribe", async (req, res): Promise<void> => {
@@ -85,6 +93,7 @@ router.get("/alerts/confirm", async (req, res): Promise<void> => {
     return;
   }
   try {
+    await ensureAlertsSchema();
     await db.execute(sql`UPDATE visa_alerts SET confirmed = TRUE, is_active = TRUE WHERE id = ${id}`);
     res.type("html").send(
       "<div style=\"font-family:Arial,sans-serif;text-align:center;padding:48px\"><h2>✓ Alert confirmed</h2><p>We'll email you if this visa requirement changes. You can unsubscribe from any alert email.</p><p><a href=\"https://www.isvisarequired.com\">Back to isvisarequired.com</a></p></div>",
@@ -114,6 +123,7 @@ router.post("/alerts", writeLimiter, async (req, res): Promise<void> => {
   const { email, passport_code, destination_code } = parsed.data;
 
   try {
+    await ensureAlertsSchema();
     // Double-opt-in: while email sending is configured, a new alert stays
     // unconfirmed until the address owner clicks the emailed link — otherwise
     // anyone could sign someone else's inbox up for alerts. Without email
@@ -156,6 +166,7 @@ router.get("/alerts", async (req, res): Promise<void> => {
   }
 
   try {
+    await ensureAlertsSchema();
     const result = await db.execute(sql`
       SELECT id, passport_code, destination_code, created_at
       FROM visa_alerts
