@@ -28,6 +28,7 @@ import { GUIDES, getGuide } from "../data/guidesData";
 import { renderGuidesHub, renderGuide } from "../seo/guides";
 import { ROUTE_SEO, renderAppRoute, loadShell } from "../seo/appShell";
 import { renderBlogPostShell, type BlogPostRow } from "../seo/blogSeo";
+import { renderPassportPowerReport, renderReportCsv, REPORT_PATH } from "../seo/report";
 import { db, isDatabaseConfigured } from "@workspace/db";
 import { sql } from "drizzle-orm";
 
@@ -257,6 +258,7 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   for (const g of TRANSIT_GUIDES) urls.push(`${SITE_ORIGIN}/transit-visa/${g.slug}`);
   urls.push(`${SITE_ORIGIN}/travel-authorization`);
   for (const a of TRAVEL_AUTHS) urls.push(`${SITE_ORIGIN}/travel-authorization/${a.slug}`);
+  urls.push(`${SITE_ORIGIN}${REPORT_PATH}`);
   urls.push(`${SITE_ORIGIN}/guides`);
   for (const g of GUIDES) urls.push(`${SITE_ORIGIN}/guides/${g.slug}`);
   // Canonical passport & destination hubs (server-rendered). The SPA
@@ -290,6 +292,18 @@ router.get("/sitemaps/pairs-:code.xml", (req: Request, res: Response): void => {
   res.type("application/xml").send(
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>`,
   );
+});
+
+// ── Passport Power Report (linkable data asset) ──────────────────────────────
+router.get(REPORT_PATH, (_req: Request, res: Response): void => {
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderPassportPowerReport());
+});
+
+router.get(`${REPORT_PATH}.csv`, (_req: Request, res: Response): void => {
+  res.setHeader("Cache-Control", XML_CACHE);
+  res.setHeader("Content-Disposition", "attachment; filename=passport-power-2026.csv");
+  res.type("text/csv").send(renderReportCsv());
 });
 
 // ── blog posts: server-rendered into the SPA shell (crawlable editorial) ─────

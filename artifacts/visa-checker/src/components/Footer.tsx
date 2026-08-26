@@ -119,6 +119,7 @@ export function Footer() {
                   { href: "/my-travels", label: "My Travels" },
                   { href: "/alerts", label: "Visa Alerts" },
                   { href: "/stats", label: "Passport Power Index" },
+                  { href: "/reports/passport-power-2026", label: "Passport Power Report 2026" },
                   { href: "/popular", label: "Popular Destinations" },
                   { href: "/transit-visa", label: "Transit Visa Guides" },
                   { href: "/travel-authorization", label: "ETIAS, ESTA & ETA" },

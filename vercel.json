@@ -94,6 +94,10 @@
       "destination": "/api"
     },
     {
+      "source": "/reports/(.*)",
+      "destination": "/api"
+    },
+    {
       "source": "/",
       "destination": "/api"
     },
