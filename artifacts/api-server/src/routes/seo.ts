@@ -298,6 +298,15 @@ router.get("/sitemaps/pairs-:code.xml", (req: Request, res: Response): void => {
   );
 });
 
+// ── missing static assets: real 404, not the SPA shell ───────────────────────
+// Vercel serves existing files from the filesystem before rewrites, so only
+// assets that DON'T exist reach us. Without this, a stale chunk URL (old HTML
+// after a deploy) fell through to the SPA catch-all and got 200 + HTML-as-JS —
+// breaking returning visitors and creating soft-404s for crawlers.
+router.get("/assets/*splat", (_req: Request, res: Response): void => {
+  res.status(404).setHeader("Cache-Control", "no-store").type("text/plain").send("Not found");
+});
+
 // ── Passport Power Report (linkable data asset) ──────────────────────────────
 router.get(REPORT_PATH, (_req: Request, res: Response): void => {
   res.setHeader("Cache-Control", HTML_CACHE);

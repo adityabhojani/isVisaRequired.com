@@ -146,6 +146,10 @@
       "destination": "/api"
     },
     {
+      "source": "/assets/(.*)",
+      "destination": "/api"
+    },
+    {
       "source": "/(.*)",
       "destination": "/shell.html"
     }
