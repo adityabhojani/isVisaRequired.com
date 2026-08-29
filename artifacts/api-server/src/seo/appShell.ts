@@ -44,6 +44,7 @@ export interface RouteSeo {
   description: string;
   h1: string;
   body: string; // crawlable HTML injected into #root (React replaces it on mount)
+  jsonLd?: object[]; // structured data injected into <head>
 }
 
 // Shared crawlable link block (internal links boost crawl + relevance).
@@ -70,6 +71,24 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     description: "Check visa requirements instantly for any passport and destination. Find out if you need a visa, visa on arrival, e-visa, ETA/ETIAS, or can travel visa-free — free, no sign-up.",
     h1: "Do you need a visa?",
     body: `<p>Select your passport and destination to instantly see whether you need a visa, visa on arrival, an e-visa, an electronic travel authorisation (ETIAS/ESTA/ETA), or can travel visa-free — across 199 countries and ~38,000 passport–destination combinations. Free, no account needed.</p>`,
+    jsonLd: [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "isvisarequired.com",
+        alternateName: "Is Visa Required?",
+        url: SITE,
+        description: "Free visa-requirement checker covering 199 countries and ~38,000 passport-to-destination combinations.",
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "isvisarequired.com",
+        url: SITE,
+        logo: `${SITE}/favicon.svg`,
+        contactPoint: { "@type": "ContactPoint", url: `${SITE}/contact`, contactType: "customer support" },
+      },
+    ],
   },
   "/compare": {
     title: "Compare Two Passports — Visa-Free Power & Differences | isvisarequired.com",
@@ -151,6 +170,11 @@ export function renderAppRoute(routePath: string, seo: RouteSeo): string | null 
   html = html.replace(/<meta\s+name="description"\s+content="[\s\S]*?"\s*\/?>/i, `<meta name="description" content="${esc(seo.description)}" />`);
   // Replace canonical
   html = html.replace(/<link\s+rel="canonical"\s+href="[\s\S]*?"\s*\/?>/i, `<link rel="canonical" href="${canonical}" />`);
+  // Structured data (e.g. WebSite/Organization on the homepage)
+  if (seo.jsonLd && seo.jsonLd.length) {
+    const ld = seo.jsonLd.map((o) => `<script type="application/ld+json">${JSON.stringify(o)}</script>`).join("");
+    html = html.replace("</head>", `${ld}</head>`);
+  }
   // Inject crawlable content into the empty root
   html = html.replace(/<div id="root">\s*<\/div>/i, `<div id="root">${injected}</div>`);
   return html;

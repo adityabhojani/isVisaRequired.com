@@ -166,8 +166,16 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
   // Related internal links (crawlable graph): same destination / other passports,
   // and same passport / other destinations.
   const others = countries.filter((c) => c.code !== from.code && c.code !== to.code);
-  const otherPassports = others.slice(0, 12);
-  const otherDestinations = others.slice(12, 24);
+  // Deterministic per-pair rotation. With fixed slices, all ~38k pair pages
+  // linked the SAME 24 alphabetically-first pages, starving the long tail of
+  // internal links; a pair-seeded window spreads the link graph evenly across
+  // every page while staying stable between renders (crawl-friendly).
+  const seed =
+    (from.code.charCodeAt(0) * 31 + from.code.charCodeAt(1) * 17 + to.code.charCodeAt(0) * 7 + to.code.charCodeAt(1)) %
+    others.length;
+  const rotated = [...others.slice(seed), ...others.slice(0, seed)];
+  const otherPassports = rotated.slice(0, 12);
+  const otherDestinations = rotated.slice(12, 24);
 
   const docsList = detail.documents.map((d) => `<li>${esc(d)}</li>`).join("");
   const processList = detail.process.map((p) => `<li>${esc(p)}</li>`).join("");

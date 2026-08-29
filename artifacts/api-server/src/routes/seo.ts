@@ -156,6 +156,10 @@ router.get("/llms.txt", (_req: Request, res: Response): void => {
 ## Primary pages
 - Visa checker (home): ${SITE_ORIGIN}/
 - Per-pair visa requirements: ${SITE_ORIGIN}/visa-requirements/{from-country}/{to-country}
+- Visa requirements by passport (hubs): ${SITE_ORIGIN}/visa-requirements
+- Visa requirements by destination country: ${SITE_ORIGIN}/countries
+- Editorial guides (visa-free lists, visa types): ${SITE_ORIGIN}/guides
+- Global Passport Power Report (rankings + open CSV data, CC BY 4.0): ${SITE_ORIGIN}/reports/passport-power-2026
 - Transit visa guides: ${SITE_ORIGIN}/transit-visa
 - ETIAS / ESTA / ETA / eTA explainers: ${SITE_ORIGIN}/travel-authorization
 - Residence-permit & second-document rules: ${SITE_ORIGIN}/residence-permit-visa-benefits
