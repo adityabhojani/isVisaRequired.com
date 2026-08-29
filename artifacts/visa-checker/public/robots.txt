@@ -1,8 +1,13 @@
 User-agent: *
 Allow: /
 
+# Homepage deep-link parameters (used by page CTAs) — same content as /,
+# blocked so crawl budget goes to the real pages instead of tens of
+# thousands of query-string duplicates.
+Disallow: /*?passport=
+Disallow: /*?destinations=
+Disallow: /*?from=
+Disallow: /*?to=
+
 # Sitemap
 Sitemap: https://www.isvisarequired.com/sitemap.xml
-
-# Crawl-delay for polite bots
-Crawl-delay: 1
