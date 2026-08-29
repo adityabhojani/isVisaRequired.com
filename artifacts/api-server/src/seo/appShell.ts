@@ -56,6 +56,13 @@ const POPULAR = [
 function linkBlock(): string {
   const pairs = POPULAR.map(([f, label, t]) => `<li><a href="/visa-requirements/${f}/${t}">${esc(f.replace(/-/g, " "))} → ${esc(label)}</a></li>`).join("");
   return `<nav aria-label="Popular" style="margin-top:24px"><p style="font-weight:600">Popular visa checks</p><ul>${pairs}</ul>
+    <p style="font-weight:600;margin-top:12px">Browse</p>
+    <ul>
+      <li><a href="/visa-requirements">Visa requirements by passport</a></li>
+      <li><a href="/countries">Visa requirements by country</a></li>
+      <li><a href="/guides">Visa &amp; travel guides</a></li>
+      <li><a href="/reports/passport-power-2026">Global Passport Power Report 2026</a></li>
+    </ul>
     <p style="font-weight:600;margin-top:12px">Guides</p>
     <ul>
       <li><a href="/transit-visa">Transit visa guides</a></li>
