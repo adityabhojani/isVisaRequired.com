@@ -23,7 +23,7 @@ console.log(`collected ${urls.length} URLs from ${childSitemaps.length} sitemaps
 
 for (let i = 0; i < urls.length; i += 10000) {
   const batch = urls.slice(i, i + 10000);
-  const res = await fetch("https://api.indexnow.org/indexnow", {
+  const res = await fetch("https://www.bing.com/indexnow", {
     method: "POST",
     headers: { "Content-Type": "application/json; charset=utf-8" },
     body: JSON.stringify({ host: HOST, key: KEY, keyLocation: KEY_LOCATION, urlList: batch }),
