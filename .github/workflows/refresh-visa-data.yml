@@ -61,3 +61,17 @@ jobs:
           else
             echo "An open PR already exists for $BRANCH; its branch has been updated."
           fi
+
+  indexnow:
+    # Weekly IndexNow ping (Bing/DuckDuckGo/Yandex + AI search engines). The
+    # submitter is quota-aware: it submits core pages first in small batches and
+    # stops cleanly when the daily quota is hit, so partial runs are fine —
+    # coverage accumulates week over week as the key earns trust.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Submit sitemap URLs to IndexNow
+        run: node scripts/indexnow-submit.mjs
