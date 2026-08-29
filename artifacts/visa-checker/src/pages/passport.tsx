@@ -120,7 +120,10 @@ export default function PassportPage() {
       "@type": "Dataset",
       "name": `${country.name} Passport Visa Requirements`,
       "description": `Visa requirements for ${country.name} passport holders across 199 countries`,
-      "url": `https://www.isvisarequired.com/passport/${code}`,
+      "url": country ? `https://www.isvisarequired.com/visa-requirements/${slugify(country.name)}` : `https://www.isvisarequired.com/passport/${code}`,
+      "creator": { "@type": "Organization", "name": "isvisarequired.com", "url": "https://www.isvisarequired.com" },
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "isAccessibleForFree": true,
       "keywords": `${country.name} passport, visa requirements, visa free countries ${country.name}`,
     } : undefined,
   });
