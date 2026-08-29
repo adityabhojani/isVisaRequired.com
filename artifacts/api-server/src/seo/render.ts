@@ -115,7 +115,16 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
   const answer = answerSentence(requirement, from.name, to.name);
 
   const canonical = `${SITE_ORIGIN}${pairPath(from, to)}`;
-  const title = `Do ${from.name} citizens need a visa for ${to.name}? (${new Date(DATA_LAST_UPDATED).getFullYear()})`;
+  // Answer-in-title: for question queries, the SERP result that already
+  // answers wins the click (site CTR was 0.4% at avg position ~29).
+  const TITLE_ANSWER: Record<string, string> = {
+    visa_free: "No — Visa-Free",
+    visa_on_arrival: "Visa on Arrival",
+    e_visa: "Yes — eVisa",
+    visa_required: "Yes — Visa Required",
+    no_admission: "Entry Suspended",
+  };
+  const title = `Do ${from.name} citizens need a visa for ${to.name}? ${TITLE_ANSWER[requirement] ?? ""} (${new Date(DATA_LAST_UPDATED).getFullYear()})`;
   const metaDesc = `${answer} Visa type: ${reqLabel}. Max stay: ${maxStay}. Fee: ${fee}. Processing: ${processing}. Documents, costs and official links — updated ${DATA_LAST_UPDATED}.`;
 
   // FAQ (kept identical between visible content and JSON-LD)
@@ -127,6 +136,14 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
     { q: `How long does it take to get a ${to.name} visa?`, a: `Processing time: ${processing}.` },
     { q: `What documents do ${from.name} citizens need for ${to.name}?`, a: detail.documents.length ? detail.documents.join("; ") + "." : "Check the official portal for the current document checklist." },
     { q: `How long must my passport be valid to enter ${to.name}?`, a: rules.passportValidity },
+    // Mirrors how people actually search ("does {country} give visa to {nationality}") per Search Console query data.
+    { q: `Does ${to.name} give visas to ${from.name} citizens?`, a: (
+      requirement === "visa_free" ? `${to.name} does not require a visa from ${from.name} citizens — entry is visa-free for short stays (maximum stay: ${maxStay}).` :
+      requirement === "visa_on_arrival" ? `Yes — ${to.name} issues ${from.name} citizens a visa on arrival at the border or airport, so no embassy application is needed beforehand.` :
+      requirement === "e_visa" ? `Yes — ${to.name} issues eVisas to ${from.name} citizens. Apply online before travelling; approval is delivered electronically.` :
+      requirement === "visa_required" ? `Yes — ${to.name} issues visas to ${from.name} citizens through its embassies and consulates. Apply in advance before travelling.` :
+      `${to.name} does not currently admit ${from.name} citizens — check with your foreign ministry before making plans.`
+    ) },
   ];
   if (links?.visaPortal) {
     faqs.push({ q: `Where do ${from.name} citizens apply for a ${to.name} visa?`, a: `Apply via the official portal: ${links.visaPortal}` });
