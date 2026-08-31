@@ -14,7 +14,9 @@ export interface PassportRoundup {
   nationality: string; // "Indian citizens"
   adjective: string; // "Indian"
   intro: string; // editorial lead paragraph (plain text)
-  tips: string[]; // practical, non-obvious tips
+  // NB: practical tips are no longer stored here — seo/guides.ts derives them
+  // per passport from live visa data (passportTips), so each guide's advice is
+  // unique and correct for that nationality.
 }
 
 export interface Article {
@@ -30,14 +32,6 @@ export interface Article {
 
 export type Guide = PassportRoundup | Article;
 
-const SHARED_TIPS = (adj: string): string[] => [
-  `Visa-free does not mean unlimited — each country sets a maximum stay (often 30, 90 or 180 days). Overstaying can lead to fines, deportation or entry bans, so always check the permitted stay for your specific destination.`,
-  `Even for visa-free entry, border officers can ask for an onward or return ticket and proof of funds. Carry a printed itinerary and evidence you can support yourself.`,
-  `Your passport usually needs to be valid for at least six months beyond your travel dates, with two or more blank pages. Renew early if you are close to expiry.`,
-  `From late 2026, ${adj} travellers visiting Europe's Schengen Area visa-free will need an approved ETIAS travel authorisation before departure — it is not a visa, but you cannot board without it.`,
-  `Visa policies change frequently. Confirm the current rule with the destination's official immigration website or nearest embassy before you book flights.`,
-];
-
 export const GUIDES: Guide[] = [
   {
     kind: "passport-roundup",
@@ -47,7 +41,6 @@ export const GUIDES: Guide[] = [
     adjective: "Indian",
     intro:
       "For Indian passport holders, knowing exactly where you can travel without a prior embassy visa saves time, money and uncertainty. This guide breaks down every destination an Indian citizen can enter visa-free, on a visa on arrival, or with a quick online eVisa — with the current maximum stay for each, and a direct link to the full requirements.",
-    tips: SHARED_TIPS("Indian"),
   },
   {
     kind: "passport-roundup",
@@ -57,7 +50,6 @@ export const GUIDES: Guide[] = [
     adjective: "Nigerian",
     intro:
       "Nigerian passport holders face some of the world's more demanding visa requirements, which makes it especially valuable to know precisely where you can go with little or no paperwork. Below is every destination open to Nigerian citizens visa-free, on arrival, or via a straightforward eVisa, each with its permitted stay and full details.",
-    tips: SHARED_TIPS("Nigerian"),
   },
   {
     kind: "passport-roundup",
@@ -67,7 +59,6 @@ export const GUIDES: Guide[] = [
     adjective: "Pakistani",
     intro:
       "This guide lists every country a Pakistani passport holder can visit without arranging a visa in advance — whether that means visa-free entry, a visa on arrival, or an online eVisa. Each destination shows the maximum stay and links through to fees, documents and official sources.",
-    tips: SHARED_TIPS("Pakistani"),
   },
   {
     kind: "passport-roundup",
@@ -77,7 +68,6 @@ export const GUIDES: Guide[] = [
     adjective: "Filipino",
     intro:
       "Filipino passport holders enjoy visa-free or visa-on-arrival access to a large number of countries across Asia, the Americas and beyond. This guide sets out every one of them, plus the destinations reachable with a simple eVisa, along with how long you can stay in each.",
-    tips: SHARED_TIPS("Filipino"),
   },
   {
     kind: "passport-roundup",
@@ -87,7 +77,6 @@ export const GUIDES: Guide[] = [
     adjective: "Bangladeshi",
     intro:
       "Bangladeshi passport holders need a visa for most of the world, which makes the destinations that waive it — or grant one at the border — genuinely worth knowing. This guide lists every country a Bangladeshi citizen can enter visa-free or on a visa on arrival, plus the growing set reachable with an online eVisa, each with its permitted stay.",
-    tips: SHARED_TIPS("Bangladeshi"),
   },
   {
     kind: "passport-roundup",
@@ -97,7 +86,6 @@ export const GUIDES: Guide[] = [
     adjective: "Kenyan",
     intro:
       "Kenyan passport holders benefit from strong access across Africa and the Caribbean, including broad visa-free travel within the East African Community and beyond. This guide sets out every destination open to Kenyan citizens without a prior embassy visa — visa-free, visa on arrival, or a simple eVisa — with the maximum stay for each.",
-    tips: SHARED_TIPS("Kenyan"),
   },
   {
     kind: "passport-roundup",
@@ -107,7 +95,6 @@ export const GUIDES: Guide[] = [
     adjective: "Vietnamese",
     intro:
       "Vietnamese passport holders can travel across much of Southeast Asia without a visa thanks to ASEAN agreements, and a growing list of countries further afield offer entry on arrival or with a simple online eVisa. This guide lists every destination open to Vietnamese citizens without an embassy visit, with the permitted stay for each.",
-    tips: SHARED_TIPS("Vietnamese"),
   },
   {
     kind: "passport-roundup",
@@ -117,7 +104,6 @@ export const GUIDES: Guide[] = [
     adjective: "Indonesian",
     intro:
       "Indonesian passport holders enjoy some of the widest visa-free access in Southeast Asia — the whole ASEAN region plus a long list of destinations across Asia, Africa and the Americas. Below is every country Indonesian citizens can enter visa-free, on a visa on arrival, or with an online eVisa, each with its maximum stay.",
-    tips: SHARED_TIPS("Indonesian"),
   },
   {
     kind: "passport-roundup",
@@ -127,7 +113,6 @@ export const GUIDES: Guide[] = [
     adjective: "Egyptian",
     intro:
       "Egyptian passport holders can reach a meaningful set of destinations across Africa, Asia and the Middle East without arranging a visa in advance. This guide breaks down every country open to Egyptian citizens visa-free, on arrival, or via eVisa — with the permitted stay and a link to the full requirements for each.",
-    tips: SHARED_TIPS("Egyptian"),
   },
   {
     kind: "passport-roundup",
@@ -137,7 +122,6 @@ export const GUIDES: Guide[] = [
     adjective: "Sri Lankan",
     intro:
       "Sri Lankan passport holders need a visa for much of the world, which makes the exceptions worth knowing precisely. This guide lists every destination a Sri Lankan citizen can enter visa-free or with a visa granted at the border, plus the growing number of countries reachable with an online eVisa.",
-    tips: SHARED_TIPS("Sri Lankan"),
   },
   {
     kind: "passport-roundup",
@@ -147,7 +131,6 @@ export const GUIDES: Guide[] = [
     adjective: "Nepali",
     intro:
       "Nepali passport holders have open-border access to India and visa-free or on-arrival entry to a modest but useful set of destinations across Asia, Africa and beyond. This guide lists all of them — visa-free, visa on arrival and eVisa — with the maximum stay for each and links to full requirements.",
-    tips: SHARED_TIPS("Nepali"),
   },
   {
     kind: "article",
