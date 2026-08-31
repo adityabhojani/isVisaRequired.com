@@ -169,4 +169,48 @@ export const VISA_OVERRIDES: VisaOverride[] = [
     verifiedOn: "2026-06-07",
     note: "30-day visa-free under China's unilateral scheme; valid through ~14 Sep 2026.",
   },
+
+  // --- Thailand reverts from 60 days to 30 days (Cabinet vote 19 May 2026) ----
+  // The Jan-2025 CSV snapshot recorded the 60-day extension that Thailand
+  // introduced in mid-2024. Thailand's Cabinet voted on 19 May 2026 to end the
+  // extension; the standard 30-day visa-free period was reinstated from that date.
+  // 92 passports in the CSV show "60" and must be corrected to "30".
+  // Countries with separate bilateral agreements (AR, BR, CL at 90 days) are
+  // unaffected and intentionally excluded.
+  ...([
+    "AD", "AE", "AL", "AT", "AU", "BE", "BG", "BH",
+    "BN", "BT", "CA", "CH", "CN", "CO", "CU", "CY",
+    "CZ", "DE", "DK", "DM", "DO", "EC", "EE", "ES",
+    "FI", "FJ", "FR", "GB", "GE", "GR", "GT", "HK",
+    "HR", "HU", "ID", "IE", "IL", "IN", "IS", "IT",
+    "JM", "JO", "JP", "KH", "KR", "KW", "KZ", "LA",
+    "LI", "LK", "LT", "LU", "LV", "MA", "MC", "MN",
+    "MO", "MT", "MU", "MV", "MX", "MY", "NL", "NO",
+    "NZ", "OM", "PA", "PE", "PG", "PH", "PL", "PT",
+    "QA", "RO", "RU", "SA", "SE", "SG", "SI", "SK",
+    "SM", "TO", "TR", "TT", "TW", "UA", "US", "UY",
+    "UZ", "VN", "XK", "ZA",
+  ] as string[]).map((passport): VisaOverride => ({
+    passport,
+    destination: "TH",
+    value: "30",
+    source: "Thai Cabinet Resolution 19 May 2026 / Tourism Authority of Thailand",
+    verifiedOn: "2026-08-31",
+    note: "Standard 30-day visa-free reinstated after 60-day extension ended.",
+  })),
+
+  // --- Indonesia adds Brazil and Turkey to visa-free (3 Jul 2025) -------------
+  // Indonesia's Immigration Directorate extended visa-free access to Brazilian
+  // and Turkish passport holders effective 3 July 2025. The Jan-2025 base CSV
+  // still shows "visa on arrival" for both; this override upgrades them.
+  ...([
+    "BR", "TR",
+  ] as string[]).map((passport): VisaOverride => ({
+    passport,
+    destination: "ID",
+    value: "visa free",
+    source: "Indonesia Immigration Directorate General — imigrasi.go.id",
+    verifiedOn: "2026-08-31",
+    note: "Visa-free access granted effective 3 Jul 2025; previously visa on arrival.",
+  })),
 ];

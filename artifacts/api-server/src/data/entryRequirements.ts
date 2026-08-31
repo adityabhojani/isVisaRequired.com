@@ -251,8 +251,7 @@ const RULES: Record<string, EntryRules> = {
       { name: "Routine vaccines", level: "recommended" },
     ],
     notes: [
-      "Visa-exempt stays typically 30–60 days depending on nationality",
-      "Thailand Pass no longer required",
+      "Visa-exempt stays are 30 days for most nationalities (60-day extension ended May 2026)",
       "Respect royal family and temples — dress modestly at sacred sites",
     ],
   },
@@ -273,8 +272,8 @@ const RULES: Record<string, EntryRules> = {
     preAuth: {
       name: "Visa on Arrival / eVOA",
       applies: "Most nationalities (some eligible for free visa-free entry)",
-      fee: "IDR 500,000 (approx. USD 35)",
-      url: "https://molina.imigrasi.go.id",
+      fee: "IDR 500,000 (approx. USD 31)",
+      url: "https://evoa.imigrasi.go.id",
     },
     notes: [
       "eVOA can be purchased in advance online for faster processing",
@@ -365,8 +364,8 @@ const RULES: Record<string, EntryRules> = {
     ],
     preAuth: {
       name: "Tourist e-Visa",
-      applies: "Nationals of 50+ countries",
-      fee: "SAR 300 + VAT",
+      applies: "Nationals of 60+ countries",
+      fee: "SAR 100 + VAT (~SAR 115)",
       url: "https://visa.visitsaudi.com",
     },
     notes: [

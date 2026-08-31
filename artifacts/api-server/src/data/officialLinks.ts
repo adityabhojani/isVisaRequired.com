@@ -327,7 +327,7 @@ export const officialLinks: Record<string, OfficialLinks> = {
     embassyFinder: "https://www.mea.gov.in/indian-missions-abroad.htm",
   },
   ID: {
-    visaPortal: "https://molina.imigrasi.go.id",
+    visaPortal: "https://evoa.imigrasi.go.id",
     embassyFinder: "https://www.kemlu.go.id/en/beranda/perwakilan/Pages/Default.aspx",
   },
   IR: {
