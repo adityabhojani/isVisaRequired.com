@@ -42,6 +42,49 @@ function faqJsonLd(faqs: { q: string; a: string }[]) {
   };
 }
 
+const SCHENGEN = ["AT","BE","BG","HR","CZ","DK","EE","FI","FR","DE","GR","HU","IS","IT","LV","LI","LT","LU","MT","NL","NO","PL","PT","RO","SK","SI","ES","SE","CH"];
+
+// Tips computed from THIS passport's actual data. Previously every guide shared
+// one hardcoded list, which (a) duplicated a whole section across 11 pages and
+// (b) told nationalities who need a full Schengen visa that they'd need an
+// ETIAS — advice that only applies to visa-exempt travellers.
+function passportTips(
+  from: CountryData,
+  groups: Record<string, { c: CountryData; maxStay?: string }[]>,
+  adjective: string,
+): string[] {
+  const vf = groups.visa_free, voa = groups.visa_on_arrival, ev = groups.e_visa;
+  const tips: string[] = [];
+
+  // Where this passport is strongest — genuinely varies per nationality.
+  const byRegion = new Map<string, number>();
+  for (const { c } of [...vf, ...voa]) byRegion.set(c.region, (byRegion.get(c.region) ?? 0) + 1);
+  const strongest = [...byRegion].sort((a, b) => b[1] - a[1])[0];
+  if (strongest && strongest[1] > 1) {
+    tips.push(`Your easiest travel is in ${strongest[0]}: ${strongest[1]} destinations there admit ${adjective} passport holders visa-free or on arrival — usually the cheapest and least paperwork-heavy trips to plan.`);
+  }
+
+  // Europe: accurate for BOTH cases instead of assuming visa-exemption.
+  const schengenFree = SCHENGEN.filter((code) => vf.some((x) => x.c.code === code)).length;
+  if (schengenFree > 0) {
+    tips.push(`You can enter ${schengenFree} Schengen countries visa-free, but from late 2026 visa-exempt travellers must hold an approved ETIAS authorisation before departure. It is not a visa, yet airlines will refuse boarding without it.`);
+  } else {
+    tips.push(`Europe's Schengen Area requires a full visa for ${adjective} passport holders — ETIAS does not apply to you. Apply at the consulate of your main destination (or first entry point), and start 4–6 weeks ahead, as appointment slots are the usual bottleneck.`);
+  }
+
+  if (ev.length) {
+    tips.push(`${ev.length} destinations issue ${adjective} travellers an eVisa or online authorisation. These cannot be obtained at the airport — apply before you book non-refundable travel, and use only the official government portal, never a paid "visa service" lookalike.`);
+  }
+  if (voa.length) {
+    tips.push(`For the ${voa.length} visa-on-arrival destinations, carry the exact fee in clean US dollars plus a printed return ticket and hotel booking — arrival counters frequently decline cards and ask for onward proof.`);
+  }
+
+  // Genuinely universal, but kept short so the data-specific tips lead.
+  tips.push(`Visa-free never means unlimited: each country sets its own maximum stay, and overstaying risks fines, deportation or an entry ban. Check the permitted stay in the tables above for your exact destination.`);
+  tips.push(`Keep at least six months' passport validity beyond your travel dates with two blank pages, and re-confirm the rule on the destination's official immigration site before booking — visa policy changes often.`);
+  return tips;
+}
+
 function renderRoundup(g: PassportRoundup): string {
   const from = countries.find((c) => c.code === g.code);
   if (!from) return renderNotFound();
@@ -66,7 +109,7 @@ function renderRoundup(g: PassportRoundup): string {
       .map(({ c, maxStay }) => `<tr><td>${esc(c.flag)} ${esc(c.name)}</td><td>${esc(maxStay || "—")}</td><td><a href="${pairPath(from, c)}">${esc(g.adjective)} → ${esc(c.name)} requirements →</a></td></tr>`)
       .join("")}</tbody></table></div>`;
 
-  const tipsHtml = `<ul style="padding-left:20px;color:#334155">${g.tips.map((t) => `<li style="margin:6px 0">${esc(t)}</li>`).join("")}</ul>`;
+  const tipsHtml = `<ul style="padding-left:20px;color:#334155">${passportTips(from, groups, g.adjective).map((t) => `<li style="margin:6px 0">${esc(t)}</li>`).join("")}</ul>`;
 
   const faqs = [
     { q: `How many countries can ${g.nationality} visit visa-free?`, a: `${g.adjective} passport holders can enter ${vf} countries and territories visa-free and a further ${voa} on a visa on arrival — ${noVisa} destinations in total with no visa arranged in advance. Another ${ev} are reachable with an online eVisa.` },

@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import html2canvas from "html2canvas";
 import { useSEO } from "@/hooks/useSEO";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -189,6 +188,9 @@ export default function TripPlannerPage() {
     setDownloading(true);
     setShareMsg("Generating card…");
     try {
+      // Loaded on demand: html2canvas is ~196 KB and only needed when the
+      // visitor actually downloads a card (same pattern as PassportPowerCard).
+      const { default: html2canvas } = await import("html2canvas");
       const canvas = await html2canvas(cardRef.current, { scale: 2, backgroundColor: "#ffffff", useCORS: true, logging: false });
       const link = document.createElement("a");
       link.download = `${(tripName || "trip").replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-visa-card.png`;
