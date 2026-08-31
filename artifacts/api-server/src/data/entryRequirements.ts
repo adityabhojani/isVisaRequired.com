@@ -49,8 +49,8 @@ const SCHENGEN: EntryRules = {
   ],
   preAuth: {
     name: "ETIAS",
-    applies: "Visa-exempt non-EU nationals (launching 2025)",
-    fee: "€7",
+    applies: "Visa-exempt non-EU nationals — expected Q4 2026, then a transitional grace period (not required yet)",
+    fee: "€20",
     url: "https://travel-europe.europa.eu/etias_en",
   },
   notes: [
