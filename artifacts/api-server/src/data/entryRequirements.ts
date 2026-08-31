@@ -49,7 +49,7 @@ const SCHENGEN: EntryRules = {
   ],
   preAuth: {
     name: "ETIAS",
-    applies: "Visa-exempt non-EU nationals (launching 2025)",
+    applies: "Visa-exempt non-EU nationals (not yet launched — expected Q4 2026)",
     fee: "€7",
     url: "https://travel-europe.europa.eu/etias_en",
   },
@@ -131,7 +131,6 @@ const RULES: Record<string, EntryRules> = {
     notes: [
       "eTA is NOT required if you need a visa or are a US citizen",
       "Maximum stay up to 6 months as visitor",
-      "ArriveCAN app not currently required but recommended",
     ],
   },
 
@@ -273,7 +272,7 @@ const RULES: Record<string, EntryRules> = {
       name: "Visa on Arrival / eVOA",
       applies: "Most nationalities (some eligible for free visa-free entry)",
       fee: "IDR 500,000 (approx. USD 31)",
-      url: "https://evoa.imigrasi.go.id",
+      url: "https://evisa.imigrasi.go.id",
     },
     notes: [
       "eVOA can be purchased in advance online for faster processing",
@@ -295,9 +294,9 @@ const RULES: Record<string, EntryRules> = {
     ],
     preAuth: {
       name: "E-Visa",
-      applies: "Citizens of most countries (90-day single entry)",
-      fee: "USD 25",
-      url: "https://evisa.xuatnhapcanh.gov.vn",
+      applies: "Citizens of all countries (90-day single or multiple entry)",
+      fee: "USD 25 (single) / USD 50 (multiple entry)",
+      url: "https://evisa.gov.vn",
     },
     notes: [
       "E-Visa grants 90 days single entry — multiple entry also available",
@@ -365,7 +364,7 @@ const RULES: Record<string, EntryRules> = {
     preAuth: {
       name: "Tourist e-Visa",
       applies: "Nationals of 60+ countries",
-      fee: "SAR 100 + VAT (~SAR 115)",
+      fee: "~SAR 535 total (SAR 300 visa + mandatory medical insurance + VAT)",
       url: "https://visa.visitsaudi.com",
     },
     notes: [

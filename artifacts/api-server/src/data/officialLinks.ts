@@ -327,7 +327,7 @@ export const officialLinks: Record<string, OfficialLinks> = {
     embassyFinder: "https://www.mea.gov.in/indian-missions-abroad.htm",
   },
   ID: {
-    visaPortal: "https://evoa.imigrasi.go.id",
+    visaPortal: "https://evisa.imigrasi.go.id",
     embassyFinder: "https://www.kemlu.go.id/en/beranda/perwakilan/Pages/Default.aspx",
   },
   IR: {
@@ -779,7 +779,7 @@ export const officialLinks: Record<string, OfficialLinks> = {
     embassyFinder: "https://mppre.gob.ve/embajadas-consulados",
   },
   VN: {
-    visaPortal: "https://evisa.xuatnhapcanh.gov.vn",
+    visaPortal: "https://evisa.gov.vn",
     embassyFinder: "https://www.mofa.gov.vn/en/co_quan_dai_dien/viet_nam_o_nuoc_ngoai",
   },
   YE: {
