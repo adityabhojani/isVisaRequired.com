@@ -213,4 +213,32 @@ export const VISA_OVERRIDES: VisaOverride[] = [
     verifiedOn: "2026-08-31",
     note: "Visa-free access granted effective 3 Jul 2025; previously visa on arrival.",
   })),
+
+  // --- Vietnam grants 45-day visa-free entry to 12 European countries ----------
+  // Effective 15 Aug 2025 (valid through 14 Aug 2028), Vietnam added 12 EU/EEA
+  // member states to its visa-exemption list at 45 days. The Jan-2025 CSV shows
+  // "e-visa" for all of these; this overrides them to 45-day visa-free.
+  ...([
+    "BE", "BG", "HR", "CZ", "HU", "LU", "NL", "PL", "RO", "SK", "SI", "CH",
+  ] as string[]).map((passport): VisaOverride => ({
+    passport,
+    destination: "VN",
+    value: "45",
+    source: "Vietnam Ministry of Culture / Vietnam Tourism official site — vietnam.travel",
+    verifiedOn: "2026-08-31",
+    note: "45-day visa-free; stimulus program effective 15 Aug 2025 – 14 Aug 2028.",
+  })),
+
+  // --- Vietnam reduces Indonesia visa-free stay from 30 to 14 days (15 Jul 2026)
+  // Indonesia had 30-day visa-free access to Vietnam under a bilateral agreement.
+  // Vietnam reduced this to 14 days for ordinary passport holders from 15 Jul 2026.
+  // The Jan-2025 CSV correctly shows 30 days for the old arrangement.
+  {
+    passport: "ID",
+    destination: "VN",
+    value: "14",
+    source: "Vietnam Immigration Department / Jakarta Globe report Jul 2026",
+    verifiedOn: "2026-08-31",
+    note: "Reduced from 30 to 14 days for ordinary passports effective 15 Jul 2026.",
+  },
 ];
