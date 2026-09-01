@@ -122,13 +122,23 @@ const defaultVisaDetails: Record<string, VisaDetail> = {
   },
 };
 
+// Fees are in US DOLLARS and are destination-wide (they apply to every passport
+// that has this requirement for that destination). Only add an entry when the
+// destination charges a single, well-known price — otherwise leave it out and
+// the page honestly renders "Varies — check official portal". Where a country
+// prices in its own currency, convert to USD here; do not copy the local
+// number, which under-quotes travellers (this is what happened with Jordan).
 const countrySpecificFees: Record<string, number | null> = {
   "TH-visa_on_arrival": 35,
   "ID-visa_on_arrival": 35,
   "MV-visa_on_arrival": 0,
-  "JO-visa_on_arrival": 40,
+  // Jordan prices its visa on arrival at JOD 40 ≈ US$56 — previously published
+  // here as "40", which read as US$40 and under-quoted arrivals by ~29%.
+  "JO-visa_on_arrival": 56,
   "EG-visa_on_arrival": 25,
-  "KE-visa_on_arrival": 50,
+  // Kenya's old US$50 visa on arrival is gone — since the 2024/2025 reforms the
+  // country runs an eTA instead, so no passport has VoA to Kenya and this entry
+  // would publish an obsolete price if the data ever changed. Removed.
   "TZ-visa_on_arrival": 50,
   "ET-visa_on_arrival": 50,
   "MZ-visa_on_arrival": 50,
