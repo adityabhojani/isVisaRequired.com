@@ -42,18 +42,22 @@ export const TRANSIT_GUIDES: TransitGuide[] = [
   {
     slug: "united-kingdom",
     name: "United Kingdom",
-    summary: "Some nationalities need a Direct Airside Transit Visa (DATV) even without passing immigration; leaving the airport may need a Visitor in Transit visa.",
-    airside: "Depends on nationality. Many travelers can transit airside without a visa, but nationals of a specific list of countries need a Direct Airside Transit Visa (DATV) even if they never pass through UK immigration.",
-    landside: "To pass through UK border control during a layover (e.g. to change airports or stay overnight landside) you generally need a Visitor in Transit visa, unless you're visa-exempt or hold certain qualifying documents.",
+    summary: "Whether you need a UK ETA on a layover depends on if you cross the border: airside transit is currently exempt, but Gatwick has no airside transit route, and some nationalities need a Direct Airside Transit Visa regardless.",
+    airside: "If you connect without passing through UK border control, you are currently exempt from needing an ETA — but the Home Office calls this exemption temporary and keeps it under review, so re-check close to travel. Separately, nationals on the Direct Airside Transit Visa (DATV) list need a DATV even though they never formally enter the UK.",
+    landside: "If your connection takes you through UK border control — changing airports, collecting and re-checking bags, or staying overnight landside — you need an ETA (if you are ETA-eligible) or a Visitor in Transit visa, depending on your nationality.",
     schemes: [
-      "Direct Airside Transit Visa (DATV): for transiting without going through immigration — required for certain nationalities.",
-      "Visitor in Transit visa: for passing through the UK border within 48 hours en route to another country.",
+      "Airside transit (no border control): currently ETA-exempt. Treat this as provisional — the exemption is temporary and under review.",
+      "Gatwick is the trap: it has no international airside transit facility, so every connecting passenger passes UK border control regardless of ticket or baggage — which means ETA-eligible nationalities DO need an ETA to connect there. Heathrow and Manchester do offer airside transit.",
+      "Direct Airside Transit Visa (DATV): required for certain nationalities even when transiting airside and never entering the UK.",
+      "Visitor in Transit visa: for passing through the UK border within 48 hours en route to another country, where an ETA is not sufficient for your nationality.",
       "Holders of certain US, Canadian, EEA, Australian and other documents may qualify for transit exemptions — check the official tool.",
-      "The UK ETA does not cover all transit cases — verify before you book.",
+      "Confirm your exact routing with the airline: whether you stay airside is a property of the airport and your itinerary, not just your ticket.",
     ],
     officialName: "UK Government — Transit visas",
     officialUrl: "https://www.gov.uk/transit-visa",
-    reviewed: REVIEWED,
+    // Re-verified separately (ETA airside-transit exemption + the Gatwick
+    // exception), so this is newer than the shared REVIEWED constant.
+    reviewed: "2026-08-31",
   },
   {
     slug: "schengen-area",
