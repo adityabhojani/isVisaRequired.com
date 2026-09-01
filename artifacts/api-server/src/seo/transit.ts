@@ -1,7 +1,7 @@
 // Server-rendered transit-visa guide pages (hub + per-hub), reusing the same
 // look and SEO structure as the per-pair pages.
 import { TRANSIT_GUIDES, type TransitGuide } from "../data/transitData";
-import { SITE_ORIGIN } from "./render";
+import { SITE_ORIGIN, DATA_LAST_UPDATED } from "./render";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -37,8 +37,8 @@ export function renderTransitHub(): string {
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${canonical}"><meta name="robots" content="index,follow,max-image-preview:large">
-<meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="${esc(canonical)}"><meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="Is Visa Required?"><meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="https://www.isvisarequired.com/opengraph.jpg">
 <link rel="icon" href="/favicon.svg"><style>${STYLE}</style></head>
 <body>${HEADER}<main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › Transit visas</nav>
@@ -46,7 +46,7 @@ export function renderTransitHub(): string {
 <p class="lead">A "transit visa" lets you pass through a country on the way to somewhere else. Whether you need one depends on the country, your nationality, and whether you stay airside or leave the airport. Pick your connecting country:</p>
 <section class="card"><div class="cols">${links}</div></section>
 <div class="note"><strong>Heads up:</strong> transit rules change frequently and vary by nationality and route. Use these guides to understand the scheme, then confirm the specifics with your airline and the official government source before you book.</div>
-</main>${FOOTER("2026-06-01")}</body></html>`;
+</main>${FOOTER(DATA_LAST_UPDATED)}</body></html>`;
 }
 
 export function renderTransitGuide(g: TransitGuide): string {
@@ -77,14 +77,20 @@ export function renderTransitGuide(g: TransitGuide): string {
   const others = TRANSIT_GUIDES.filter((x) => x.slug !== g.slug)
     .map((x) => `<a href="/transit-visa/${x.slug}">Transit visa for ${esc(x.name)}</a>`).join("");
 
+  const webpageJsonLd = {
+    "@context": "https://schema.org", "@type": "WebPage",
+    name: title, url: canonical, dateModified: g.reviewed, inLanguage: "en",
+    isPartOf: { "@type": "WebSite", name: "Is Visa Required?", url: SITE_ORIGIN },
+  };
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${canonical}"><meta name="robots" content="index,follow,max-image-preview:large">
-<meta property="og:type" content="article"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+<meta property="og:type" content="article"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${canonical}"><meta property="og:site_name" content="Is Visa Required?"><meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="https://www.isvisarequired.com/opengraph.jpg">
 <link rel="icon" href="/favicon.svg">
 <script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>
+<script type="application/ld+json">${JSON.stringify(webpageJsonLd)}</script>
 <style>${STYLE}</style></head>
 <body>${HEADER}<main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › <a href="/transit-visa">Transit visas</a> › ${esc(g.name)}</nav>

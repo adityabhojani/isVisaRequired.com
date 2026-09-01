@@ -32,13 +32,40 @@ function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function hubShell(title: string, h1: string, intro: string, body: string): string {
+function hubShell(
+  title: string,
+  h1: string,
+  intro: string,
+  body: string,
+  canonicalUrl: string,
+  breadcrumbItems: Array<{ name: string; item: string }>,
+): string {
+  const breadcrumbJsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbItems.map((b, i) => ({
+      "@type": "ListItem", position: i + 1, name: b.name, item: b.item,
+    })),
+  });
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(intro)}">
-<link rel="canonical" href="${esc(SITE_ORIGIN)}">
-<meta name="robots" content="index,follow">
+<link rel="canonical" href="${esc(canonicalUrl)}">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(intro)}">
+<meta property="og:url" content="${esc(canonicalUrl)}">
+<meta property="og:site_name" content="Is Visa Required?">
+<meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="${esc(intro)}">
+<meta name="twitter:image" content="https://www.isvisarequired.com/opengraph.jpg">
+<script type="application/ld+json">${breadcrumbJsonLd}</script>
 <link rel="icon" href="/favicon.svg">
 <style>:root{--navy:#0A2FA1;--accent:#0DB5E8;--bg:#F7F9FC;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
@@ -58,6 +85,7 @@ router.get("/visa-requirements", (_req: Request, res: Response): void => {
   const links = allCountries()
     .map((c) => `<a href="/visa-requirements/${slugify(c.name)}">${esc(c.flag)} ${esc(c.name)} passport</a>`)
     .join("");
+  const hubCanonical = `${SITE_ORIGIN}/visa-requirements`;
   res.setHeader("Cache-Control", HTML_CACHE);
   res.type("html").send(
     hubShell(
@@ -65,6 +93,8 @@ router.get("/visa-requirements", (_req: Request, res: Response): void => {
       "Visa requirements by passport",
       "Pick your passport to see visa requirements for every destination country.",
       `<div class="cols">${links}</div>`,
+      hubCanonical,
+      [{ name: "Home", item: SITE_ORIGIN + "/" }, { name: "Visa requirements", item: hubCanonical }],
     ),
   );
 });
@@ -81,6 +111,7 @@ router.get("/visa-requirements/:from", (req: Request, res: Response): void => {
     .filter((c) => c.code !== from.code)
     .map((c) => `<a href="${pairPath(from, c)}">${esc(from.name)} → ${esc(c.flag)} ${esc(c.name)}</a>`)
     .join("");
+  const passportCanonical = `${SITE_ORIGIN}/visa-requirements/${slugify(from.name)}`;
   res.setHeader("Cache-Control", HTML_CACHE);
   res.type("html").send(
     hubShell(
@@ -88,6 +119,12 @@ router.get("/visa-requirements/:from", (req: Request, res: Response): void => {
       `${from.name} passport: visa requirements for every country`,
       `Where can ${from.name} passport holders travel? Select a destination for detailed visa requirements, costs, documents and official links.`,
       `<div class="cols">${links}</div>`,
+      passportCanonical,
+      [
+        { name: "Home", item: SITE_ORIGIN + "/" },
+        { name: "Visa requirements", item: SITE_ORIGIN + "/visa-requirements" },
+        { name: `${from.name} passport`, item: passportCanonical },
+      ],
     ),
   );
 });
@@ -201,24 +238,42 @@ router.get("/sitemap.xml", (_req: Request, res: Response): void => {
 });
 
 router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
-  const staticPaths = [
-    "/", "/compare", "/discover", "/stats", "/popular", "/map", "/trip-planner",
-    "/schengen", "/tier-list", "/digital-nomad", "/reciprocity", "/blog", "/alerts",
-    "/visa-requirements", "/methodology", "/residence-permit-visa-benefits", "/privacy", "/terms",
+  type SitemapEntry = { loc: string; priority: string; changefreq: string };
+  const entries: SitemapEntry[] = [];
+
+  // Tier 1: homepage
+  entries.push({ loc: `${SITE_ORIGIN}/`, priority: "1.0", changefreq: "daily" });
+
+  // Tier 2: SSR hub and utility pages (server-rendered, unique content)
+  const ssrHubs = [
+    "/visa-requirements", "/transit-visa", "/travel-authorization",
+    "/methodology", "/residence-permit-visa-benefits",
   ];
-  const urls: string[] = [];
-  for (const p of staticPaths) urls.push(`${SITE_ORIGIN}${p}`);
-  urls.push(`${SITE_ORIGIN}/transit-visa`);
-  for (const g of TRANSIT_GUIDES) urls.push(`${SITE_ORIGIN}/transit-visa/${g.slug}`);
-  urls.push(`${SITE_ORIGIN}/travel-authorization`);
-  for (const a of TRAVEL_AUTHS) urls.push(`${SITE_ORIGIN}/travel-authorization/${a.slug}`);
-  for (const c of allCountries()) {
-    urls.push(`${SITE_ORIGIN}/passport/${c.code}`);
-    urls.push(`${SITE_ORIGIN}/destination/${c.code}`);
-    urls.push(`${SITE_ORIGIN}/visa-requirements/${slugify(c.name)}`);
+  for (const p of ssrHubs) {
+    entries.push({ loc: `${SITE_ORIGIN}${p}`, priority: "0.9", changefreq: "weekly" });
   }
-  const body = urls
-    .map((loc) => `  <url><loc>${loc}</loc><lastmod>${DATA_LAST_UPDATED}</lastmod></url>`)
+
+  // Tier 3: per-passport hubs
+  for (const c of allCountries()) {
+    entries.push({ loc: `${SITE_ORIGIN}/visa-requirements/${slugify(c.name)}`, priority: "0.8", changefreq: "weekly" });
+  }
+
+  // Tier 4: transit guides + travel-auth guides
+  for (const g of TRANSIT_GUIDES) {
+    entries.push({ loc: `${SITE_ORIGIN}/transit-visa/${g.slug}`, priority: "0.7", changefreq: "monthly" });
+  }
+  for (const a of TRAVEL_AUTHS) {
+    entries.push({ loc: `${SITE_ORIGIN}/travel-authorization/${a.slug}`, priority: "0.7", changefreq: "monthly" });
+  }
+
+  // Tier 5: static SPA pages with meaningful unique content (not duplicates)
+  const spaPages = ["/privacy", "/terms"];
+  for (const p of spaPages) {
+    entries.push({ loc: `${SITE_ORIGIN}${p}`, priority: "0.3", changefreq: "yearly" });
+  }
+
+  const body = entries
+    .map((e) => `  <url><loc>${e.loc}</loc><lastmod>${DATA_LAST_UPDATED}</lastmod><changefreq>${e.changefreq}</changefreq><priority>${e.priority}</priority></url>`)
     .join("\n");
   res.setHeader("Cache-Control", XML_CACHE);
   res.type("application/xml").send(
@@ -235,7 +290,7 @@ router.get("/sitemaps/pairs-:code.xml", (req: Request, res: Response): void => {
   }
   const body = allCountries()
     .filter((c) => c.code !== from.code)
-    .map((to) => `  <url><loc>${SITE_ORIGIN}${pairPath(from, to)}</loc><lastmod>${DATA_LAST_UPDATED}</lastmod><changefreq>monthly</changefreq></url>`)
+    .map((to) => `  <url><loc>${SITE_ORIGIN}${pairPath(from, to)}</loc><lastmod>${DATA_LAST_UPDATED}</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>`)
     .join("\n");
   res.setHeader("Cache-Control", XML_CACHE);
   res.type("application/xml").send(

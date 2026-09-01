@@ -1,8 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /api/
 
 # Sitemap
 Sitemap: https://www.isvisarequired.com/sitemap.xml
-
-# Crawl-delay for polite bots
-Crawl-delay: 1

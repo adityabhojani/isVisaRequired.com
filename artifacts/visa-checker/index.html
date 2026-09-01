@@ -41,10 +41,11 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Fonts -->
+    <!-- Fonts (async to avoid render-blocking) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" /></noscript>
 
     <!-- Structured Data: WebSite + SearchAction -->
     <script type="application/ld+json">
@@ -138,7 +139,7 @@
           "name": "Which passport gives the most visa-free access?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "As of 2025, passports from Denmark, Spain, and the United Arab Emirates offer the broadest access, each granting entry to 184 out of 199 countries without a prior visa. France, Germany, Italy, and other EU passports are close behind, offering access to 183 countries."
+            "text": "As of 2026, passports from Singapore, Germany, Italy, Spain, and other top-ranked EU nations offer the broadest access, granting visa-free or visa-on-arrival entry to 190+ out of 199 countries. Check the visa checker for the current ranking."
           }
         },
         {
@@ -162,7 +163,7 @@
           "name": "Do I need a visa to visit Europe / the Schengen Area?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Access to the Schengen Area (26 European countries) is visa-free for citizens of many countries including the USA, Canada, Australia, Japan, and South Korea for up to 90 days. Citizens of other countries need to apply for a Schengen visa. Starting 2025, most visa-free travelers also need to register with the ETIAS system before entry."
+            "text": "Access to the Schengen Area (27 European countries) is visa-free for citizens of many countries including the USA, Canada, Australia, Japan, and South Korea for up to 90 days in any 180-day period. Citizens of other countries need to apply for a Schengen visa. ETIAS (the EU travel authorisation for visa-exempt visitors) has not yet launched as of 2026 — check travel-authorization/etias for the current status."
           }
         },
         {

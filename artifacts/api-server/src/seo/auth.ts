@@ -2,7 +2,7 @@
 // (ETIAS, UK ETA, US ESTA, Canada eTA, Australia ETA). Same look/SEO structure
 // as the transit + pair pages.
 import { TRAVEL_AUTHS, type TravelAuth } from "../data/authData";
-import { SITE_ORIGIN } from "./render";
+import { SITE_ORIGIN, DATA_LAST_UPDATED } from "./render";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -46,15 +46,15 @@ export function renderAuthHub(): string {
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${canonical}"><meta name="robots" content="index,follow,max-image-preview:large">
-<meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="${esc(canonical)}"><meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="Is Visa Required?"><meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="https://www.isvisarequired.com/opengraph.jpg">
 <link rel="icon" href="/favicon.svg"><style>${STYLE}</style></head>
 <body>${HEADER}<main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › Travel authorisations</nav>
 <h1>ETIAS, ESTA, ETA & eTA — what they are and who needs them</h1>
 <p class="lead">An electronic travel authorisation is <strong>not a visa</strong> — it's a quick online approval that visa-exempt travellers get before a trip. Here's each major one:</p>
 ${cards}
-</main>${FOOTER("2026-06-01")}</body></html>`;
+</main>${FOOTER(DATA_LAST_UPDATED)}</body></html>`;
 }
 
 export function renderAuthGuide(a: TravelAuth): string {
@@ -63,7 +63,7 @@ export function renderAuthGuide(a: TravelAuth): string {
   const title = a.status === "upcoming"
     ? `${a.name}: what it is & when you'll need it (${yr})`
     : `${a.name}: who needs it, cost & how to apply (${yr})`;
-  const desc = `${a.summary} ${a.statusNote}`.slice(0, 320);
+  const desc = `${a.summary} ${a.statusNote}`.slice(0, 155);
 
   const faqs = [
     { q: `What is ${a.name}?`, a: a.whatItIs },
@@ -92,14 +92,20 @@ export function renderAuthGuide(a: TravelAuth): string {
   const others = TRAVEL_AUTHS.filter((x) => x.slug !== a.slug)
     .map((x) => `<a href="/travel-authorization/${x.slug}">${esc(x.name)}</a>`).join("");
 
+  const webpageJsonLd = {
+    "@context": "https://schema.org", "@type": "WebPage",
+    name: title, url: canonical, dateModified: a.reviewed, inLanguage: "en",
+    isPartOf: { "@type": "WebSite", name: "Is Visa Required?", url: SITE_ORIGIN },
+  };
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${canonical}"><meta name="robots" content="index,follow,max-image-preview:large">
-<meta property="og:type" content="article"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="${esc(canonical)}"><meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="article"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:site_name" content="Is Visa Required?"><meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="https://www.isvisarequired.com/opengraph.jpg">
 <link rel="icon" href="/favicon.svg">
 <script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>
+<script type="application/ld+json">${JSON.stringify(webpageJsonLd)}</script>
 <style>${STYLE}</style></head>
 <body>${HEADER}<main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › <a href="/travel-authorization">Travel authorisations</a> › ${esc(a.name)}</nav>

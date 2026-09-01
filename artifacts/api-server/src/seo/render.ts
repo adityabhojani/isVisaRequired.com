@@ -115,8 +115,23 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
   const answer = answerSentence(requirement, from.name, to.name);
 
   const canonical = `${SITE_ORIGIN}${pairPath(from, to)}`;
-  const title = `Do ${from.name} citizens need a visa for ${to.name}? (${new Date(DATA_LAST_UPDATED).getFullYear()})`;
-  const metaDesc = `${answer} Visa type: ${reqLabel}. Max stay: ${maxStay}. Fee: ${fee}. Processing: ${processing}. Documents, costs and official links — updated ${DATA_LAST_UPDATED}.`;
+  const year = new Date(DATA_LAST_UPDATED).getFullYear();
+  const titleFull = `Do ${from.name} citizens need a visa for ${to.name}? (${year})`;
+  const titleShort = `${from.name} visa for ${to.name} (${year})`;
+  const title = titleFull.length <= 70
+    ? titleFull
+    : titleShort.length <= 70
+      ? titleShort
+      : `${from.name} → ${to.name} visa requirements`;
+  const shortReq: Record<string, string> = {
+    visa_free: "No visa needed",
+    visa_on_arrival: "Visa on arrival",
+    e_visa: "eVisa required (apply online)",
+    visa_required: "Visa required",
+    no_admission: "Entry not permitted",
+  };
+  const stayPart = maxStay && !maxStay.startsWith("Varies") ? ` Up to ${maxStay}.` : "";
+  const metaDesc = `${from.name} to ${to.name}: ${shortReq[requirement] ?? reqLabel}.${stayPart} Costs, documents & official links — updated ${DATA_LAST_UPDATED}.`.slice(0, 155);
 
   // FAQ (kept identical between visible content and JSON-LD)
   const rules = getEntryRules(to.code);
@@ -160,7 +175,7 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
     url: canonical,
     dateModified: DATA_LAST_UPDATED,
     inLanguage: "en",
-    isPartOf: { "@type": "WebSite", name: "isvisarequired.com", url: SITE_ORIGIN },
+    isPartOf: { "@type": "WebSite", name: "Is Visa Required?", url: SITE_ORIGIN },
   };
 
   // Related internal links (crawlable graph): same destination / other passports,
@@ -246,11 +261,14 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(metaDesc)}">
 <meta property="og:url" content="${esc(canonical)}">
-<meta property="og:site_name" content="isvisarequired.com">
+<meta property="og:site_name" content="Is Visa Required?">
 <meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="${esc(metaDesc)}">
+<meta name="twitter:image" content="https://www.isvisarequired.com/opengraph.jpg">
 <link rel="icon" href="/favicon.svg">
 <script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>
