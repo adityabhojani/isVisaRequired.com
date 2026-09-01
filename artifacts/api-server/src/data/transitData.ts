@@ -21,7 +21,6 @@ export interface TransitGuide {
   reviewed: string; // ISO date
 }
 
-const REVIEWED = "2026-06-01";
 
 export const TRANSIT_GUIDES: TransitGuide[] = [
   {
@@ -33,11 +32,13 @@ export const TRANSIT_GUIDES: TransitGuide[] = [
     schemes: [
       "Because there is no airside transit, you need either an ESTA (if you're from a Visa Waiver Program country), a B-1/B-2 visitor visa, or a dedicated C-1 transit visa.",
       "A C-1 transit visa is for travelers passing through the US to another country.",
+      "There is no such thing as a quick airside connection here: an ESTA or visa is required even for a two-hour stop where you never intend to leave the terminal, because you still legally enter the United States.",
+      "Expect to be asked for proof of onward travel at the border — it is one of the standard conditions officers check.",
       "Allow extra connection time — you must collect and re-check baggage and pass security again.",
     ],
     officialName: "U.S. Department of State — Transit (C) visas",
     officialUrl: "https://travel.state.gov/content/travel/en/us-visas/other-visa-categories/transit-crew-visa.html",
-    reviewed: REVIEWED,
+    reviewed: "2026-09-01",
   },
   {
     slug: "united-kingdom",
@@ -66,14 +67,14 @@ export const TRANSIT_GUIDES: TransitGuide[] = [
     airside: "Usually visa-free, with an exception: nationals of a specific list of countries require an Airport Transit Visa (ATV) to pass through the international zone of a Schengen airport, even without entering the Schengen Area.",
     landside: "To leave the airport during a layover you must formally enter the Schengen Area, which requires a Schengen visa (or visa-free entry / ETIAS once live) according to your nationality.",
     schemes: [
-      "Airport Transit Visa (ATV / type A): required for a fixed list of nationalities; individual Schengen states may add more countries to their own list.",
+      "Airport Transit Visa (ATV / type A): required for a fixed EU-wide list — Afghanistan, Bangladesh, DR Congo, Eritrea, Ethiopia, Ghana, Iran, Iraq, Nigeria, Pakistan, Somalia and Sri Lanka (Burundi joins from 1 August 2026). Individual Schengen states may add further nationalities to their own lists, so check the country you connect in.",
       "Holders of valid visas/residence permits from certain countries (e.g. US, Canada, Ireland, Japan) are often exempt from the ATV — confirm on the official source.",
       "Connecting between two non-Schengen flights at the same airport without leaving the international zone is what the ATV covers.",
       "ETIAS (the EU travel authorization) is separate from transit rules — check both.",
     ],
     officialName: "European Commission — Airport transit visa",
     officialUrl: "https://home-affairs.ec.europa.eu/policies/schengen-borders-and-visa/visa-policy_en",
-    reviewed: REVIEWED,
+    reviewed: "2026-09-01",
   },
   {
     slug: "china",
@@ -199,13 +200,14 @@ export const TRANSIT_GUIDES: TransitGuide[] = [
     airside: "Connecting airside through a Japanese airport without entering Japan generally does not require a transit visa.",
     landside: "To leave the airport you must enter Japan — many nationalities are visa-free for short stays; others need a visa.",
     schemes: [
-      "Shore pass / transit landing permit: short permits that may be granted to transit passengers at the immigration officer's discretion.",
+      "Shore pass / transit landing permit: lets some transit passengers leave the airport for up to 72 hours, provided they hold an onward international ticket departing within that window and the documents for their final destination.",
+      "You cannot apply for it in advance — it is assessed and granted at the airport, at the immigration officer's discretion, so never build a layover plan that depends on getting one.",
       "Many nationalities enjoy visa-free short-stay entry if they wish to leave the airport.",
       "An onward ticket is required.",
     ],
     officialName: "Japan Ministry of Foreign Affairs — Visa",
     officialUrl: "https://www.mofa.go.jp/j_info/visit/visa/index.html",
-    reviewed: REVIEWED,
+    reviewed: "2026-09-01",
   },
   {
     slug: "hong-kong",
@@ -215,12 +217,13 @@ export const TRANSIT_GUIDES: TransitGuide[] = [
     landside: "Many nationalities can enter Hong Kong visa-free for short stays; some require a visa or entry permit.",
     schemes: [
       "Hong Kong has its own immigration system, separate from mainland China.",
-      "Visa-free access for short visits applies to a wide range of nationalities.",
+      "Visa-free access for short visits applies to a wide range of nationalities, and the allowances are generous — commonly 90 days for US, EU, Australian, Canadian, Japanese and South Korean visitors, and up to 180 days on a UK passport.",
+      "The trap: entering Hong Kong does NOT let you cross into mainland China. A day trip to Shenzhen needs a Chinese visa or a mainland scheme such as the 240-hour transit — and for China's purposes Hong Kong counts as a separate region.",
       "An onward ticket may be requested.",
     ],
     officialName: "Hong Kong Immigration Department",
     officialUrl: "https://www.immd.gov.hk/eng/services/visas/visit-transit/visit-visa-entry-permit.html",
-    reviewed: REVIEWED,
+    reviewed: "2026-09-01",
   },
 ];
 
