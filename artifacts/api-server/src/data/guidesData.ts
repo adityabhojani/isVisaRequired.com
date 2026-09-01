@@ -133,6 +133,60 @@ export const GUIDES: Guide[] = [
       "Nepali passport holders have open-border access to India and visa-free or on-arrival entry to a modest but useful set of destinations across Asia, Africa and beyond. This guide lists all of them — visa-free, visa on arrival and eVisa — with the maximum stay for each and links to full requirements.",
   },
   {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-chinese-citizens",
+    code: "CN",
+    nationality: "Chinese citizens",
+    adjective: "Chinese",
+    intro:
+      "The Chinese passport has moved faster than almost any other in recent years, as Beijing signed a wave of mutual visa-exemption agreements and more countries opened eVisa channels. That makes an up-to-date list genuinely useful: what was visa-required a couple of years ago may not be today. Below is every destination open to Chinese citizens without an embassy appointment — visa-free, on arrival, or through an online application — with the permitted stay for each.",
+  },
+  {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-turkish-citizens",
+    code: "TR",
+    nationality: "Turkish citizens",
+    adjective: "Turkish",
+    intro:
+      "Turkish passport holders sit at a genuine crossroads: strong access across Africa, the Balkans, Central Asia and much of Southeast Asia, but a visa requirement for the European Union next door. This guide separates the two realities — everywhere you can simply board a plane, everywhere a visa is issued at the border, and everywhere an online application is enough — so you can plan around the paperwork rather than into it.",
+  },
+  {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-brazilian-citizens",
+    code: "BR",
+    nationality: "Brazilian citizens",
+    adjective: "Brazilian",
+    intro:
+      "Brazil holds one of the strongest passports outside Europe and North America: visa-free travel across the whole of Europe, nearly all of South America, and a long list of destinations in Asia and Africa. The catch is that a strong passport makes it easy to assume everywhere is open — and it isn't. This guide lists exactly where Brazilian citizens walk through, where a visa is issued on arrival, and where an online application is required first.",
+  },
+  {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-mexican-citizens",
+    code: "MX",
+    nationality: "Mexican citizens",
+    adjective: "Mexican",
+    intro:
+      "Mexican passport holders travel visa-free across Europe and most of Latin America, which surprises people who assume the opposite from the paperwork required for the United States and Canada. Those two neighbours are the exception, not the rule. Here is the full picture: every destination open without a prior visa, every one that issues a visa at the border, and every one that expects an online application before you fly.",
+  },
+  {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-south-african-citizens",
+    code: "ZA",
+    nationality: "South African citizens",
+    adjective: "South African",
+    intro:
+      "The South African passport is among the strongest on the continent, with broad access across southern Africa and a useful spread of destinations in Asia, the Caribbean and South America. Europe and North America still require visas, so knowing precisely where you can travel on the passport alone is worth real time and money. This guide sets out every one of those destinations, with the permitted stay and full requirements for each.",
+  },
+  {
+    kind: "passport-roundup",
+    slug: "visa-free-countries-for-ghanaian-citizens",
+    code: "GH",
+    nationality: "Ghanaian citizens",
+    adjective: "Ghanaian",
+    intro:
+      "For Ghanaian passport holders, ECOWAS free movement makes West Africa straightforward, and a growing number of countries further afield now accept an online application instead of an embassy visit. Those eVisa routes are where most of the recent progress has been. This guide lists every destination reachable without a prior embassy visa — visa-free, visa on arrival, or eVisa — so you can see the realistic options at a glance.",
+  },
+  {
     kind: "article",
     slug: "visa-on-arrival-vs-evisa-vs-eta",
     title: "Visa on Arrival vs eVisa vs ETA — What's the Difference? (2026)",
