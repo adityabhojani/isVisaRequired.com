@@ -74,18 +74,22 @@ export const TRANSIT_GUIDES: TransitGuide[] = [
   {
     slug: "china",
     name: "China (mainland)",
-    summary: "China offers 24-hour visa-free transit nationwide, and 72/144-hour visa-free transit in many cities for ~54 nationalities with an onward ticket.",
+    summary: "China offers 24-hour visa-free transit nationwide, plus a 240-hour (10-day) visa-free transit for around 55 nationalities at 60+ ports — the scheme that replaced the old 72/144-hour rules.",
     airside: "If you stay in the international transit area and don't clear immigration, you generally don't need a visa. To leave the secure area you use one of the transit schemes below.",
     landside: "China runs generous visa-free transit programmes that let eligible travelers leave the airport during a layover.",
     schemes: [
       "24-hour visa-free transit: available nationwide to most nationalities, with an onward ticket to a third country/region.",
-      "72-hour and 144-hour visa-free transit: available at many major cities and provinces for citizens of around 54 countries, travelling between two different countries/regions.",
-      "You must arrive and depart from eligible ports and have a confirmed onward ticket within the time window.",
+      "240-hour (10-day) visa-free transit: this REPLACED the older 72-hour and 144-hour schemes. It is open to citizens of roughly 55 countries at 60+ ports of entry, and now lets you move around some two dozen provinces rather than staying in one city.",
+      "It is genuinely a transit scheme, not a tourist entry: you must be travelling between two different countries or regions, and hold a confirmed onward ticket to that third country within the time window.",
+      "You must also arrive and depart through ports that are approved for the scheme — check the current port list before booking, as it has been expanded several times.",
       "Hong Kong and Macao have separate entry rules from mainland China.",
     ],
     officialName: "China National Immigration Administration",
     officialUrl: "https://en.nia.gov.cn/",
-    reviewed: REVIEWED,
+    // Re-verified separately: the 72/144-hour scheme this guide used to describe
+    // was superseded by the 240-hour policy, so this entry is newer than the
+    // shared REVIEWED date used by the guides that were not re-checked.
+    reviewed: "2026-08-31",
   },
   {
     slug: "united-arab-emirates",
