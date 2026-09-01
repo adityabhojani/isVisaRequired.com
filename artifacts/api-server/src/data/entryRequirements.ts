@@ -179,8 +179,9 @@ const RULES: Record<string, EntryRules> = {
       url: "https://www.immigration.govt.nz/new-zealand-visas/apply-for-a-visa/about-visa/nzeta",
     },
     notes: [
-      "NZeTA also covers an International Visitor Conservation and Tourism Levy (IVL) of NZD 35",
-      "Maximum stay 3–9 months depending on nationality",
+      "NZeTA also covers the International Visitor Conservation and Tourism Levy (IVL), which is NZD 100 per person — it tripled from NZD 35 on 1 October 2024, so budget for the current amount",
+      "Maximum stay is 3 months at a time on the NZeTA visa waiver — 6 months on a UK passport",
+      "Hard cap most people miss: you cannot spend more than 6 months in New Zealand in any 12-month period, however many separate trips you make",
       "Very strict biosecurity — declare all food, soil, outdoor equipment",
     ],
   },
