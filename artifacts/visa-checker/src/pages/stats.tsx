@@ -37,8 +37,20 @@ export default function StatsPage() {
         "name": "Passport Power Index",
         "description": "Rankings of all 199 passports by the number of countries accessible without a prior visa.",
         "url": "https://www.isvisarequired.com/stats",
-        "creator": { "@type": "Organization", "name": "isvisarequired.com" },
-        "keywords": ["passport power", "passport index", "visa free countries", "passport ranking", "travel freedom"]
+        "creator": { "@type": "Organization", "name": "isvisarequired.com", "url": "https://www.isvisarequired.com" },
+        "publisher": { "@type": "Organization", "name": "isvisarequired.com", "url": "https://www.isvisarequired.com" },
+        "keywords": ["passport power", "passport index", "visa free countries", "passport ranking", "travel freedom"],
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+        "isAccessibleForFree": true,
+        "inLanguage": "en",
+        "spatialCoverage": "Worldwide",
+        "variableMeasured": ["Visa-free destinations", "Visa on arrival destinations", "eVisa destinations", "Passport rank"],
+        "distribution": {
+          "@type": "DataDownload",
+          "encodingFormat": "application/json",
+          "contentUrl": "https://www.isvisarequired.com/api/visa/all-rankings"
+        },
+        "sameAs": "https://www.isvisarequired.com/methodology"
       }
     ],
   });

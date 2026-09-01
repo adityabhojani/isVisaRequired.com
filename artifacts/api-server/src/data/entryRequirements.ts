@@ -395,6 +395,41 @@ const RULES: Record<string, EntryRules> = {
     ],
   },
 
+  // ── Argentina ──────────────────────────────────────────────────────────────
+  // Sourced from Dirección Nacional de Migraciones (migraciones.gob.ar), the
+  // Cancillería visa pages, ARCA customs, CDC and UK FCDO. Deliberately does NOT
+  // repeat the lazy "6 months passport validity" default — Argentina only asks
+  // for validity covering the stay (the 6-month rule applies to consular visa
+  // applicants, which is noted on the pages that need it).
+  AR: {
+    passportValidity: "Valid for the duration of your stay (Argentina has no 6-month rule) — but 6 months' validity plus a blank page if you need a consular visa",
+    returnTicket: "recommended",
+    returnTicketNote: "Not on the official entry-document list, but officers may ask to see onward travel",
+    proofOfFunds: "recommended",
+    proofOfFundsNote: "No published minimum — Migraciones sets no figure; any amount quoted elsewhere is invented",
+    travelInsurance: "recommended",
+    travelInsuranceNote: "Not checked at the border, but since Resolución 1066/2026 (11 Aug 2026) public hospitals charge non-residents for non-emergency care",
+    vaccinations: [
+      { name: "Yellow fever", level: "recommended", detail: "No certificate required to enter Argentina. CDC recommends the vaccine for travel to Corrientes and Misiones provinces — Misiones includes Iguazú Falls" },
+      { name: "Hepatitis A", level: "recommended", detail: "CDC recommends it for unvaccinated travellers aged 1 and over" },
+      { name: "Typhoid", level: "recommended", detail: "Consider it for rural areas, longer stays, or if visiting friends and relatives" },
+      { name: "Routine vaccines", level: "recommended", detail: "No vaccine is an entry condition for Argentina — keep MMR, tetanus and polio up to date" },
+    ],
+    preAuth: {
+      name: "AVE (Autorización de Viaje Electrónica)",
+      applies: "Nationals of ~70 visa-required countries who hold a valid US visa (B2, J, B1, O, P, E or H-1B) or a valid US ESTA — an alternative to the consular visa, not a general ETA",
+      url: "https://www.migraciones.gob.ar/ave/",
+    },
+    notes: [
+      "Argentina no longer stamps passports on entry — keep boarding passes as proof of your entry date",
+      "Tourist entry is 90 days, extendable once by a further 90 days (prórroga de permanencia); file it in the 10 days before your stay expires",
+      "The old 'reciprocity fee' is abolished for every nationality — any site charging one is fraudulent",
+      "Cash: under USD 10,000 needs no declaration; USD 10,000 or more must be declared to customs",
+      "Duty-free baggage: USD 500 arriving by air or sea (plus USD 500 in the arrivals free shop); USD 300 by land",
+      "Foreign tourists get an automatic 21% VAT refund on accommodation paid with a foreign card or foreign bank transfer",
+    ],
+  },
+
   // ── Mexico ─────────────────────────────────────────────────────────────────
   MX: {
     passportValidity: "Valid for duration of stay",

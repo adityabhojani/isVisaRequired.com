@@ -114,14 +114,48 @@ export default function PassportPage() {
       ? `Complete visa requirements for ${country.name} passport holders. Visa-free access to ${vfCount} countries, visa on arrival for ${voaCount}, eVisa for ${evCount}. Check all 199 destinations.`
       : "Check visa requirements for this passport across all 199 countries.",
     canonical: `https://www.isvisarequired.com/passport/${code}`,
-    jsonLd: country && results.length > 0 ? {
-      "@context": "https://schema.org",
-      "@type": "Dataset",
-      "name": `${country.name} Passport Visa Requirements`,
-      "description": `Visa requirements for ${country.name} passport holders across 199 countries`,
-      "url": `https://www.isvisarequired.com/passport/${code}`,
-      "keywords": `${country.name} passport, visa requirements, visa free countries ${country.name}`,
-    } : undefined,
+    jsonLd: country && results.length > 0 ? [
+      {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "name": `${country.name} Passport Visa Requirements`,
+        "description": `Visa requirements for ${country.name} passport holders across 199 countries — visa-free access to ${vfCount}, visa on arrival for ${voaCount}, eVisa for ${evCount}.`,
+        "url": `https://www.isvisarequired.com/passport/${code}`,
+        "keywords": `${country.name} passport, visa requirements, visa free countries ${country.name}`,
+        // Search Console flagged "Missing field 'creator'" on these pages — it is a
+        // recommended-field warning rather than an eligibility error, but the
+        // attribution is real, so state it rather than leaving the dataset ownerless.
+        "creator": {
+          "@type": "Organization",
+          "name": "isvisarequired.com",
+          "url": "https://www.isvisarequired.com",
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "isvisarequired.com",
+          "url": "https://www.isvisarequired.com",
+        },
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+        "isAccessibleForFree": true,
+        "inLanguage": "en",
+        "spatialCoverage": "Worldwide",
+        "variableMeasured": ["Visa requirement", "Maximum stay", "Visa type"],
+        "distribution": {
+          "@type": "DataDownload",
+          "encodingFormat": "application/json",
+          "contentUrl": `https://www.isvisarequired.com/api/visa/check-all?passport=${code}`,
+        },
+        "sameAs": "https://www.isvisarequired.com/methodology",
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.isvisarequired.com/" },
+          { "@type": "ListItem", "position": 2, "name": `${country.name} Passport`, "item": `https://www.isvisarequired.com/passport/${code}` },
+        ],
+      },
+    ] : undefined,
   });
 
   return (

@@ -142,11 +142,54 @@ const countrySpecificFees: Record<string, number | null> = {
   "AZ-e_visa": 20,
 };
 
+// Destination-specific overrides for the whole VisaDetail, not just the fee.
+//
+// The per-requirement defaults above are generic by design, which means every
+// "visa_required" page renders the same document checklist and the same eight
+// application steps. That is the bulk of the duplicate-content problem on the
+// pair pages, so destinations we have researched properly get a real, sourced
+// checklist here and stop sharing the boilerplate.
+//
+// Keyed `${destinationCode}-${requirement}`. Fields are merged over the default,
+// so an entry only needs to state what it actually knows.
+const destinationVisaDetails: Record<string, Partial<VisaDetail>> = {
+  // Argentina — consular tourist visa ("Visa para Turismo", residencia
+  // transitoria art. 24 inc. a, Ley 25.871). Fee and checklist from
+  // cancilleria.gob.ar/es/servicios/visas/visa-para-turismo, corroborated by the
+  // Consulate General in New York and the Embassy in New Delhi.
+  "AR-visa_required": {
+    feeUSD: 150,
+    processingDays: "Apply at least 6 weeks before travel — longer in high season",
+    maxStay: "90 days, extendable once by a further 90 days",
+    documents: [
+      "Passport valid at least 6 months from your date of entry, with 2 completely blank pages",
+      "Two 4x4 cm colour photographs, front-facing, white background",
+      "Completed and signed visa application form (FSV)",
+      "Proof of funds — recent bank statements, an account balance certificate, and pay slips",
+      "Confirmed round-trip flight reservation",
+      "Hotel reservation and tourist itinerary, or a legalised letter of invitation plus the host's ID",
+      "Payment of the USD 150 consular fee (non-refundable, payable in local currency)",
+    ],
+    process: [
+      "Email your complete scanned document set to the Argentine mission that covers your country",
+      "Wait for the visa section to verify your documents and issue an appointment",
+      "Pay the USD 150 consular fee — the process only starts once it is paid, and it is not refunded if you are refused",
+      "Attend the in-person consular interview with your original passport and photographs",
+      "Collect your passport with the visa stamp on the date confirmed at your interview",
+    ],
+    notes: "Meeting the checklist does not guarantee a visa — issuance is at the discretion of the Argentine state.",
+  },
+};
+
 export function getVisaDetail(passport: string, destination: string, requirement: string): VisaDetail {
   const key = `${destination}-${requirement}`;
   const base = { ...defaultVisaDetails[requirement] } as VisaDetail;
   if (countrySpecificFees[key] !== undefined) {
     base.feeUSD = countrySpecificFees[key];
+  }
+  const specific = destinationVisaDetails[key];
+  if (specific) {
+    Object.assign(base, specific);
   }
   return base;
 }
