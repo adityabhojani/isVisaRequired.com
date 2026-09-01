@@ -21,7 +21,7 @@ export interface TravelAuth {
   reviewed: string;
 }
 
-const REVIEWED = "2026-06-01";
+const REVIEWED = "2026-08-31";
 
 export const TRAVEL_AUTHS: TravelAuth[] = [
   {
@@ -49,7 +49,7 @@ export const TRAVEL_AUTHS: TravelAuth[] = [
     summary: "The UK ETA is an online authorisation required before travel for visitors who don't need a UK visa.",
     whatItIs: "An Electronic Travel Authorisation linked to your passport, required before you travel to the UK if you don't need a visa for short visits. It is not a visa and doesn't guarantee entry — the final decision is made at the border.",
     whoNeeds: "Visa-exempt visitors to the UK, being phased in by nationality. If you already need a UK visa, you apply for that instead.",
-    cost: "A low fee per application (the UK has changed the amount — check the official site for the current price).",
+    cost: "£20 per person, including babies and children — increased from £16 on 8 April 2026. The fee is non-refundable whether or not the application is approved, and is the same on GOV.UK and in the official UK ETA app. Beware third-party sites charging more.",
     validity: "Typically valid for 2 years for multiple trips, or until your passport expires.",
     howToApply: "Through the official 'UK ETA' app or the GOV.UK website. Apply before you book travel where possible.",
     officialName: "UK Government — Electronic Travel Authorisation",
@@ -65,7 +65,7 @@ export const TRAVEL_AUTHS: TravelAuth[] = [
     summary: "ESTA is the US online authorisation for citizens of Visa Waiver Program countries flying to the United States.",
     whatItIs: "An online authorisation for short visits (up to 90 days) under the Visa Waiver Program. It is not a visa; it pre-screens travellers before they board. Approval doesn't guarantee entry — that's decided at the US border.",
     whoNeeds: "Citizens of Visa Waiver Program countries arriving by air or sea. Everyone else needs a US visa (and note: there's no visa-free airport transit in the US).",
-    cost: "A fee per application (about US$21 at the last review — confirm the current amount on the official site).",
+    cost: "US$40.27 per approved authorisation for FY2026 — made up of a $17 travel promotion fee, a $10.27 CBP operational fee and a $13 Treasury fee. This rose sharply from $21 on 30 September 2025 and is now adjusted for inflation each year. If your application is denied you are charged only the $10.27 operational portion. Pay only on the official CBP site.",
     validity: "Generally 2 years for multiple trips, or until your passport expires.",
     howToApply: "Only on the official US Customs and Border Protection ESTA website — beware of look-alike paid third-party sites.",
     officialName: "U.S. CBP — Official ESTA",
