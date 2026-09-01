@@ -22,6 +22,9 @@ export interface TransitGuide {
 }
 
 
+// Every guide carries its own `reviewed` date: these rules change independently
+// (schemes get retired, fees move), so a shared constant would either go stale
+// or falsely imply that untouched guides had been re-checked.
 export const TRANSIT_GUIDES: TransitGuide[] = [
   {
     slug: "united-states",
@@ -56,8 +59,6 @@ export const TRANSIT_GUIDES: TransitGuide[] = [
     ],
     officialName: "UK Government — Transit visas",
     officialUrl: "https://www.gov.uk/transit-visa",
-    // Re-verified separately (ETA airside-transit exemption + the Gatwick
-    // exception), so this is newer than the shared REVIEWED constant.
     reviewed: "2026-08-31",
   },
   {
@@ -91,9 +92,6 @@ export const TRANSIT_GUIDES: TransitGuide[] = [
     ],
     officialName: "China National Immigration Administration",
     officialUrl: "https://en.nia.gov.cn/",
-    // Re-verified separately: the 72/144-hour scheme this guide used to describe
-    // was superseded by the 240-hour policy, so this entry is newer than the
-    // shared REVIEWED date used by the guides that were not re-checked.
     reviewed: "2026-08-31",
   },
   {
