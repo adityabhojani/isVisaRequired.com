@@ -82,10 +82,10 @@ function linkBlock(): string {
 
 export const ROUTE_SEO: Record<string, RouteSeo> = {
   "/": {
-    title: "Is Visa Required? | Free Visa Checker for 199 Countries",
+    title: "Is Visa Required? | Free Visa Checker for 195 Countries",
     description: "Check visa requirements instantly for any passport and destination. Find out if you need a visa, visa on arrival, e-visa, ETA/ETIAS, or can travel visa-free — free, no sign-up.",
     h1: "Do you need a visa?",
-    body: `<p>Select your passport and destination to instantly see whether you need a visa, visa on arrival, an e-visa, an electronic travel authorisation (ETIAS/ESTA/ETA), or can travel visa-free — across 199 countries and ~38,000 passport–destination combinations. Free, no account needed.</p>`,
+    body: `<p>Select your passport and destination to instantly see whether you need a visa, visa on arrival, an e-visa, an electronic travel authorisation (ETIAS/ESTA/ETA), or can travel visa-free — across 195 countries and 37,830 passport–destination combinations. Free, no account needed. Data last reviewed ${DATA_LAST_UPDATED}.</p>`,
     jsonLd: [
       {
         "@context": "https://schema.org",
@@ -93,7 +93,7 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
         name: "isvisarequired.com",
         alternateName: "Is Visa Required?",
         url: SITE,
-        description: "Free visa-requirement checker covering 199 countries and ~38,000 passport-to-destination combinations.",
+        description: "Free visa-requirement checker covering 195 countries and 37,830 passport-to-destination combinations.",
       },
       {
         "@context": "https://schema.org",

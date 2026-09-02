@@ -1,5 +1,7 @@
 import { useState, useMemo, lazy, Suspense, useEffect, useRef } from "react";
 import { useSEO } from "@/hooks/useSEO";
+import { slugify } from "@/lib/slug";
+import { COVERAGE } from "@/lib/coverage";
 import { useQuery } from "@tanstack/react-query";
 import {
   useListCountries,
@@ -290,6 +292,70 @@ function ShareButtons({ passport, passportFlag, passportName, destinations, resu
   );
 }
 
+
+// Passports that have an editorial roundup guide behind them (guidesData.ts).
+// Deliberately titled "Start with a passport", not "most popular" — we have no
+// traffic data to substantiate a popularity claim.
+const START_PASSPORTS = [
+  { code: "IN", name: "India", flag: "\u{1F1EE}\u{1F1F3}" },
+  { code: "NG", name: "Nigeria", flag: "\u{1F1F3}\u{1F1EC}" },
+  { code: "PK", name: "Pakistan", flag: "\u{1F1F5}\u{1F1F0}" },
+  { code: "PH", name: "Philippines", flag: "\u{1F1F5}\u{1F1ED}" },
+  { code: "BD", name: "Bangladesh", flag: "\u{1F1E7}\u{1F1E9}" },
+  { code: "KE", name: "Kenya", flag: "\u{1F1F0}\u{1F1EA}" },
+  { code: "VN", name: "Vietnam", flag: "\u{1F1FB}\u{1F1F3}" },
+  { code: "ID", name: "Indonesia", flag: "\u{1F1EE}\u{1F1E9}" },
+  { code: "EG", name: "Egypt", flag: "\u{1F1EA}\u{1F1EC}" },
+  { code: "CN", name: "China", flag: "\u{1F1E8}\u{1F1F3}" },
+  { code: "TR", name: "T\u00FCrkiye", flag: "\u{1F1F9}\u{1F1F7}" },
+  { code: "ZA", name: "South Africa", flag: "\u{1F1FF}\u{1F1E6}" },
+];
+
+// Static link panels. Each entry states a route, never an outcome, so no visa
+// fact is asserted here and nothing can drift out of date.
+const EXPLORE_PANELS: { heading: string; links: { href: string; label: string }[] }[] = [
+  {
+    heading: "Popular checks",
+    links: [
+      { href: "/visa-requirements/united-states/japan", label: "United States → Japan" },
+      { href: "/visa-requirements/india/thailand", label: "India → Thailand" },
+      { href: "/visa-requirements/united-kingdom/united-states", label: "United Kingdom → United States" },
+      { href: "/visa-requirements/germany/united-states", label: "Germany → United States" },
+      { href: "/visa-requirements/nigeria/united-kingdom", label: "Nigeria → United Kingdom" },
+      { href: "/visa-requirements/china/singapore", label: "China → Singapore" },
+    ],
+  },
+  {
+    heading: "Before you book",
+    links: [
+      { href: "/guides/six-month-passport-rule", label: "The six-month passport rule, explained" },
+      { href: "/guides/visa-validity-vs-duration-of-stay", label: "Visa validity vs duration of stay" },
+      { href: "/guides/proof-of-onward-travel", label: "What counts as proof of onward travel" },
+      { href: "/guides/single-entry-vs-multiple-entry-visas", label: "Single-entry vs multiple-entry visas" },
+      { href: "/guides/can-i-leave-the-airport-during-a-layover", label: "Can I leave the airport during a layover?" },
+    ],
+  },
+  {
+    heading: "Browse everything",
+    links: [
+      { href: "/visa-requirements", label: "All 195 passports" },
+      { href: "/countries", label: "All 195 destinations" },
+      { href: "/guides", label: "Visa & travel guides" },
+      { href: "/reports/passport-power-2026", label: "Passport Power Report 2026" },
+      { href: "/tier-list", label: "Passport tier list" },
+    ],
+  },
+];
+
+// Requirement → follow-on guide. Editorial routing, not a visa fact.
+const GUIDE_FOR_REQUIREMENT: Record<string, { href: string; label: string }> = {
+  visa_free: { href: "/guides/six-month-passport-rule", label: "Check your passport is still valid enough" },
+  visa_on_arrival: { href: "/guides/visa-on-arrival-vs-evisa-vs-eta", label: "Visa on arrival vs eVisa vs ETA" },
+  e_visa: { href: "/guides/visa-on-arrival-vs-evisa-vs-eta", label: "Visa on arrival vs eVisa vs ETA" },
+  visa_required: { href: "/guides/proof-of-onward-travel", label: "What counts as proof of onward travel" },
+  no_admission: { href: "/guides", label: "Browse our visa guides" },
+};
+
 export default function HomePage() {
   const [initialParams] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -346,13 +412,35 @@ export default function HomePage() {
   }, [countries.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const passportCountry = countries.find((c) => c.code === passport);
+
+  // Follow-on links built from the answer the user just got. Nothing is
+  // fetched and nothing new is asserted — URLs come from slugify() on the
+  // country names already in `results`.
+  const keepGoingTiles = useMemo(() => {
+    if (!results || results.length === 0 || !passportCountry) return [];
+    const pSlug = slugify(passportCountry.name);
+    const first = results[0];
+    const dSlug = slugify(first.destinationCountry.name);
+    const tiles = [
+      { href: `/visa-requirements/${pSlug}/${dSlug}`, label: `Full requirements: ${passportCountry.name} → ${first.destinationCountry.name}` },
+      { href: `/countries/${dSlug}`, label: `Who else can enter ${first.destinationCountry.name}?` },
+      { href: `/visa-requirements/${pSlug}`, label: `All destinations for ${passportCountry.name}` },
+    ];
+    if (results.length > 1) {
+      tiles.push({ href: "/trip-planner", label: `Plan all ${results.length} legs of this trip` });
+    } else {
+      const g = GUIDE_FOR_REQUIREMENT[first.requirement] ?? GUIDE_FOR_REQUIREMENT.visa_required;
+      tiles.push(g);
+    }
+    return tiles;
+  }, [results, passportCountry]);
   const singleDest = destinations.length === 1 ? countries.find((c) => c.code === destinations[0]) : null;
   const dynamicTitle = passportCountry && singleDest
     ? `${passportCountry.name} to ${singleDest.name} Visa Requirements | Is Visa Required?`
-    : "Is Visa Required? | Free Visa Checker for 199 Countries";
+    : `Is Visa Required? | Free Visa Checker for ${COVERAGE.countries} Countries`;
   const dynamicDesc = passportCountry && singleDest
     ? `Do ${passportCountry.name} passport holders need a visa for ${singleDest.name}? Check the requirement instantly — visa free, visa on arrival, e-visa, or visa required.`
-    : "Check visa requirements instantly for any passport and destination. Find out if you need a visa, visa on arrival, e-visa, or can travel freely — covers 199 countries worldwide.";
+    : `Check visa requirements instantly for any passport and destination. Find out if you need a visa, visa on arrival, e-visa, or can travel freely — covers ${COVERAGE.countries} countries worldwide.`;
 
   useSEO({
     title: dynamicTitle,
@@ -447,54 +535,31 @@ export default function HomePage() {
 
       {/* Hero strip */}
       <div className="bg-gradient-to-b from-primary/8 via-primary/4 to-transparent border-b border-border/50">
-        <div className="max-w-5xl mx-auto px-4 pt-12 pb-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/12 text-primary rounded-full px-3.5 py-1 text-xs font-semibold mb-4 border border-primary/20 shadow-sm">
-            <Plane className="h-3 w-3" />
-            199 countries · Instant results
-          </div>
+        <div className="max-w-5xl mx-auto px-4 pt-6 pb-6 md:pt-10 md:pb-8 text-center">
+          <a
+            href="/methodology"
+            className="inline-flex items-center gap-2 bg-primary/12 text-primary rounded-full px-3.5 py-1 text-xs font-semibold mb-4 border border-primary/20 shadow-sm hover:bg-primary/20 transition-colors">
+            <Shield className="h-3 w-3" />
+            Data last reviewed {COVERAGE.lastReviewedLabel}
+          </a>
           <h1 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight tracking-tight">
             Do you need a visa?
           </h1>
           <p className="text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
-            Select your passport and destination — get instant visa requirements, costs, and travel highlights.
+            Any passport, any destination — the rule in one tap.
           </p>
-          <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-2 text-sm">
-            <span className="px-4 py-2 rounded-full bg-primary text-primary-foreground font-semibold cursor-default">
-              Website
-            </span>
-            <a href="/app" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-border bg-card text-foreground font-semibold hover:bg-secondary/50 transition-colors">
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-              </svg>
-              iOS &amp; Android App
-            </a>
-          </div>
-
-          {/* Social proof strip */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mt-7">
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Globe className="h-4 w-4 text-primary/70" />
-              <span>199 countries covered</span>
-            </div>
-            <span className="text-border/70 hidden sm:block">·</span>
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Zap className="h-4 w-4 text-amber-500/80" />
-              <span>Instant results, no sign-up</span>
-            </div>
-            <span className="text-border/70 hidden sm:block">·</span>
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Lock className="h-4 w-4 text-green-600/70" />
-              <span>Always free</span>
-            </div>
+          {/* One line, real numbers. Fixed min-height so the async subscriber
+              count cannot add a wrap line and shove the search card down. */}
+          <div className="mt-4 min-h-[20px] text-sm text-muted-foreground">
+            <span className="tabular-nums">{COVERAGE.countries} countries</span>
+            <span className="mx-2 text-border">·</span>
+            <span className="tabular-nums">{COVERAGE.pairsLabel} rules</span>
+            <span className="mx-2 text-border">·</span>
+            <span>Free, no sign-up</span>
             {(newsletterData?.count ?? 0) > 0 && (
               <>
-                <span className="text-border/70 hidden sm:block">·</span>
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <Users className="h-4 w-4 text-blue-500/70" />
-                  <span>
-                    {newsletterData!.count.toLocaleString()}+ travellers subscribed
-                  </span>
-                </div>
+                <span className="mx-2 text-border">·</span>
+                <span className="tabular-nums">{newsletterData!.count.toLocaleString()}+ subscribed</span>
               </>
             )}
           </div>
@@ -667,6 +732,24 @@ export default function HomePage() {
               />
             )}
 
+            {results.length > 0 && passportCountry && (
+              <div className="mt-5 pt-5 border-t border-border/60">
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                  Keep going
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {keepGoingTiles.map((t) => (
+                    <a
+                      key={t.href}
+                      href={t.href}
+                      className="bg-card border border-border rounded-lg p-3 text-xs leading-snug hover:border-primary/50 hover:bg-secondary/40 transition-colors">
+                      {t.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center justify-between pt-1">
               <button
                 onClick={() => setResults(null)}
@@ -776,36 +859,58 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Empty state — no passport selected */}
-        {!passport && (
-          <div className="text-center py-16">
-            <div className="relative inline-block mb-6">
-              <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mx-auto shadow-inner">
-                <Globe className="h-10 w-10 text-primary/60" />
+        {/* Explore floor. Rendered in EVERY state, not just the empty one: the
+            page used to end here for anyone who didn't immediately pick a
+            passport, with no route into the 37,830 pair pages, 195 hubs or the
+            guides. Static links — no fetch, no layout shift, crawlable. */}
+        <section className="mt-10 pt-8 border-t border-border/60">
+          {!passport && (
+            <div className="mb-8">
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                Start with a passport
+              </p>
+              <div className="flex gap-2 overflow-x-auto snap-x pb-1 sm:flex-wrap sm:overflow-visible">
+                {START_PASSPORTS.map((p) => (
+                  <button
+                    key={p.code}
+                    onClick={() => setPassport(p.code)}
+                    className="snap-start shrink-0 h-11 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-medium hover:bg-secondary/60 transition-colors">
+                    <span aria-hidden="true">{p.flag}</span>
+                    {p.name}
+                  </button>
+                ))}
               </div>
-              <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-green-400 flex items-center justify-center shadow">
-                <CheckCircle2 className="h-3.5 w-3.5 text-white" />
+              <a href="/visa-requirements" className="inline-block mt-3 text-sm text-primary hover:underline">
+                Or browse all {COVERAGE.countries} passports →
+              </a>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {EXPLORE_PANELS.map((panel) => (
+              <div key={panel.heading} className="bg-card border border-border rounded-xl p-5">
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                  {panel.heading}
+                </p>
+                <div className="flex flex-col gap-2">
+                  {panel.links.map((l) => (
+                    <a key={l.href} href={l.href} className="text-sm text-foreground hover:text-primary transition-colors">
+                      {l.label}
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
-            <p className="text-xl font-semibold text-foreground mb-2">Select your passport to get started</p>
-            <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
-              Instant visa requirements, costs, and tourist highlights for all {countries.length || "199"} countries worldwide.
-            </p>
-            <div className="flex items-center justify-center gap-4 mt-6 flex-wrap">
-              {[
-                { color: "bg-green-500", label: "Visa Free" },
-                { color: "bg-amber-500", label: "On Arrival" },
-                { color: "bg-blue-500", label: "eVisa" },
-                { color: "bg-orange-500", label: "Visa Required" },
-              ].map(({ color, label }) => (
-                <span key={label} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <span className={`w-2 h-2 rounded-full ${color}`} />
-                  {label}
-                </span>
-              ))}
-            </div>
+            ))}
           </div>
-        )}
+
+          <p className="mt-6 text-xs text-muted-foreground leading-relaxed">
+            Built from an open base dataset, corrected against official government portals, and
+            last reviewed {COVERAGE.lastReviewedLabel}. We're independent — not a visa agency, and
+            we never charge for applications.{" "}
+            <a href="/methodology" className="text-primary hover:underline">How we source this →</a>
+          </p>
+        </section>
+
       </main>
       <Footer />
     </div>

@@ -96,7 +96,7 @@ export function Footer() {
                 <span className="font-serif font-bold text-foreground">isvisarequired.com</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Free visa requirement checker covering 199 countries and 39,601 passport–destination combinations.
+                Free visa requirement checker covering 195 countries and 37,830 passport–destination combinations.
               </p>
             </div>
 
