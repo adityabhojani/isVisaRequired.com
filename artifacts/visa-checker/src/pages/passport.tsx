@@ -112,14 +112,14 @@ export default function PassportPage() {
       ? `${country.name} Passport Visa Requirements — ${vfCount} Visa-Free Countries | Is Visa Required?`
       : `Passport Visa Requirements | Is Visa Required?`,
     description: country
-      ? `Complete visa requirements for ${country.name} passport holders. Visa-free access to ${vfCount} countries, visa on arrival for ${voaCount}, eVisa for ${evCount}. Check all 199 destinations.`
-      : "Check visa requirements for this passport across all 199 countries.",
+      ? `Complete visa requirements for ${country.name} passport holders. Visa-free access to ${vfCount} countries, visa on arrival for ${voaCount}, eVisa for ${evCount}. Check all 195 destinations.`
+      : "Check visa requirements for this passport across all 195 countries.",
     canonical: country ? `https://www.isvisarequired.com/visa-requirements/${slugify(country.name)}` : `https://www.isvisarequired.com/visa-requirements`,
     jsonLd: country && results.length > 0 ? {
       "@context": "https://schema.org",
       "@type": "Dataset",
       "name": `${country.name} Passport Visa Requirements`,
-      "description": `Visa requirements for ${country.name} passport holders across 199 countries`,
+      "description": `Visa requirements for ${country.name} passport holders across 195 countries`,
       "url": country ? `https://www.isvisarequired.com/visa-requirements/${slugify(country.name)}` : `https://www.isvisarequired.com/passport/${code}`,
       "creator": { "@type": "Organization", "name": "isvisarequired.com", "url": "https://www.isvisarequired.com" },
       "license": "https://creativecommons.org/licenses/by/4.0/",

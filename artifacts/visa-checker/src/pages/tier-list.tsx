@@ -50,7 +50,7 @@ function useAllRankings() {
 export default function TierListPage() {
   useSEO({
     title: "Passport Tier List 2026 — Ranked S to E",
-    description: "See all 199 passports ranked into S, A, B, C, D, and E tiers based on visa-free access to countries worldwide.",
+    description: "See all 195 passports ranked into S, A, B, C, D, and E tiers based on visa-free access to countries worldwide.",
   });
 
   const { scores, loading } = useAllRankings();
@@ -78,7 +78,7 @@ export default function TierListPage() {
             <Trophy className="h-8 w-8 text-amber-500" />
           </div>
           <h1 className="text-3xl font-serif font-bold text-foreground mb-2">Passport Tier List 2026</h1>
-          <p className="text-muted-foreground max-w-xl mx-auto">All 199 passports ranked by the number of countries accessible without requiring a visa in advance (visa-free + visa on arrival + eVisa).</p>
+          <p className="text-muted-foreground max-w-xl mx-auto">All 195 passports ranked by the number of countries accessible without requiring a visa in advance (visa-free + visa on arrival + eVisa).</p>
         </div>
 
         {loading && (

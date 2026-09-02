@@ -10,7 +10,7 @@ const features = [
   {
     icon: Zap,
     title: "Instant visa answers",
-    description: "Select your passport and destination — get the requirement in under a second, covering 199 countries.",
+    description: "Select your passport and destination — get the requirement in under a second, covering 195 countries.",
   },
   {
     icon: Globe,
@@ -41,7 +41,7 @@ const features = [
 
 const screens = [
   { label: "Check", emoji: "🔍", description: "Visa check with passport stats" },
-  { label: "Explore", emoji: "🌍", description: "Browse 199 countries with visa status" },
+  { label: "Explore", emoji: "🌍", description: "Browse 195 countries with visa status" },
   { label: "History", emoji: "🕐", description: "Recent lookups saved offline" },
   { label: "Passport", emoji: "🛂", description: "Power card, rank & tier" },
 ];
@@ -49,7 +49,7 @@ const screens = [
 export default function AppLandingPage() {
   useSEO({
     title: "Is Visa Required? — iOS App | Visa Checker for iPhone",
-    description: "Download the Is Visa Required? iOS app. Check visa requirements for 199 countries instantly on your iPhone. Free, no sign-up needed.",
+    description: "Download the Is Visa Required? iOS app. Check visa requirements for 195 countries instantly on your iPhone. Free, no sign-up needed.",
     canonical: "https://www.isvisarequired.com/app",
   });
 
@@ -188,7 +188,7 @@ export default function AppLandingPage() {
           <CheckCircle2 className="h-8 w-8 text-green-600 mx-auto mb-3" />
           <h3 className="font-serif text-2xl font-bold text-foreground mb-2">Free, no sign-up needed</h3>
           <p className="text-muted-foreground max-w-lg mx-auto">
-            Visa data for all 199 countries. No account required — just open the app and check. History is saved locally on your device.
+            Visa data for all 195 countries. No account required — just open the app and check. History is saved locally on your device.
           </p>
         </div>
       </div>

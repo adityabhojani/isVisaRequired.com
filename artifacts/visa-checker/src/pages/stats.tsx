@@ -20,7 +20,7 @@ const LABELS = ["Visa Free", "Visa on Arrival", "eVisa", "Visa Required", "No Ad
 export default function StatsPage() {
   useSEO({
     title: "Passport Power Index – Compare Passport Strength | Is Visa Required?",
-    description: "Discover how powerful your passport is. See how many countries you can visit visa-free, on arrival, or with an e-visa. Compare passport rankings for all 199 countries.",
+    description: "Discover how powerful your passport is. See how many countries you can visit visa-free, on arrival, or with an e-visa. Compare passport rankings for all 195 countries.",
     canonical: "https://www.isvisarequired.com/stats",
     jsonLd: [
       {
@@ -35,7 +35,7 @@ export default function StatsPage() {
         "@context": "https://schema.org",
         "@type": "Dataset",
         "name": "Passport Power Index",
-        "description": "Rankings of all 199 passports by the number of countries accessible without a prior visa.",
+        "description": "Rankings of all 195 passports by the number of countries accessible without a prior visa.",
         "url": "https://www.isvisarequired.com/stats",
         "creator": { "@type": "Organization", "name": "isvisarequired.com", "url": "https://www.isvisarequired.com" },
         "license": "https://creativecommons.org/licenses/by/4.0/",

@@ -1,5 +1,5 @@
 /**
- * Comprehensive country metadata for all 199 countries.
+ * Comprehensive country metadata for all 195 countries.
  * Sources: UN Statistics Division, World Bank, CIA World Factbook, ISO 4217.
  * Population figures are approximate (latest available estimates).
  */

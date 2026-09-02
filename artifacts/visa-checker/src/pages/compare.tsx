@@ -103,7 +103,7 @@ export default function ComparePage() {
       : "Compare Passport Visa Access | Is Visa Required?",
     description: countryA && countryB
       ? `Side-by-side visa access comparison: ${countryA.name} passport vs ${countryB.name} passport. See which passport opens more doors worldwide.`
-      : "Compare two passports side-by-side to see which has better visa-free access across 199 countries.",
+      : "Compare two passports side-by-side to see which has better visa-free access across 195 countries.",
     canonical: "https://www.isvisarequired.com/compare",
   });
 
@@ -170,7 +170,7 @@ export default function ComparePage() {
       <main className="max-w-5xl mx-auto px-4 py-10">
         <PageHero
           title="Passport Showdown"
-          description="Compare visa-free access for any two passports across 199 countries"
+          description="Compare visa-free access for any two passports across 195 countries"
         />
 
         {/* Selector card */}

@@ -81,7 +81,7 @@ export default function DiscoverPage() {
       <main className="max-w-5xl mx-auto px-4 py-10">
         <PageHero
           title="Discover Destinations"
-          description="Filter all 199 countries by visa type, region, and more"
+          description="Filter all 195 countries by visa type, region, and more"
         />
 
         {/* Controls */}
@@ -226,7 +226,7 @@ export default function DiscoverPage() {
               <Sparkles className="h-10 w-10 text-violet-400" />
             </div>
             <p className="text-lg font-semibold text-foreground mb-1">Select your passport</p>
-            <p className="text-sm">Filter all 199 countries by visa type and region</p>
+            <p className="text-sm">Filter all 195 countries by visa type and region</p>
           </div>
         )}
       </main>

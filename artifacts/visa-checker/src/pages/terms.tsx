@@ -30,7 +30,7 @@ export default function TermsPage() {
           <section className="mb-8">
             <h2 className="text-xl font-semibold text-foreground mb-3">2. Description of Service</h2>
             <p className="text-muted-foreground leading-relaxed">
-              isvisarequired.com provides a free, informational tool that displays visa requirement data for international travel. The Site covers 199 passports and 199 destination countries. The service is provided free of charge.
+              isvisarequired.com provides a free, informational tool that displays visa requirement data for international travel. The Site covers 195 passports and 195 destination countries. The service is provided free of charge.
             </p>
           </section>
 
