@@ -11,6 +11,7 @@ import path from "path";
 import { computeReport } from "./report";
 import { DATA_LAST_UPDATED } from "./hubLayout";
 import { slugify } from "./render";
+import { digitalNomadVisas } from "@workspace/travel-data";
 
 export const SITE = "https://www.isvisarequired.com";
 
@@ -132,7 +133,7 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     title: "Digital Nomad Visas — Countries, Requirements & Income Rules | isvisarequired.com",
     description: "Browse countries offering digital nomad and remote-work visas, with income requirements, length of stay and how to apply.",
     h1: "Digital nomad visas",
-    body: `<p>Explore the growing list of countries offering digital nomad and remote-work visas — including income thresholds, how long you can stay, and where to apply, so you can base yourself abroad legally.</p>`,
+    body: digitalNomadBody,
   },
   "/reciprocity": {
     title: "Visa Reciprocity — Who Lets Each Other In Visa-Free | isvisarequired.com",
@@ -301,6 +302,31 @@ function reciprocityBody(): string {
   <h2>Examples of one-sided access</h2>
   ${table(["Direction", "Requirement", "Reverse direction", "Requirement"], sample)}
   <p style="margin-top:12px">Enter any two countries above to see both directions side by side, or read the <a href="/reports/passport-power-2026">full passport power report</a>.</p>`;
+}
+
+
+function digitalNomadBody(): string {
+  const v = digitalNomadVisas;
+  const byRegion = new Map<string, number>();
+  for (const x of v) byRegion.set(x.region, (byRegion.get(x.region) ?? 0) + 1);
+  const regions = [...byRegion].sort((a, b) => b[1] - a[1]);
+  const withTax = v.filter((x) => x.taxBenefits).length;
+  const freeToApply = v.filter((x) => x.govFee === "Free").length;
+  const rows = [...v]
+    .sort((a, b) => a.region.localeCompare(b.region) || a.country.localeCompare(b.country))
+    .map((x) => [
+      `${esc(x.flag)} <strong>${esc(x.country)}</strong>`,
+      esc(x.visaName),
+      esc(x.minMonthlyIncome ? `${x.minMonthlyIncome}/mo` : x.minAnnualIncome ? `${x.minAnnualIncome}/yr` : "Not stated"),
+      esc(x.duration),
+      esc(x.govFee ?? "Not stated"),
+    ]);
+  const regionList = regions.map(([r, n]) => `${esc(r)} (${n})`).join(" · ");
+  return `<p><strong>${v.length} countries</strong> currently run a digital nomad or remote-work visa. Below is every programme we track, with the income you must show, how long the permit lasts and the government fee. ${withTax} offer some form of tax benefit and ${freeToApply} charge no government fee. Coverage: ${regionList}.</p>
+  <p style="color:#475569;font-size:14px">Income thresholds and fees are set by each government and change without notice — always confirm on the official application site linked from the interactive table before you apply.</p>
+  <h2>All ${v.length} digital nomad visa programmes</h2>
+  ${table(["Country", "Visa", "Income requirement", "Duration", "Government fee"], rows)}
+  <p style="margin-top:12px">A nomad visa is a residence permit, not a tourist entry — check the plain tourist rule for your passport with the <a href="/">visa checker</a>, and read <a href="/guides/visa-validity-vs-duration-of-stay">visa validity vs duration of stay</a> before you plan a long stay.</p>`;
 }
 
 export function renderAppRoute(routePath: string, seo: RouteSeo): string | null {

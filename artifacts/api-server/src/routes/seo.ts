@@ -374,6 +374,50 @@ router.get("/sitemaps/blog.xml", async (_req: Request, res: Response): Promise<v
   );
 });
 
+// /blog index — server-rendered from the database so the post list is crawlable
+// and citable. Registered BEFORE the generic ROUTE_SEO loop below, which also
+// declares "/blog"; Express uses the first match, so this async version wins and
+// the ROUTE_SEO entry stays as the metadata source (and a fallback if the DB is
+// unreachable).
+router.get("/blog", async (_req: Request, res: Response): Promise<void> => {
+  const seo = ROUTE_SEO["/blog"];
+  let list = "";
+  if (isDatabaseConfigured()) {
+    try {
+      const result = await db.execute(sql`
+        SELECT title, slug, excerpt, created_at FROM blog_posts
+        WHERE published = true ORDER BY created_at DESC LIMIT 100
+      `);
+      const rows = result.rows as { title: string; slug: string; excerpt?: string; created_at?: string }[];
+      if (rows.length) {
+        list = `<h2>${rows.length} published post${rows.length === 1 ? "" : "s"}</h2><ul style="line-height:1.7">` +
+          rows.map((p) => {
+            const d = new Date(p.created_at ?? Date.now());
+            const date = isNaN(d.getTime()) ? "" : ` <span style="color:#64748b;font-size:13px">— ${d.toISOString().slice(0, 10)}</span>`;
+            const ex = p.excerpt ? `<div style="color:#475569;font-size:14px">${esc(p.excerpt)}</div>` : "";
+            return `<li><a href="/blog/${esc(p.slug)}"><strong>${esc(p.title)}</strong></a>${date}${ex}</li>`;
+          }).join("") + "</ul>";
+      }
+    } catch { /* fall through to the static intro */ }
+  }
+  if (!list) {
+    list = `<p>New posts are published here as visa policies change. In the meantime, our
+      <a href="/guides">travel guides</a> cover the rules that catch travellers out, and the
+      <a href="/reports/passport-power-2026">Passport Power Report</a> ranks all 195 passports.</p>`;
+  }
+  try {
+    const body = typeof seo.body === "function" ? seo.body() : seo.body;
+    const html = renderAppRoute("/blog", { ...seo, body: `${body}${list}` }) ?? loadShell();
+    if (!html) { res.status(503).type("html").send("Temporarily unavailable. Please refresh."); return; }
+    res.setHeader("Cache-Control", HTML_CACHE);
+    res.type("html").send(html);
+  } catch {
+    const shell = loadShell();
+    if (shell) { res.type("html").send(shell); return; }
+    res.status(503).type("html").send("Temporarily unavailable. Please refresh.");
+  }
+});
+
 // ── SPA marketing/tool routes: serve the index.html shell with route-specific
 // SEO content injected into #root (React takes over on load). Falls back to the
 // raw shell so the page never breaks.
