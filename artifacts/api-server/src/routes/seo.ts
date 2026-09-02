@@ -22,6 +22,7 @@ import { renderAuthHub, renderAuthGuide } from "../seo/auth";
 import { TRAVEL_AUTHS, getTravelAuth } from "../data/authData";
 import { renderMethodology } from "../seo/methodology";
 import { renderResidence } from "../seo/residence";
+import { renderNomadHub, renderNomadCountry, allNomadCountries, nomadFromSlug, nomadSlug } from "../seo/nomad";
 
 const router: IRouter = Router();
 
@@ -167,6 +168,7 @@ router.get("/llms.txt", (_req: Request, res: Response): void => {
 - Per-pair visa requirements: ${SITE_ORIGIN}/visa-requirements/{from-country}/{to-country}
 - Transit visa guides: ${SITE_ORIGIN}/transit-visa
 - ETIAS / ESTA / ETA / eTA explainers: ${SITE_ORIGIN}/travel-authorization
+- Digital nomad visas (income thresholds, fees, duration): ${SITE_ORIGIN}/digital-nomad-visas
 - Residence-permit & second-document rules: ${SITE_ORIGIN}/residence-permit-visa-benefits
 - How we source our data (methodology): ${SITE_ORIGIN}/methodology
 - Sitemap: ${SITE_ORIGIN}/sitemap.xml
@@ -209,6 +211,23 @@ router.get("/travel-authorization/:slug", (req: Request, res: Response): void =>
   res.type("html").send(renderAuthGuide(guide));
 });
 
+// ── digital nomad visas: comparison hub + one page per country ───────────────
+router.get("/digital-nomad-visas", (_req: Request, res: Response): void => {
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderNomadHub());
+});
+
+router.get("/digital-nomad-visas/:slug", (req: Request, res: Response): void => {
+  const visa = nomadFromSlug(String(req.params.slug ?? ""));
+  if (!visa) {
+    res.status(404).setHeader("Cache-Control", "no-store");
+    res.type("html").send(renderPairNotFound());
+    return;
+  }
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderNomadCountry(visa));
+});
+
 // ── per-pair page ────────────────────────────────────────────────────────────
 router.get("/visa-requirements/:from/:to", (req: Request, res: Response): void => {
   const from = countryFromSlug(req.params.from);
@@ -247,7 +266,7 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   // Tier 2: SSR hub and utility pages (server-rendered, unique content)
   const ssrHubs = [
     "/visa-requirements", "/transit-visa", "/travel-authorization",
-    "/methodology", "/residence-permit-visa-benefits",
+    "/digital-nomad-visas", "/methodology", "/residence-permit-visa-benefits",
   ];
   for (const p of ssrHubs) {
     entries.push({ loc: `${SITE_ORIGIN}${p}`, priority: "0.9", changefreq: "weekly" });
@@ -264,6 +283,9 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   }
   for (const a of TRAVEL_AUTHS) {
     entries.push({ loc: `${SITE_ORIGIN}/travel-authorization/${a.slug}`, priority: "0.7", changefreq: "monthly" });
+  }
+  for (const v of allNomadCountries()) {
+    entries.push({ loc: `${SITE_ORIGIN}/digital-nomad-visas/${nomadSlug(v)}`, priority: "0.7", changefreq: "monthly" });
   }
 
   // Tier 5: static SPA pages with meaningful unique content (not duplicates)
