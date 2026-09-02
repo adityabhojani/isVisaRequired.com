@@ -1,0 +1,36 @@
+# Fails loudly if the live site stops being indexable.
+#
+# In June-July 2026 the site lost all Google impressions because the live
+# domain was served by a Vercel PREVIEW deployment, which carries
+# `x-robots-tag: noindex`. Nothing looked wrong in a browser or in
+# view-source; 25,922 pages quietly dropped out of the index over seven weeks
+# and it was only noticed from the traffic graph long afterwards.
+#
+# GitHub emails the repository owner when a scheduled workflow fails, so this
+# turns a silent seven-week outage into an email within six hours.
+name: SEO canary
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # On push, give Vercel time to build and promote before we check.
+      - name: Wait for deployment
+        if: github.event_name == 'push'
+        run: sleep 180
+
+      - name: Check the live site the way Googlebot sees it
+        run: node scripts/seo-canary.mjs
