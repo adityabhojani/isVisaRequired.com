@@ -6,6 +6,17 @@
   "framework": null,
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "isvisarequired.com"
+        }
+      ],
+      "destination": "https://www.isvisarequired.com/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {
