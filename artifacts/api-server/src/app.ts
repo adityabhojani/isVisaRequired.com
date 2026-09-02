@@ -12,6 +12,7 @@ import {
 } from "./middlewares/clerkProxyMiddleware";
 import router from "./routes";
 import seoRouter from "./routes/seo";
+import { shellFallback } from "./seo/shellFallback";
 import { logger } from "./lib/logger";
 import { apiLimiter } from "./middleware/rateLimiter";
 import { notFoundHandler, globalErrorHandler } from "./middleware/errorHandler";
@@ -112,6 +113,10 @@ app.use(seoRouter);
 
 // Routes
 app.use("/api", router);
+
+// HTML fallback: known client route -> 200 shell, anything else -> 404 + noindex.
+// Must sit after the API router so /api/* still gets the JSON 404 below.
+app.use(shellFallback);
 
 // 404 for unknown routes
 app.use(notFoundHandler);
