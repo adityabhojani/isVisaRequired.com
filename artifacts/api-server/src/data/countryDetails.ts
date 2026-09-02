@@ -152,7 +152,39 @@ const countrySpecificFees: Record<string, number | null> = {
 //
 // Keyed `${destinationCode}-${requirement}`. Fields are merged over the default,
 // so an entry only needs to state what it actually knows.
+// A uniform Schengen visa is the same product whichever member state issues it —
+// same 90/180 rule, same EUR 90 fee, same evidence. Applied to every Schengen
+// destination below so those pages stop saying "Varies by destination".
+const SCHENGEN_VISA: Partial<VisaDetail> = {
+  feeUSD: 99, // EUR 90 standard adult short-stay fee, approximated in USD
+  processingDays: "15 calendar days typically, up to 45 in complex cases — you can apply up to 6 months ahead",
+  maxStay: "90 days in any 180-day period",
+  documents: [
+    "Passport issued within the last 10 years, valid 3 months beyond your departure, with 2 blank pages",
+    "Completed and signed Schengen visa application form",
+    "One recent passport photo to ICAO specification",
+    "Travel medical insurance covering at least EUR 30,000 across the Schengen area",
+    "Round-trip flight reservation and proof of accommodation for the whole stay",
+    "Proof of sufficient funds — bank statements, and a sponsor's letter if someone is funding your trip",
+    "Proof of your ties at home: employment letter, business registration or student enrolment",
+  ],
+  process: [
+    "Work out which country to apply to — your main destination, or your first point of entry if the stay is split evenly",
+    "Book an appointment with that country's consulate or its visa centre (often VFS Global or TLScontact)",
+    "Submit your documents and give fingerprints — biometrics are reused for 59 months",
+    "Pay the visa fee (EUR 90 for adults, EUR 45 for children aged 6–11, free under 6)",
+    "Collect your passport; a uniform Schengen visa is valid for travel across all Schengen states",
+  ],
+  notes: "The 90/180 rule counts days across the whole Schengen area, not per country.",
+};
+const SCHENGEN_DESTINATIONS = [
+  "FR", "DE", "ES", "IT", "NL", "BE", "PT", "CH", "AT", "SE", "NO", "DK", "FI", "GR",
+  "PL", "CZ", "HU", "HR", "SK", "SI", "EE", "LV", "LT", "LU", "MT", "IS", "LI", "RO", "BG",
+];
+
 const destinationVisaDetails: Record<string, Partial<VisaDetail>> = {
+  ...Object.fromEntries(SCHENGEN_DESTINATIONS.map((c) => [`${c}-visa_required`, SCHENGEN_VISA])),
+
   // Argentina — consular tourist visa ("Visa para Turismo", residencia
   // transitoria art. 24 inc. a, Ley 25.871). Fee and checklist from
   // cancilleria.gob.ar/es/servicios/visas/visa-para-turismo, corroborated by the
@@ -178,6 +210,71 @@ const destinationVisaDetails: Record<string, Partial<VisaDetail>> = {
       "Collect your passport with the visa stamp on the date confirmed at your interview",
     ],
     notes: "Meeting the checklist does not guarantee a visa — issuance is at the discretion of the Argentine state.",
+  },
+
+  // Mexico — visitor visa without permission to carry out paid activities.
+  // Source: Mexico's Foreign Ministry consular network (consulmex.sre.gob.mx).
+  "MX-visa_required": {
+    feeUSD: 56, // "Por la recepción, solicitud, y en su caso, autorización de la visa" — some posts list USD 54
+    processingDays: "Around 10 working days after your consular appointment",
+    maxStay: "Up to 180 days",
+    documents: [
+      "Passport valid for your whole stay — Mexico sets no minimum validity period",
+      "Completed visa application form",
+      "One recent colour photograph, face uncovered, white background",
+      "Proof of financial solvency — recent bank statements or pay slips",
+      "Proof of employment, studies or business ownership",
+      "Evidence of your trip: flight reservation and accommodation",
+    ],
+    process: [
+      "First check whether you are exempt — a valid US, Canadian, Japanese, UK or Schengen visa, or permanent residence in any of them, removes the need for a Mexican visa entirely",
+      "If you are not exempt, book an appointment at a Mexican consulate through citas.sre.gob.mx",
+      "Attend in person with your documents — visitor visas are decided at interview",
+      "Collect your passport with the visa affixed",
+      "On arrival in Mexico, complete the FMM tourist card and keep your copy until you leave",
+    ],
+    notes: "The visa is an authorisation to travel to a port of entry; the immigration officer sets the length of stay, up to 180 days.",
+  },
+
+  // Lebanon — free visa on arrival. Sources: Lebanon's General Security and the
+  // Lebanese embassies in London and Ottawa.
+  "LB-visa_on_arrival": {
+    feeUSD: 0,
+    processingDays: "Issued at the border, usually a few minutes",
+    maxStay: "1 month, extendable by a further 2 months",
+    documents: [
+      "Passport valid at least 3 months beyond your stay, with 2 blank pages, and no Israeli stamp, visa or seal",
+      "A non-refundable return or onward ticket",
+      "An address in Lebanon where you will be staying",
+      "A contact telephone number",
+    ],
+    process: [
+      "Check your passport carries no Israeli stamp, visa or seal — this alone will get you refused, and it invalidates a visa you already hold",
+      "Present your passport at the General Security desk on arrival at Beirut airport or a land border",
+      "Give your Lebanese address, telephone number and return ticket details",
+      "Receive the free one-month entry stamp",
+      "To stay longer, apply for a 2-month extension at a General Security office before your month expires",
+    ],
+  },
+
+  // Nepal — visa-free entry. In practice this covers Indian nationals, who are the
+  // only ones Nepal admits without a visa, under the 1950 Treaty of Peace and
+  // Friendship. Everyone else gets a visa on arrival or an eVisa.
+  "NP-visa_free": {
+    feeUSD: 0,
+    processingDays: "No processing — walk through immigration",
+    maxStay: "No limit for Indian nationals",
+    documents: [
+      "Valid Indian passport, or an original voter ID (EPIC) issued by the Election Commission of India",
+      "For children under 3: original birth certificate showing date of birth and parents' names",
+      "For under-18s travelling with a parent or guardian: original school ID, or a school letter with photo and the principal's stamp",
+    ],
+    process: [
+      "Check you are carrying an accepted document — Aadhaar, PAN cards and driving licences are refused at check-in",
+      "Fly into Kathmandu or another international airport, or cross at any open land border",
+      "Present your passport or voter ID at immigration — no visa, no fee, no arrival form",
+    ],
+    notes: "Free movement between India and Nepal rests on Article 7 of the 1950 Treaty of Peace and Friendship.",
   },
 };
 

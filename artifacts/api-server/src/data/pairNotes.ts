@@ -46,6 +46,54 @@ const PAIR_NOTES: Record<string, PairNote> = {
     },
     reviewed: "2026-09-01",
   },
+
+  // Morocco → Mexico. Source: Mexico's Foreign Ministry consular network
+  // (consulmex.sre.gob.mx), which states the US-visa exemption in identical terms
+  // across posts: "todos los visitantes extranjeros, independientemente de su
+  // nacionalidad ... están exentos de visa mexicana siempre y cuando cuenten con
+  // visa vigente expedida por el gobierno de los Estados Unidos de América."
+  "MA-MX": {
+    headline: "A valid US visa lets Moroccans skip the Mexican visa entirely",
+    detail: [
+      "Mexico exempts any foreign national — whatever their nationality — from needing a Mexican visa if they hold a valid visa issued by the United States. The same exemption applies if you hold a valid Canadian, Japanese, UK or Schengen visa, or permanent residence in the US, Canada, Japan, the UK or any Schengen country. For Moroccan travellers this is usually far quicker than applying to a Mexican consulate.",
+      "The exemption is for tourism, business or transit, and it still requires a passport valid for your stay. Mexico sets no minimum passport validity beyond that. A US visa in an old or expired passport is generally accepted as long as the visa itself is still valid, but carry both documents.",
+      "Without one of those visas or residences, you need a Mexican visitor visa without permission to carry out paid activities, applied for by appointment at a Mexican consulate.",
+    ],
+    reviewed: "2026-09-01",
+  },
+
+  // Qatar → Czech Republic. Sources: the European Commission's 2022 proposal to
+  // lift the Schengen visa requirement for Qatar and Kuwait, subsequent European
+  // Parliament approval, and the Czech Embassy in Doha, which routes Schengen
+  // applications through VFS Global.
+  "QA-CZ": {
+    headline: "Qatar's EU visa waiver is agreed but not yet in force",
+    detail: [
+      "The European Commission proposed lifting the Schengen visa requirement for Qatari nationals, and the European Parliament has approved it — but the agreement still has to be concluded and brought into force, so a Schengen visa is required today. Qatar is the only passport whose holders travel visa-free to both the United States and Canada while still needing a visa for the Schengen area.",
+      "Because the Czech Republic is in the Schengen area, the visa you apply for is a uniform Schengen visa, valid across all Schengen states. Apply through the country you will spend most time in, or your first point of entry if the stay is evenly split.",
+      "When the waiver does take effect, Qatari travellers will not become requirement-free: visa-exempt visitors need an ETIAS travel authorisation instead. Check the current status before you book.",
+    ],
+    applyAt: {
+      mission: "Embassy of the Czech Republic in Doha — Schengen visa applications are submitted through the VFS Global visa centre in Doha, not at the embassy",
+      url: "https://mzv.gov.cz/doha/en/visa_and_consular/visa/appointment_booking/index.html",
+    },
+    reviewed: "2026-09-01",
+  },
+
+  // India → Nepal. Sources: Article 7 of the 1950 India–Nepal Treaty of Peace and
+  // Friendship, Nepal's Department of Immigration / Nepal Tourism Board ("Travelers
+  // of Indian nationality do not need visa to enter Nepal"), and the Embassy of
+  // India in Kathmandu's list of valid travel documents.
+  "IN-NP": {
+    headline: "No visa — but only a passport or original voter ID gets you on the plane",
+    detail: [
+      "Indian citizens need no visa for Nepal in any category — tourism, business, study, pilgrimage or work — under Article 7 of the 1950 Treaty of Peace and Friendship, which provides for free movement between the two countries. There is no entry fee and no stay limit of the kind other nationalities face.",
+      "Documents are where people get caught. The Embassy of India in Kathmandu recognises only two documents for Indian nationals flying between India and Nepal: a valid Indian passport, or an original voter ID (EPIC) issued by the Election Commission of India. Aadhaar, PAN cards and driving licences are not accepted, and neither is the Embassy's own Certificate of Registration.",
+      "Airlines apply extra rules for young travellers: children under 3 typically need an original birth certificate showing date of birth and parents' names, and under-18s travelling with a parent or guardian are usually accepted on an original school ID or school letter bearing a photo and the principal's stamp. An unaccompanied minor should carry a passport.",
+      "Land crossings are more relaxed in practice than air travel, but carrying a passport avoids arguments at check-in and at the border.",
+    ],
+    reviewed: "2026-09-01",
+  },
 };
 
 export function getPairNote(passport: string, destination: string): PairNote | undefined {

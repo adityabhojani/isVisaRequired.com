@@ -395,6 +395,51 @@ const RULES: Record<string, EntryRules> = {
     ],
   },
 
+  // ── Lebanon ────────────────────────────────────────────────────────────────
+  // The Israeli-stamp rule is the single thing that strands travellers here, and
+  // it is absolute — it voids an otherwise valid visa. Sourced from Lebanon's
+  // General Security, the Lebanese embassies in London and Ottawa, and Sweden's
+  // embassy in Beirut.
+  LB: {
+    passportValidity: "Valid for at least 3 months beyond your intended stay, with 2 blank pages — some Lebanese missions ask for longer, so check before you book",
+    returnTicket: "required",
+    returnTicketNote: "A non-refundable return or onward ticket is a stated condition of the free visa on arrival",
+    proofOfFunds: "recommended",
+    travelInsurance: "recommended",
+    vaccinations: [
+      { name: "Hepatitis A", level: "recommended" },
+      { name: "Typhoid", level: "recommended" },
+      { name: "Routine vaccines", level: "recommended" },
+    ],
+    notes: [
+      "Entry is refused to anyone whose passport carries an Israeli stamp, visa or seal — and an Israeli seal renders an already-issued Lebanese visa invalid",
+      "The free visa on arrival is for 1 month, extendable by a further 2 months at a General Security office",
+      "You must be able to give a Lebanese address and a contact telephone number on arrival",
+      "A paid visa on arrival (around USD 17, single entry, 3 months) is available where the free one does not apply",
+    ],
+  },
+
+  // ── Nepal ──────────────────────────────────────────────────────────────────
+  NP: {
+    passportValidity: "Valid for at least 6 months, with a blank page for the visa",
+    returnTicket: "recommended",
+    proofOfFunds: "recommended",
+    travelInsurance: "recommended",
+    travelInsuranceNote: "Trekking above 4,000 m and helicopter rescue are usually excluded unless you buy specific cover",
+    vaccinations: [
+      { name: "Hepatitis A", level: "recommended" },
+      { name: "Typhoid", level: "recommended" },
+      { name: "Yellow fever", level: "recommended", detail: "Certificate required only if arriving from a country with risk of yellow fever transmission" },
+      { name: "Routine vaccines", level: "recommended" },
+    ],
+    notes: [
+      "Indian nationals need no visa at all, and may use an Indian passport or an original Election Commission voter ID instead",
+      "Visa on arrival is available at Tribhuvan International Airport and at land border posts for most other nationalities",
+      "Tourist visas are capped at 150 days in a calendar year",
+      "Trekking in most regions needs a TIMS card and a national park or conservation area permit, bought separately from the visa",
+    ],
+  },
+
   // ── Argentina ──────────────────────────────────────────────────────────────
   // Sourced from Dirección Nacional de Migraciones (migraciones.gob.ar), the
   // Cancillería visa pages, ARCA customs, CDC and UK FCDO. Deliberately does NOT
@@ -444,9 +489,11 @@ const RULES: Record<string, EntryRules> = {
       { name: "Routine vaccines", level: "recommended" },
     ],
     notes: [
-      "Most nationalities receive 180 days on arrival",
+      "A valid US visa exempts you from needing a Mexican visa — whatever your nationality. A valid Canadian, Japanese, UK or Schengen visa, or permanent residence in any of those, does the same",
+      "Mexico sets no minimum passport validity — it only has to be valid for your stay",
+      "Most nationalities receive up to 180 days on arrival",
       "FMM (tourist card) may need to be completed — keep your copy",
-      "US customs requires declaration of goods over USD 800 on return",
+      "Cruise passengers going ashore and re-boarding the same ship get a 21-day collective permit and need no visa",
     ],
   },
 

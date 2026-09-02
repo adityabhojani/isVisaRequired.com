@@ -495,7 +495,7 @@ ${entryNoteBlock}
 </div>
 
 ${pairNoteBlock}
-${detail.documents.length ? `<section class="card"><h2>Documents ${esc(fromAdj)} applicants typically need</h2><ul>${docsList}</ul>${detail.notes ? `<p style="color:#64748b;font-size:13px;margin-top:8px">${esc(detail.notes)}</p>` : ""}</section>` : ""}
+${detail.documents.length ? `<section class="card"><h2>Documents ${esc(fromAdj)} ${requirement === "visa_free" || requirement === "visa_on_arrival" ? "travellers need" : "applicants typically need"}</h2><ul>${docsList}</ul>${detail.notes ? `<p style="color:#64748b;font-size:13px;margin-top:8px">${esc(detail.notes)}</p>` : ""}</section>` : ""}
 ${detail.process.length ? `<section class="card"><h2>How to apply / enter</h2><ol>${processList}</ol></section>` : ""}
 ${preAuthBlock}
 ${entryBlock}
