@@ -23,6 +23,7 @@ import { TRAVEL_AUTHS, getTravelAuth } from "../data/authData";
 import { renderMethodology } from "../seo/methodology";
 import { renderResidence } from "../seo/residence";
 import { renderNomadHub, renderNomadCountry, allNomadCountries, nomadFromSlug, nomadSlug } from "../seo/nomad";
+import { renderPassportIndex } from "../seo/rankings";
 
 const router: IRouter = Router();
 
@@ -169,6 +170,7 @@ router.get("/llms.txt", (_req: Request, res: Response): void => {
 - Transit visa guides: ${SITE_ORIGIN}/transit-visa
 - ETIAS / ESTA / ETA / eTA explainers: ${SITE_ORIGIN}/travel-authorization
 - Digital nomad visas (income thresholds, fees, duration): ${SITE_ORIGIN}/digital-nomad-visas
+- Passport index / visa restrictions ranking: ${SITE_ORIGIN}/passport-index
 - Residence-permit & second-document rules: ${SITE_ORIGIN}/residence-permit-visa-benefits
 - How we source our data (methodology): ${SITE_ORIGIN}/methodology
 - Sitemap: ${SITE_ORIGIN}/sitemap.xml
@@ -209,6 +211,12 @@ router.get("/travel-authorization/:slug", (req: Request, res: Response): void =>
   }
   res.setHeader("Cache-Control", HTML_CACHE);
   res.type("html").send(renderAuthGuide(guide));
+});
+
+// ── passport index / visa restrictions ranking ───────────────────────────────
+router.get("/passport-index", (_req: Request, res: Response): void => {
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderPassportIndex());
 });
 
 // ── digital nomad visas: comparison hub + one page per country ───────────────
@@ -266,7 +274,7 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   // Tier 2: SSR hub and utility pages (server-rendered, unique content)
   const ssrHubs = [
     "/visa-requirements", "/transit-visa", "/travel-authorization",
-    "/digital-nomad-visas", "/methodology", "/residence-permit-visa-benefits",
+    "/digital-nomad-visas", "/passport-index", "/methodology", "/residence-permit-visa-benefits",
   ];
   for (const p of ssrHubs) {
     entries.push({ loc: `${SITE_ORIGIN}${p}`, priority: "0.9", changefreq: "weekly" });
