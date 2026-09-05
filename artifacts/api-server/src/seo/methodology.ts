@@ -2,6 +2,7 @@
 // "your money or your life" topic, so Google rewards visible authority,
 // transparent sourcing, dated reviews and clear limitations. Honest content —
 // no invented credentials.
+import { FONT_LINKS, BASE_STYLE, renderHeader, renderFooter } from "./shell";
 import { SITE_ORIGIN, DATA_LAST_UPDATED } from "./render";
 
 function esc(s: string): string {
@@ -31,7 +32,7 @@ export function renderMethodology(): string {
     "@type": "Organization",
     name: "isvisarequired.com",
     url: SITE_ORIGIN,
-    description: "Free visa-requirement checker covering 199 countries and ~38,000 passport–destination pairs.",
+    description: "Free visa-requirement checker covering 195 countries and 37,830 passport–destination pairs.",
   };
   const webpage = {
     "@context": "https://schema.org",
@@ -50,9 +51,9 @@ export function renderMethodology(): string {
 <link rel="icon" href="/favicon.svg"><script defer src="/_vercel/insights/script.js"></script>
 <script type="application/ld+json">${JSON.stringify(org)}</script>
 <script type="application/ld+json">${JSON.stringify(webpage)}</script>
-<style>${STYLE}</style></head>
+${FONT_LINKS}<style>${STYLE}${BASE_STYLE}</style></head>
 <body>
-<header class="site"><div class="wrap"><a class="logo" href="/">isvisarequired<span>.com</span></a><a href="/" style="font-size:14px;text-decoration:none">Visa checker →</a></div></header>
+${renderHeader()}
 <main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › Methodology</nav>
 <h1>How we source our visa data</h1>
@@ -60,7 +61,7 @@ export function renderMethodology(): string {
 <p class="lead">Visa rules affect real money and real travel plans, so we're upfront about where our information comes from, how current it is, and where its limits are.</p>
 
 <h2>What we cover</h2>
-<p>isvisarequired.com provides visa-requirement guidance for 199 countries — roughly 38,000 passport-to-destination combinations — plus dedicated guides for airport transit and electronic travel authorisations (ETIAS, ESTA, ETA, eTA).</p>
+<p>isvisarequired.com provides visa-requirement guidance for 195 countries — 37,830 passport-to-destination combinations — plus dedicated guides for airport transit and electronic travel authorisations (ETIAS, ESTA, ETA, eTA).</p>
 
 <h2>Where our data comes from</h2>
 <div class="card">
@@ -90,6 +91,6 @@ export function renderMethodology(): string {
 <h2>Who we are</h2>
 <p>isvisarequired.com is an independent travel-information service. We are not affiliated with any government, embassy or visa-processing company, and we never charge for visa applications — we only ever point you to the official portal.</p>
 </main>
-<footer class="site"><div class="wrap">© isvisarequired.com — general guidance only; always confirm with official government sources. Last reviewed ${esc(DATA_LAST_UPDATED)}. · <a href="/">Home</a></div></footer>
+${renderFooter()}
 </body></html>`;
 }

@@ -1,6 +1,7 @@
 // Server-rendered explainer pages for electronic travel authorisations
 // (ETIAS, UK ETA, US ESTA, Canada eTA, Australia ETA). Same look/SEO structure
 // as the transit + pair pages.
+import { FONT_LINKS, BASE_STYLE, renderHeader, renderFooter } from "./shell";
 import { TRAVEL_AUTHS, type TravelAuth } from "../data/authData";
 import { SITE_ORIGIN } from "./render";
 
@@ -10,7 +11,7 @@ function esc(s: string): string {
 
 const STYLE = `:root{--navy:#0A2FA1;--accent:#0DB5E8;--bg:#F7F9FC;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
-a{color:var(--navy)}.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+a{color:var(--navy)}.wrap{max-width:920px;margin:0 auto;padding:0 20px}
 header.site{background:#fff;border-bottom:1px solid var(--line)}header.site .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
 .logo{font-weight:800;color:var(--navy);text-decoration:none;font-size:18px}.logo span{color:var(--accent)}
 nav.crumbs{font-size:13px;color:var(--muted);padding:14px 0}nav.crumbs a{color:var(--muted);text-decoration:none}
@@ -30,9 +31,9 @@ h1{font-size:28px;line-height:1.25;margin:6px 0 4px}.updated{color:var(--muted);
 .cta{display:inline-block;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:10px;margin-top:6px}
 footer.site{color:var(--muted);font-size:13px;padding:28px 0;text-align:center}`;
 
-const HEADER = `<header class="site"><div class="wrap"><a class="logo" href="/">isvisarequired<span>.com</span></a><a href="/" style="font-size:14px;text-decoration:none">Visa checker →</a></div></header>`;
+const HEADER = renderHeader();
 const FOOTER = (reviewed: string) =>
-  `<footer class="site"><div class="wrap">© isvisarequired.com — travel-authorisation rules, fees and dates change; always confirm on the official site before applying or booking. Last reviewed ${esc(reviewed)}.</div></footer>`;
+  `${renderFooter()}`;
 
 export function renderAuthHub(): string {
   const canonical = `${SITE_ORIGIN}/travel-authorization`;
@@ -48,7 +49,7 @@ export function renderAuthHub(): string {
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${canonical}"><meta name="robots" content="index,follow,max-image-preview:large">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="https://www.isvisarequired.com/opengraph.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.svg"><script defer src="/_vercel/insights/script.js"></script><style>${STYLE}</style></head>
+<link rel="icon" href="/favicon.svg"><script defer src="/_vercel/insights/script.js"></script>${FONT_LINKS}<style>${STYLE}${BASE_STYLE}</style></head>
 <body>${HEADER}<main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › Travel authorisations</nav>
 <h1>ETIAS, ESTA, ETA & eTA — what they are and who needs them</h1>
@@ -100,7 +101,7 @@ export function renderAuthGuide(a: TravelAuth): string {
 <link rel="icon" href="/favicon.svg"><script defer src="/_vercel/insights/script.js"></script>
 <script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>
-<style>${STYLE}</style></head>
+${FONT_LINKS}<style>${STYLE}${BASE_STYLE}</style></head>
 <body>${HEADER}<main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › <a href="/travel-authorization">Travel authorisations</a> › ${esc(a.name)}</nav>
 <h1>${esc(a.name)} — ${esc(a.scheme)}</h1>

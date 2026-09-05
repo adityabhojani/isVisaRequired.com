@@ -2,6 +2,7 @@
 // can change your visa requirement for third countries. YMYL topic + no
 // per-document dataset, so this is a conservative principle-level guide with
 // only well-established examples and strong "verify per destination" framing.
+import { FONT_LINKS, BASE_STYLE, renderHeader, renderFooter } from "./shell";
 import { SITE_ORIGIN, DATA_LAST_UPDATED } from "./render";
 
 function esc(s: string): string {
@@ -53,9 +54,9 @@ export function renderResidence(): string {
 <link rel="icon" href="/favicon.svg"><script defer src="/_vercel/insights/script.js"></script>
 <script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>
-<style>${STYLE}</style></head>
+${FONT_LINKS}<style>${STYLE}${BASE_STYLE}</style></head>
 <body>
-<header class="site"><div class="wrap"><a class="logo" href="/">isvisarequired<span>.com</span></a><a href="/" style="font-size:14px;text-decoration:none">Visa checker →</a></div></header>
+${renderHeader()}
 <main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › Residence permits &amp; visa requirements</nav>
 <h1>Does a residence permit or US/UK/Schengen visa change your visa requirements?</h1>
@@ -78,6 +79,6 @@ export function renderResidence(): string {
 
 <section class="card"><h3 style="font-size:20px">Frequently asked questions</h3>${faqs.map((f) => `<div class="faq"><h3>${esc(f.q)}</h3><p>${esc(f.a)}</p></div>`).join("")}</section>
 </main>
-<footer class="site"><div class="wrap">© isvisarequired.com — general guidance only; always confirm with official government sources. Last reviewed ${esc(DATA_LAST_UPDATED)}. · <a href="/methodology">How we source our data</a></div></footer>
+${renderFooter()}
 </body></html>`;
 }

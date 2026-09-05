@@ -1,4 +1,5 @@
 // Shared layout + helpers for the rich passport & destination hub pages.
+import { FONT_LINKS, BASE_STYLE, renderHeader, renderFooter } from "./shell";
 import { SITE_ORIGIN, DATA_LAST_UPDATED } from "./render";
 
 export { SITE_ORIGIN, DATA_LAST_UPDATED };
@@ -63,10 +64,10 @@ export function page(opts: {
 <meta property="og:image" content="${SITE_ORIGIN}/opengraph.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg"><script defer src="/_vercel/insights/script.js"></script>
 ${ld}
-<style>${STYLE}</style></head>
+${FONT_LINKS}<style>${STYLE}${BASE_STYLE}</style></head>
 <body>
-<header class="site"><div class="wrap"><a class="logo" href="/">isvisarequired<span>.com</span></a><a href="/" style="font-size:14px;text-decoration:none">Visa checker →</a></div></header>
+${renderHeader()}
 <main class="wrap">${opts.body}</main>
-<footer class="site"><div class="wrap">© isvisarequired.com — general guidance only; always confirm with official government sources. Last reviewed ${esc(DATA_LAST_UPDATED)}. · <a href="/methodology">How we source our data</a></div></footer>
+${renderFooter()}
 </body></html>`;
 }

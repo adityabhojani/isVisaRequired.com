@@ -6,6 +6,7 @@
 // page is CDN-cached (see Cache-Control in the route), so serving ~38k pages
 // on-demand is cheap.
 
+import { FONT_LINKS, BASE_STYLE, renderHeader, renderFooter, renderKeepGoing } from "./shell";
 import { countries, type CountryData } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
 import { getVisaDetail, getCountryTouristInfo } from "../data/countryDetails";
@@ -112,6 +113,11 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
         ? `≈ US$${detail.feeUSD}`
         : "Varies — check official portal";
   const processing = detail.processingDays || "Varies";
+  const keepGuide =
+    requirement === "visa_free" ? { href: "/guides/six-month-passport-rule", label: "Is your passport valid long enough?" }
+    : requirement === "visa_required" ? { href: "/guides/proof-of-onward-travel", label: "What counts as proof of onward travel" }
+    : requirement === "no_admission" ? { href: "/guides", label: "Browse our visa guides" }
+    : { href: "/guides/visa-on-arrival-vs-evisa-vs-eta", label: "Visa on arrival vs eVisa vs ETA" };
   const answer = answerSentence(requirement, from.name, to.name);
 
   const canonical = `${SITE_ORIGIN}${pairPath(from, to)}`;
@@ -280,11 +286,11 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
 <script type="application/ld+json">${JSON.stringify(faqJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbJsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(webpageJsonLd)}</script>
-<style>
+${FONT_LINKS}<style>
 :root{--navy:#0A2FA1;--accent:#0DB5E8;--bg:#F7F9FC;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
 a{color:var(--navy)}
-.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px}
 header.site{background:#fff;border-bottom:1px solid var(--line)}
 header.site .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
 .logo{font-weight:800;color:var(--navy);text-decoration:none;font-size:18px}
@@ -312,14 +318,16 @@ h1{font-size:28px;line-height:1.25;margin:6px 0 4px}
 .cta{display:inline-block;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:10px;margin-top:6px}
 footer.site{color:var(--muted);font-size:13px;padding:28px 0;text-align:center}
 </style>
+<style>${BASE_STYLE}</style>
 </head>
 <body>
-<header class="site"><div class="wrap"><a class="logo" href="/">isvisarequired<span>.com</span></a><a href="/" style="font-size:14px;text-decoration:none">Visa checker →</a></div></header>
-<main class="wrap">
+${renderHeader()}
+<div class="hero"><div class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › <a href="/visa-requirements/${slugify(from.name)}">${esc(from.name)} passport</a> › ${esc(from.name)} → ${esc(to.name)}</nav>
 <h1>Do ${esc(from.name)} citizens need a visa for ${esc(to.name)}?</h1>
 <div class="updated">Last updated: ${esc(entry.verifiedOn || DATA_LAST_UPDATED)}</div>
-
+</div></div>
+<main class="wrap">
 <div class="answer">
   <span class="badge">${esc(reqLabel)}</span>
   <p>${esc(answer)}</p>
@@ -347,6 +355,12 @@ ${touristBlock}
   <a class="cta" href="/?passport=${esc(from.code)}&destinations=${esc(to.code)}">Open the visa checker →</a>
 </section>
 
+${renderKeepGoing([
+  { href: `/countries/${slugify(to.name)}`, label: `Who else can enter ${esc(to.name)}?`, sub: "Every nationality, one page" },
+  { href: `/visa-requirements/${slugify(from.name)}`, label: `All destinations for ${esc(from.name)}`, sub: "Visa-free, on arrival, eVisa" },
+  { href: keepGuide.href, label: keepGuide.label, sub: "Read before you book" },
+  { href: `/?passport=${esc(from.code)}&destinations=${esc(to.code)}`, label: "Plan a multi-country trip", sub: "Add more destinations" },
+])}
 <section class="card related">
   <h2>Explore full guides</h2>
   <a href="/visa-requirements/${slugify(from.name)}"><strong>${esc(from.flag)} ${esc(from.name)} passport</strong> — visa requirements for every country</a>
@@ -357,7 +371,7 @@ ${touristBlock}
   ${relatedDestinations}
 </section>
 </main>
-<footer class="site"><div class="wrap">© isvisarequired.com — General guidance only; always confirm with official government sources before booking travel. Data last reviewed ${esc(DATA_LAST_UPDATED)}. · <a href="/methodology" style="color:inherit">How we source our data</a></div></footer>
+${renderFooter()}
 </body>
 </html>`;
 }
