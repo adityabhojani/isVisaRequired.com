@@ -42,15 +42,19 @@ export default function WorldMap({
   onCountryClick,
   highlightedCode,
 }: WorldMapProps) {
+  // react-simple-maps 3 supports filterZoomEvent at runtime but omits it from its
+  // type declarations. One finger scrolls the page, two fingers pan, and a
+  // trackpad wheel only zooms with ctrl held.
+  const zoomExtras = { filterZoomEvent: (e: any) => e.type === "wheel" ? e.ctrlKey : !(e.type === "touchstart" && e.touches?.length === 1) } as object;
   return (
-    <div className="relative w-full bg-slate-50 rounded-xl overflow-hidden border border-border">
+    <div className="relative w-full bg-secondary/40 rounded-2xl overflow-hidden border border-border/70" style={{ touchAction: "pan-y" }}>
       <ComposableMap
         projection="geoNaturalEarth1"
         projectionConfig={{ scale: 140 }}
         style={{ width: "100%", height: "auto" }}
         height={400}
       >
-        <ZoomableGroup zoom={1} minZoom={0.8} maxZoom={6}>
+        <ZoomableGroup zoom={1} minZoom={0.8} maxZoom={6} {...zoomExtras}>
           <Geographies geography={GEO_URL}>
             {({ geographies }) =>
               geographies.map((geo) => {
@@ -62,7 +66,7 @@ export default function WorldMap({
 
                 let fill = "#e2e8f0";
                 if (isPassport) {
-                  fill = "#1e3a5f";
+                  fill = "hsl(222 89% 30%)";
                 } else if (req) {
                   fill = requirementColors[req];
                 }
@@ -102,11 +106,11 @@ export default function WorldMap({
       </ComposableMap>
 
       {/* Legend */}
-      <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg p-2.5 border border-border shadow-sm">
-        <div className="text-xs font-semibold text-foreground mb-1.5">Legend</div>
-        <div className="flex flex-col gap-1">
+      <div className="sm:absolute sm:bottom-3 sm:left-3 sm:rounded-lg sm:border sm:border-border sm:bg-white/90 sm:backdrop-blur-sm sm:shadow-sm sm:p-2.5 px-3 py-2 border-t border-border/70 bg-card">
+        <div className="hidden sm:block text-xs font-semibold text-foreground mb-1.5">Legend</div>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 sm:flex-col sm:gap-1">
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: "#1e3a5f" }} />
+            <div className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: "hsl(222 89% 30%)" }} />
             <span className="text-xs text-muted-foreground">Your Passport</span>
           </div>
           {legend.map(({ req, label, color }) => (
@@ -123,7 +127,7 @@ export default function WorldMap({
       </div>
 
       {/* Zoom hint */}
-      <div className="absolute top-2 right-3 text-xs text-muted-foreground/60">
+      <div className="hidden sm:block absolute top-2 right-3 text-xs text-muted-foreground/60">
         Scroll to zoom · Drag to pan
       </div>
     </div>

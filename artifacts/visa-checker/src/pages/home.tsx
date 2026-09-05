@@ -12,7 +12,7 @@ import {
 import type { Country, VisaResult, VisaRequirement } from "@workspace/api-client-react";
 import {
   Search, Globe, ChevronDown, X, CheckCircle2, AlertCircle, Clock,
-  XCircle, Shield, ArrowUpDown, ChevronRight, ChevronUp,
+  XCircle, Shield, ArrowUpDown,
   Share2, Link2, Check as CheckIcon, Plane, Users, Zap, Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,19 +33,7 @@ import { trackEvent } from "@/lib/analytics";
 
 const WorldMap = lazy(() => import("@/components/WorldMap"));
 
-const requirementOrder: VisaRequirement[] = [
-  "visa_free", "visa_on_arrival", "e_visa", "visa_required", "no_admission",
-];
-
-const reqConfig: Record<VisaRequirement, {
-  label: string; color: string; bg: string; border: string; dotColor: string; icon: typeof CheckCircle2;
-}> = {
-  visa_free:       { label: "Visa Free",       color: "text-green-700",  bg: "bg-green-50",  border: "border-green-200",  dotColor: "bg-green-500",  icon: CheckCircle2 },
-  visa_on_arrival: { label: "Visa on Arrival",  color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200",  dotColor: "bg-amber-500",  icon: Clock },
-  e_visa:          { label: "eVisa",            color: "text-blue-700",   bg: "bg-blue-50",   border: "border-blue-200",   dotColor: "bg-blue-500",   icon: Shield },
-  visa_required:   { label: "Visa Required",    color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200", dotColor: "bg-orange-500", icon: AlertCircle },
-  no_admission:    { label: "No Admission",     color: "text-red-700",    bg: "bg-red-50",    border: "border-red-200",    dotColor: "bg-red-500",    icon: XCircle },
-};
+import { reqConfig, requirementOrder } from "@/lib/requirement";
 
 function CountryCombobox({ value, onChange, countries, placeholder, label, isLoading, excludeCode, open: openProp, onOpenChange }: {
   value: string; onChange: (code: string) => void; countries: Country[];
@@ -180,40 +168,37 @@ function ResultCard({ result, passport, isExpanded, onToggle }: {
 }) {
   const config = reqConfig[result.requirement];
   const Icon = config.icon;
+  const stay = result.maxStay === "unlimited" ? "No stay limit" : result.maxStay ? `Stay up to ${result.maxStay}` : config.hint;
 
   return (
-    <div className={`rounded-2xl border overflow-hidden transition-all duration-200 ${isExpanded ? "shadow-md ring-1 ring-[rgb(15_23_41/0.07)]" : "shadow-sm hover:shadow-md"} ${config.border}`}>
+    <div>
       <button
         onClick={onToggle}
-        className={`w-full flex items-center gap-4 px-5 py-4 text-left transition-colors ${config.bg} hover:brightness-[0.97]`}
+        aria-expanded={isExpanded}
+        aria-controls={`detail-${result.destinationCountry.code}`}
+        className={`group relative w-full flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3.5 sm:py-4 text-left bg-card transition-colors hover:bg-secondary/40 aria-expanded:bg-secondary/40 before:absolute before:left-0 before:inset-y-3 before:w-[3px] before:rounded-r-full ${config.rail}`}
       >
-        <span className="text-3xl flex-shrink-0 leading-none">{result.destinationCountry.flag}</span>
+        <span className="text-2xl sm:text-3xl flex-shrink-0 leading-none" aria-hidden="true">{result.destinationCountry.flag}</span>
         <div className="flex-1 min-w-0">
-          <div className="font-bold text-foreground text-base leading-tight">{result.destinationCountry.name}</div>
-          <div className="text-xs text-muted-foreground mt-0.5">{result.destinationCountry.region}</div>
+          <div className="font-semibold text-foreground text-base leading-tight">{result.destinationCountry.name}</div>
+          <div className="text-[13px] text-muted-foreground mt-0.5 leading-snug tabular-nums">{stay}</div>
         </div>
-        <div className="flex items-center gap-2.5 flex-shrink-0">
-          <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${config.color} bg-white/80 border ${config.border} shadow-sm`}>
-            <Icon className="h-3 w-3" />
-            {config.label}
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
+          <div className={`inline-flex shrink-0 items-center gap-1.5 h-7 px-2.5 rounded-full text-[13px] font-semibold leading-none ${config.color} ${config.bg} border ${config.border}`}>
+            <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            <span className="sm:hidden">{config.short}</span><span className="hidden sm:inline">{config.label}</span>
           </div>
-          <div className={`flex sm:hidden w-2.5 h-2.5 rounded-full ${config.dotColor} flex-shrink-0`} />
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${isExpanded ? "bg-white/60" : "bg-white/40 hover:bg-white/60"}`}>
-            {isExpanded
-              ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
-              : <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />}
-          </div>
+          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground/70 transition-transform duration-200 group-aria-expanded:rotate-180" aria-hidden="true" />
         </div>
       </button>
 
       {isExpanded && (
-        <div className="bg-card px-5 py-5 border-t border-border">
+        <div id={`detail-${result.destinationCountry.code}`} className="bg-background border-t border-border/70 px-4 sm:px-5 py-5">
           <DestinationDetailExpanded
             passport={passport}
             destinationCode={result.destinationCountry.code}
             destinationName={result.destinationCountry.name}
-            destinationFlag={result.destinationCountry.flag}
-            requirement={result.requirement}
+                        requirement={result.requirement}
             maxStay={result.maxStay}
           />
         </div>
@@ -381,6 +366,12 @@ export default function HomePage() {
   const [passport, setPassport] = useState(initialParams.passport);
   const [destinations, setDestinations] = useState<string[]>(initialParams.destinations);
   const [results, setResults] = useState<VisaResult[] | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!results?.length) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    resultsRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  }, [results]);
   const [sortBy, setSortBy] = useState<SortOption>("status");
   const [filterBy, setFilterBy] = useState<FilterOption>("all");
   const [expandedCode, setExpandedCode] = useState<string | null>(null);
@@ -416,7 +407,7 @@ export default function HomePage() {
       {
         onSuccess: (data) => {
           setResults(data as VisaResult[]);
-          setExpandedCode(data.length > 0 ? (data[0] as VisaResult).destinationCountry.code : null);
+          setExpandedCode(data.length === 1 ? (data[0] as VisaResult).destinationCountry.code : null);
         },
       }
     );
@@ -505,7 +496,7 @@ export default function HomePage() {
       {
         onSuccess: (data) => {
           setResults(data as VisaResult[]);
-          setExpandedCode(data.length > 0 ? (data[0] as VisaResult).destinationCountry.code : null);
+          setExpandedCode(data.length === 1 ? (data[0] as VisaResult).destinationCountry.code : null);
           setFilterBy("all");
           pushUrl(passport, destinations);
           trackEvent("visa_check", { passport_code: passport, destination_count: destinations.length });
@@ -517,10 +508,10 @@ export default function HomePage() {
   const checkError = checkMutation.isError;
 
   const handleCountryClickOnMap = (code: string) => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     if (!destinations.includes(code) && code !== passport) {
       setDestinations((prev) => [...prev, code]);
       setHighlightedCode(code);
-      setResults(null);
     }
   };
 
@@ -553,12 +544,51 @@ export default function HomePage() {
 
   const showAllCountries = passport && !results;
 
+  const renderMap = (inResults: boolean) => (
+<>
+          <div className={inResults ? "" : "mb-8"}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-semibold text-foreground">{inResults ? "Add another destination" : "World Visa Map"}</h2>
+                {allLoading ? (
+                  <span className="inline-block h-4 w-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                ) : (
+                  <span className="text-xs text-muted-foreground bg-secondary/60 px-2 py-0.5 rounded-full">
+                    {(allVisaResults as VisaResult[]).length} countries · {inResults ? "tap one to add it" : "click to add"}
+                  </span>
+                )}
+              </div>
+              {!allLoading && (allVisaResults as VisaResult[]).length > 0 && (
+                <MysteryDestination
+                  passport={passport}
+                  results={allVisaResults as VisaResult[]}
+                />
+              )}
+            </div>
+            <div className="max-w-4xl mx-auto">
+            <Suspense fallback={
+                <div className="aspect-[2/1] bg-secondary/40 rounded-2xl border border-border/70 flex items-center justify-center text-muted-foreground text-sm">
+                <span className="animate-pulse">Loading map…</span>
+              </div>
+            }>
+              <WorldMap
+                visaMap={visaMapForMap}
+                passportCode={passport}
+                onCountryClick={handleCountryClickOnMap}
+                highlightedCode={highlightedCode}
+              />
+            </Suspense>
+            </div>
+          </div>
+        </>
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Header activeHref="/" />
 
       {/* Hero strip */}
-      <div className="relative bg-[radial-gradient(125%_150%_at_50%_0%,hsl(222_89%_34%)_0%,hsl(222_89%_27%)_52%,hsl(222_47%_15%)_100%)]">
+      <div className="relative bg-hero">
         <div className="max-w-5xl mx-auto px-4 pt-6 pb-16 md:pt-12 md:pb-24 text-center">
           <a
             href="/methodology"
@@ -649,52 +679,16 @@ export default function HomePage() {
           </CardContent>
         </Card>
 
-        {(results || showAllCountries) && <AdSlot slotId="7432198541" size="responsive" className="my-6" />}
+        {showAllCountries && <AdSlot slotId="7432198541" size="responsive" className="my-6" />}
 
         {/* World Map */}
-        {passport && (
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <h2 className="text-base font-semibold text-foreground">World Visa Map</h2>
-                {allLoading ? (
-                  <span className="inline-block h-4 w-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-                ) : (
-                  <span className="text-xs text-muted-foreground bg-secondary/60 px-2 py-0.5 rounded-full">
-                    {(allVisaResults as VisaResult[]).length} countries · click to add
-                  </span>
-                )}
-              </div>
-              {!allLoading && (allVisaResults as VisaResult[]).length > 0 && (
-                <MysteryDestination
-                  passport={passport}
-                  results={allVisaResults as VisaResult[]}
-                />
-              )}
-            </div>
-            <div className="max-w-4xl mx-auto">
-            <Suspense fallback={
-                <div className="aspect-[2/1] bg-muted/30 rounded-2xl border border-border/70 flex items-center justify-center text-muted-foreground text-sm">
-                <span className="animate-pulse">Loading map…</span>
-              </div>
-            }>
-              <WorldMap
-                visaMap={visaMapForMap}
-                passportCode={passport}
-                onCountryClick={handleCountryClickOnMap}
-                highlightedCode={highlightedCode}
-              />
-            </Suspense>
-            </div>
-          </div>
-        )}
-
+        {passport && !results && renderMap(false)}
         {/* Specific destination results */}
         {results && results.length > 0 && (
-          <div className="space-y-5">
+          <div ref={resultsRef} className="space-y-5 scroll-mt-20">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <TripSummary results={results} />
+                <TripSummary results={results} passportFlag={passportCountry?.flag ?? ""} passportName={passportCountry?.name ?? passport} />
               </div>
               <div className="flex-shrink-0 pt-1">
                 <ShareButtons
@@ -707,40 +701,43 @@ export default function HomePage() {
               </div>
             </div>
 
-            <AdSlot slotId="3198762045" size="rectangle" className="mx-auto" />
-
-            {/* Filter + sort */}
+            
+            {/* Filter + sort — only worth a row once there is something to filter */}
+            {results.length >= 4 && (
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex flex-wrap gap-1.5">
+              <div className="-mx-4 flex gap-2 overflow-x-auto snap-x px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
                 {filterOptions.map(({ value, label }) => {
                   const count = value === "all" ? results.length : (resultCounts?.[value as VisaRequirement] ?? 0);
                   if (count === 0 && value !== "all") return null;
                   const config = value !== "all" ? reqConfig[value as VisaRequirement] : null;
+                  const FIcon = config?.icon;
                   return (
-                    <button key={value} onClick={() => setFilterBy(value)}
-                      className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all ${
+                    <button key={value} onClick={() => setFilterBy(value)} aria-pressed={filterBy === value}
+                      className={`snap-start shrink-0 inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-[13px] font-semibold border transition-colors ${
                         filterBy === value
                           ? config ? `${config.color} ${config.bg} ${config.border}` : "text-foreground bg-secondary border-border"
-                          : "text-muted-foreground bg-muted border-transparent hover:border-border"
+                          : "text-muted-foreground bg-card border-border/70 hover:border-border hover:text-foreground"
                       }`}>
-                      {label}<span className="ml-1 opacity-70">{count}</span>
+                      {FIcon && <FIcon className="h-3.5 w-3.5" aria-hidden="true" />}
+                      {label}<span className="tabular-nums font-medium text-muted-foreground">{count}</span>
                     </button>
                   );
                 })}
               </div>
               <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
-                <SelectTrigger className="w-[150px] h-8 text-xs">
-                  <ArrowUpDown className="h-3 w-3 mr-1" /><SelectValue />
+                <SelectTrigger className="h-9 w-auto gap-1.5 rounded-full border-border/70 bg-card px-3 text-[13px] shadow-none">
+                  <ArrowUpDown className="h-3 w-3" /><SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="status">Sort by Status</SelectItem>
-                  <SelectItem value="alpha">Sort A–Z</SelectItem>
+                  <SelectItem value="status">Status</SelectItem>
+                  <SelectItem value="alpha">A–Z</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            )}
 
             {/* Result cards */}
-            <div className="space-y-2.5">
+            <div className="rounded-2xl bg-card shadow-sm ring-1 ring-[rgb(15_23_41/0.06)] divide-y divide-border/70 overflow-hidden">
               {sortedFilteredResults.map((r) => (
                 <ResultCard
                   key={r.destinationCountry.code}
@@ -751,7 +748,7 @@ export default function HomePage() {
                 />
               ))}
               {sortedFilteredResults.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">No results match this filter.</div>
+                <div className="px-5 py-10 text-center text-sm text-muted-foreground">No results match this filter.</div>
               )}
             </div>
 
@@ -769,6 +766,8 @@ export default function HomePage() {
               />
             )}
 
+            <AdSlot slotId="3198762045" size="rectangle" className="mx-auto" />
+
             {results.length > 0 && passportCountry && (
               <div className="mt-5 pt-5 border-t border-border/60">
                 <h3 className="text-base font-semibold text-foreground mb-4">
@@ -779,7 +778,7 @@ export default function HomePage() {
                     <a
                       key={t.href}
                       href={t.href}
-                      className="bg-card border border-border rounded-lg p-3 text-xs leading-snug hover:border-primary/50 hover:bg-secondary/40 transition-colors">
+                      className="bg-card border border-border rounded-xl p-3.5 min-h-16 flex items-center text-sm leading-snug hover:border-primary/50 hover:bg-secondary/40 active:bg-secondary transition-colors">
                       {t.label}
                     </a>
                   ))}
@@ -787,13 +786,15 @@ export default function HomePage() {
               </div>
             )}
 
-            <div className="flex items-center justify-between pt-1">
+            <section className="pt-6 border-t border-border/60">{renderMap(true)}</section>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1">
               <button
                 onClick={() => setResults(null)}
-                className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline transition-colors">
+                className="inline-flex items-center min-h-11 text-sm text-primary underline-offset-2 hover:underline">
                 ← Browse all countries
               </button>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 Requirements are indicative. Verify with official embassy before travel.
               </p>
             </div>

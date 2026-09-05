@@ -1,3 +1,4 @@
+import { reqConfig } from "@/lib/requirement";
 import { useState } from "react";
 import { Sparkles, X, ArrowRight, RefreshCw } from "lucide-react";
 import type { VisaResult } from "@workspace/api-client-react";
@@ -37,14 +38,6 @@ const FUN_FACTS: Record<string, string> = {
 
 const DEFAULT_FACT = "Every destination has a story waiting to be discovered.";
 
-function getVisaLabel(req: string): string {
-  switch (req) {
-    case "visa_free": return "🟢 Visa Free";
-    case "visa_on_arrival": return "🟡 Visa on Arrival";
-    case "e_visa": return "🔵 eVisa";
-    default: return "";
-  }
-}
 
 export function MysteryDestination({ passport, results }: Props) {
   const eligible = results.filter(
@@ -73,27 +66,26 @@ export function MysteryDestination({ passport, results }: Props) {
       <button
         onClick={spin}
         disabled={spinning}
-        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-semibold hover:from-violet-700 hover:to-indigo-700 transition-all shadow-sm disabled:opacity-60"
+        aria-label="Pick a random destination you can enter"
+        className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors hover-elevate active-elevate-2 disabled:opacity-60"
       >
         {spinning
           ? <RefreshCw className="h-4 w-4 animate-spin" />
           : <Sparkles className="h-4 w-4" />}
-        {spinning ? "Picking…" : "Mystery Destination"}
+        {spinning ? "Picking…" : "Surprise me"}
       </button>
 
       {visible && pick && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-card rounded-3xl border border-border shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="bg-gradient-to-br from-violet-600 to-indigo-600 p-6 text-white text-center relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[hsl(222_47%_11%/0.55)] backdrop-blur-sm">
+          <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-hero p-6 text-white text-center relative">
               <button onClick={() => setVisible(false)}
                 className="absolute top-3 right-3 text-white/70 hover:text-white transition-colors">
                 <X className="h-5 w-5" />
               </button>
               <div className="text-6xl mb-2">{pick.destinationCountry.flag}</div>
-              <h2 className="text-2xl font-bold">{pick.destinationCountry.name}</h2>
-              <div className="mt-2 inline-block bg-white/20 rounded-full px-3 py-1 text-sm">
-                {getVisaLabel(pick.requirement)} {pick.maxStay ? `· Up to ${pick.maxStay}` : ""}
-              </div>
+              <h2 className="font-serif text-2xl font-semibold tracking-[-0.01em]">{pick.destinationCountry.name}</h2>
+              {(() => { const C = reqConfig[pick.requirement]; const I = C.icon; return (<div className="inline-flex items-center gap-1.5 mt-3 bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm"><I className="h-3.5 w-3.5" aria-hidden="true" />{C.label}{pick.maxStay ? ` · Up to ${pick.maxStay}` : ""}</div>); })()}
             </div>
 
             <div className="p-6">

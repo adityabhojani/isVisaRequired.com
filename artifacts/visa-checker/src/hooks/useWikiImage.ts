@@ -1,15 +1,7 @@
 import { useEffect, useState } from "react";
 
-const cache: Record<string, string> = {};
-const fallbackCache: Record<string, string> = {};
+const cache: Record<string, string | null> = {};
 
-function fallbackImage(title: string) {
-  if (fallbackCache[title]) return fallbackCache[title];
-  const query = encodeURIComponent(title);
-  const url = `https://picsum.photos/seed/${query}/1200/800`;
-  fallbackCache[title] = url;
-  return url;
-}
 
 export function useWikiImage(wikiTitle: string | undefined): { imageUrl: string | null; loading: boolean } {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -35,12 +27,12 @@ export function useWikiImage(wikiTitle: string | undefined): { imageUrl: string 
       .then((data) => {
         const pages = data?.query?.pages ?? {};
         const page = Object.values(pages)[0] as { thumbnail?: { source: string } } | undefined;
-        const src = page?.thumbnail?.source ?? fallbackImage(wikiTitle);
+        const src = page?.thumbnail?.source ?? null;
         cache[wikiTitle] = src;
         setImageUrl(src);
       })
       .catch(() => {
-        const src = fallbackImage(wikiTitle);
+        const src: string | null = null;
         cache[wikiTitle] = src;
         setImageUrl(src);
       })

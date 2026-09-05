@@ -61,7 +61,7 @@ export function AlertSubscribeWidget({
 
   if (status === "success") {
     return (
-      <div className="flex items-center gap-2 text-green-700 bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm font-medium">
+      <div role="status" className="flex items-center gap-2 text-green-700 bg-green-50 border border-green-200 rounded-2xl px-4 py-3 text-sm font-medium">
         <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
         <span>{needsConfirm
           ? `Almost done — check your inbox and click the confirmation link to activate your ${destinationName} alert.`
@@ -94,20 +94,15 @@ export function AlertSubscribeWidget({
   }
 
   return (
-    <div className="bg-gradient-to-r from-primary/5 via-primary/3 to-transparent border border-primary/20 rounded-2xl px-5 py-4">
+    <div className="rounded-2xl border border-border/70 bg-secondary/50 px-4 sm:px-5 py-4 shadow-[inset_0_2px_4px_rgb(15_23_41/0.04)]">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Bell className="h-4 w-4 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground">
-              Get notified if this requirement changes
-            </p>
+                    <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-semibold text-foreground inline-flex items-center gap-2"><Bell className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />Get an email if this rule changes</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               We'll email you when the visa rule between {passportFlag} {passportName} and {destinationFlag} {destinationName} changes.
             </p>
-            <form onSubmit={submit} className="flex gap-2 mt-3 flex-wrap">
+            <form onSubmit={submit} className="mt-3 flex flex-col sm:flex-row gap-2">
               {isLoaded && !user && (
                 <input
                   type="email"
@@ -115,7 +110,7 @@ export function AlertSubscribeWidget({
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
                   required
-                  className="h-9 px-3.5 rounded-xl border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 w-full sm:w-52 transition-shadow"
+                  className="h-11 w-full sm:w-64 px-3.5 rounded-xl border border-border/80 bg-card text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/35 transition-shadow"
                 />
               )}
               {isLoaded && user && (
@@ -126,12 +121,12 @@ export function AlertSubscribeWidget({
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-60 flex items-center gap-1.5"
+                className="h-11 w-full sm:w-auto px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-[hsl(222_89%_25%)] transition-colors disabled:opacity-60 inline-flex items-center justify-center gap-1.5 hover-elevate active-elevate-2"
               >
                 {status === "loading"
                   ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   : <Bell className="h-3.5 w-3.5" />}
-                Set Alert
+                Set alert
               </button>
             </form>
             {status === "error" && (
@@ -140,9 +135,10 @@ export function AlertSubscribeWidget({
           </div>
         </div>
         <button
+          type="button"
           onClick={() => setStatus("dismissed")}
-          className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0 p-1"
-          title="Dismiss"
+          aria-label="Dismiss alert sign-up"
+          className="shrink-0 grid place-items-center h-9 w-9 -mr-1.5 -mt-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
         >
           <X className="h-4 w-4" />
         </button>
@@ -208,7 +204,7 @@ export function MultiAlertSubscribeWidget({ passportCode, passportFlag, passport
 
   if (status === "success") {
     return (
-      <div className="flex items-center gap-2 text-green-700 bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm font-medium">
+      <div role="status" className="flex items-center gap-2 text-green-700 bg-green-50 border border-green-200 rounded-2xl px-4 py-3 text-sm font-medium">
         <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
         <span>
           {needsConfirm
@@ -220,30 +216,13 @@ export function MultiAlertSubscribeWidget({ passportCode, passportFlag, passport
   }
 
   return (
-    <div className="bg-gradient-to-r from-primary/5 via-primary/3 to-transparent border border-primary/20 rounded-2xl px-5 py-4">
+    <div className="rounded-2xl border border-border/70 bg-secondary/50 px-4 sm:px-5 py-4 shadow-[inset_0_2px_4px_rgb(15_23_41/0.04)]">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Bell className="h-4 w-4 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground">
-              Get visa change alerts
-            </p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Email me when any of these {destinations.length} visa requirements change for {passportFlag} {passportName}.
-            </p>
-            <div className="flex flex-wrap gap-1 mt-2 mb-3">
-              {destinations.slice(0, 8).map((d) => (
-                <span key={d.code} className="inline-flex items-center gap-1 text-xs bg-card border border-border rounded-full px-2 py-0.5">
-                  {d.flag} {d.name}
-                </span>
-              ))}
-              {destinations.length > 8 && (
-                <span className="text-xs text-muted-foreground self-center">+{destinations.length - 8} more</span>
-              )}
-            </div>
-            <form onSubmit={submit} className="flex gap-2 flex-wrap">
+                    <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-semibold text-foreground inline-flex items-center gap-2"><Bell className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />Get an email if any of these {destinations.length} rules change</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">One message when a requirement for your {passportFlag} {passportName} passport changes. No newsletter.</p>
+            <form onSubmit={submit} className="mt-3 flex flex-col sm:flex-row gap-2">
               {isLoaded && !user && (
                 <input
                   type="email"
@@ -251,7 +230,7 @@ export function MultiAlertSubscribeWidget({ passportCode, passportFlag, passport
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
                   required
-                  className="h-9 px-3.5 rounded-xl border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 w-full sm:w-52 transition-shadow"
+                  className="h-11 w-full sm:w-64 px-3.5 rounded-xl border border-border/80 bg-card text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/35 transition-shadow"
                 />
               )}
               {isLoaded && user && (
@@ -262,12 +241,12 @@ export function MultiAlertSubscribeWidget({ passportCode, passportFlag, passport
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-60 flex items-center gap-1.5"
+                className="h-11 w-full sm:w-auto px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-[hsl(222_89%_25%)] transition-colors disabled:opacity-60 inline-flex items-center justify-center gap-1.5 hover-elevate active-elevate-2"
               >
                 {status === "loading"
                   ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   : <Bell className="h-3.5 w-3.5" />}
-                Set {destinations.length} Alert{destinations.length > 1 ? "s" : ""}
+                Set {destinations.length} alert{destinations.length > 1 ? "s" : ""}
               </button>
             </form>
             {status === "error" && (
@@ -276,9 +255,10 @@ export function MultiAlertSubscribeWidget({ passportCode, passportFlag, passport
           </div>
         </div>
         <button
+          type="button"
           onClick={() => setStatus("dismissed")}
-          className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0 p-1"
-          title="Dismiss"
+          aria-label="Dismiss alert sign-up"
+          className="shrink-0 grid place-items-center h-9 w-9 -mr-1.5 -mt-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
         >
           <BellOff className="h-4 w-4" />
         </button>

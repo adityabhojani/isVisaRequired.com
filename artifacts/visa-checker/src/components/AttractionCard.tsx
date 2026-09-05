@@ -24,19 +24,15 @@ const typeLabels: Record<string, string> = {
 
 export function AttractionCard({ attraction }: { attraction: Attraction }) {
   const { imageUrl } = useWikiImage(attraction.wikiTitle);
-  const fallback = `https://picsum.photos/seed/${encodeURIComponent(attraction.name)}/1200/800`;
-
+  
   return (
     <div className="group rounded-2xl overflow-hidden border border-border bg-card shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
-      <div className="relative h-48 bg-slate-100 overflow-hidden">
-        <img
-          src={imageUrl ?? fallback}
-          alt={attraction.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = fallback;
-          }}
-        />
+      <div className="relative h-48 bg-secondary overflow-hidden">
+        {imageUrl ? (
+          <img src={imageUrl} alt={attraction.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        ) : (
+          <div className="h-48 bg-secondary" aria-hidden="true" />
+        )}
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 

@@ -166,6 +166,7 @@
    had no hover or press feedback at all. The :active half is the first touch
    feedback the comboboxes have ever had on a phone. */
 @layer utilities {
+  .bg-hero { background-image: radial-gradient(125% 150% at 50% 0%, hsl(222 89% 34%) 0%, hsl(222 89% 27%) 52%, hsl(222 47% 15%) 100%); }
   .hover-elevate, .active-elevate-2 { position: relative; }
   .hover-elevate::after, .active-elevate-2::after {
     content: ""; position: absolute; inset: 0; border-radius: inherit;
