@@ -136,7 +136,6 @@ export default function StatsPage() {
           <div className="space-y-6">
             {/* Rank + power bar */}
             <Card className="shadow-md overflow-hidden">
-              <div className="h-1 bg-gradient-to-r from-primary via-primary/70 to-primary/30" />
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-5">
                   <div>
@@ -156,7 +155,7 @@ export default function StatsPage() {
                 </div>
                 <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
                   <div
-                    className="h-2.5 rounded-full bg-gradient-to-r from-primary to-blue-400 transition-all duration-700"
+                    className="h-2.5 rounded-full bg-primary transition-all duration-700"
                     style={{ width: `${powerPercent}%` }}
                   />
                 </div>

@@ -85,8 +85,7 @@ export default function DiscoverPage() {
         />
 
         {/* Controls */}
-        <div className="bg-card rounded-2xl border border-border shadow-lg overflow-hidden mb-8">
-          <div className="h-1 bg-gradient-to-r from-primary via-primary/70 to-primary/30" />
+        <div className="bg-card rounded-2xl border border-border/70 shadow-sm ring-1 ring-[rgb(15_23_41/0.06)] overflow-hidden mb-8">
           <div className="p-6 space-y-5">
             {/* Passport picker */}
             <div className="flex flex-col gap-1.5">
@@ -197,7 +196,7 @@ export default function DiscoverPage() {
                   <a
                     key={r.destinationCountry.code}
                     href={`/?passport=${passport}&destinations=${r.destinationCountry.code}`}
-                    className={`flex items-center gap-3 p-3 rounded-xl border transition-all hover:shadow-sm hover:-translate-y-px ${cfg.border} ${cfg.bg}`}
+                    className={`flex items-center gap-3 p-3 rounded-xl border transition-colors hover:border-primary/40 ${cfg.border} ${cfg.bg}`}
                   >
                     <span className="text-2xl flex-shrink-0 leading-none">{r.destinationCountry.flag}</span>
                     <div className="flex-1 min-w-0">
@@ -222,8 +221,8 @@ export default function DiscoverPage() {
 
         {!passport && (
           <div className="text-center py-16 text-muted-foreground">
-            <div className="w-20 h-20 rounded-3xl bg-violet-50 flex items-center justify-center mx-auto mb-5">
-              <Sparkles className="h-10 w-10 text-violet-400" />
+            <div className="w-20 h-20 rounded-3xl bg-secondary flex items-center justify-center mx-auto mb-5">
+              <Sparkles className="h-10 w-10 text-primary/50" />
             </div>
             <p className="text-lg font-semibold text-foreground mb-1">Select your passport</p>
             <p className="text-sm">Filter all 195 countries by visa type and region</p>

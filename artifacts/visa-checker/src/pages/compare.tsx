@@ -174,8 +174,7 @@ export default function ComparePage() {
         />
 
         {/* Selector card */}
-        <div className="bg-card rounded-2xl border border-border shadow-lg overflow-hidden mb-8">
-          <div className="h-1 bg-gradient-to-r from-primary via-primary/70 to-primary/30" />
+        <div className="bg-card rounded-2xl border border-border/70 shadow-sm ring-1 ring-[rgb(15_23_41/0.06)] overflow-hidden mb-8">
           <div className="p-6">
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-end gap-4">
             <PassportPicker value={passportA} onChange={setPassportA} countries={countries} exclude={passportB} label="First Passport" />

@@ -391,12 +391,12 @@ export default function DestinationPage() {
                     );
                   })()}
                   {/* Nomad Score */}
-                  <div className={`rounded-2xl border p-4 ${score.nomadScore >= 75 ? "bg-violet-50 border-violet-200" : score.nomadScore >= 55 ? "bg-blue-50 border-blue-200" : "bg-secondary/30 border-border/70"}`}>
-                    <Laptop className={`h-5 w-5 mb-2 ${score.nomadScore >= 75 ? "text-violet-600" : score.nomadScore >= 55 ? "text-blue-600" : "text-muted-foreground"}`} />
-                    <p className={`text-2xl font-bold ${score.nomadScore >= 75 ? "text-violet-700" : score.nomadScore >= 55 ? "text-blue-700" : "text-muted-foreground"}`}>
+                  <div className={`rounded-2xl border p-4 ${score.nomadScore >= 75 ? "bg-primary/10 border-primary/20" : score.nomadScore >= 55 ? "bg-secondary border-border" : "bg-secondary/30 border-border/70"}`}>
+                    <Laptop className={`h-5 w-5 mb-2 ${score.nomadScore >= 75 ? "text-primary" : score.nomadScore >= 55 ? "text-foreground" : "text-muted-foreground"}`} />
+                    <p className={`text-2xl font-bold ${score.nomadScore >= 75 ? "text-primary" : score.nomadScore >= 55 ? "text-foreground" : "text-muted-foreground"}`}>
                       {score.nomadScore}<span className="text-sm font-normal">/100</span>
                     </p>
-                    <p className={`text-xs font-semibold mt-0.5 ${score.nomadScore >= 75 ? "text-violet-700" : score.nomadScore >= 55 ? "text-blue-700" : "text-muted-foreground"}`}>
+                    <p className={`text-xs font-semibold mt-0.5 ${score.nomadScore >= 75 ? "text-primary" : score.nomadScore >= 55 ? "text-foreground" : "text-muted-foreground"}`}>
                       {score.nomadScore >= 80 ? "Top Nomad Hub" : score.nomadScore >= 65 ? "Nomad Friendly" : score.nomadScore >= 45 ? "Emerging" : "Limited"}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">Digital Nomad Score</p>
@@ -439,7 +439,7 @@ export default function DestinationPage() {
                       <span className="text-xs text-amber-800">{score.climate}</span>
                     </div>
                     {score.nomadScore >= 70 && (
-                      <a href="/digital-nomad" className="text-xs text-violet-600 font-medium hover:underline flex-shrink-0">
+                      <a href="/digital-nomad" className="text-xs text-primary font-medium hover:underline flex-shrink-0">
                         Nomad visa →
                       </a>
                     )}
@@ -466,7 +466,7 @@ export default function DestinationPage() {
                     🗺 View on World Map
                   </a>
                   <a href={`/trip-planner`}
-                    className="inline-flex items-center gap-1 text-xs text-teal-700 font-medium hover:underline border border-teal-200 bg-teal-50 rounded-full px-3 py-1">
+                    className="inline-flex items-center gap-1 text-xs text-primary font-medium hover:underline border border-primary/20 bg-primary/5 rounded-full px-3 py-1">
                     ✈️ Plan a trip here
                   </a>
                   <a href={`/reciprocity?passportA=${code}`}

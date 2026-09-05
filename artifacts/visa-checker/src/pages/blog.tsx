@@ -63,7 +63,7 @@ export default function BlogPage() {
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
               <svg className="h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
               </svg>
@@ -83,7 +83,7 @@ export default function BlogPage() {
                   {posts[0].cover_url ? (
                     <img src={posts[0].cover_url} alt={posts[0].title} className="w-full h-64 object-cover" />
                   ) : (
-                    <div className="w-full h-64 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent flex items-center justify-center">
+                    <div className="w-full h-64 bg-secondary/60 flex items-center justify-center">
                       <div className="text-6xl">✈️</div>
                     </div>
                   )}
@@ -117,7 +117,7 @@ export default function BlogPage() {
                       {post.cover_url ? (
                         <img src={post.cover_url} alt={post.title} className="w-full h-44 object-cover" />
                       ) : (
-                        <div className="w-full h-44 bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center">
+                        <div className="w-full h-44 bg-secondary flex items-center justify-center">
                           <span className="text-4xl">🌍</span>
                         </div>
                       )}

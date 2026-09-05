@@ -38,7 +38,7 @@ export default function WidgetPage() {
 
   return (
     <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
-      <div className={`w-full max-w-sm rounded-2xl border shadow-lg overflow-hidden ${cfg ? `${cfg.bg} ${cfg.border}` : "bg-card border-border"}`}>
+      <div className={`w-full max-w-sm rounded-2xl border shadow-md overflow-hidden ${cfg ? `${cfg.bg} ${cfg.border}` : "bg-card border-border"}`}>
         {/* Header */}
         <div className={`px-5 py-4 border-b ${cfg ? cfg.border : "border-border"}`}>
           <div className="flex items-center justify-between">

@@ -33,7 +33,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border">
       {/* Newsletter bar — gradient accent */}
-      <div className="bg-gradient-to-r from-primary/8 via-primary/5 to-transparent border-b border-border">
+      <div className="bg-secondary/60 border-b border-border">
         <div className="max-w-5xl mx-auto px-4 py-7">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 justify-between">
             <div className="flex items-start gap-3">
@@ -84,7 +84,7 @@ export function Footer() {
       </div>
 
       {/* Main footer */}
-      <div className="bg-slate-50 dark:bg-slate-900/50">
+      <div className="bg-card">
         <div className="max-w-5xl mx-auto px-4 py-10">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
             {/* Brand */}

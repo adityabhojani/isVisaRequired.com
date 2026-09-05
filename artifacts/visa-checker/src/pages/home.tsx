@@ -254,7 +254,7 @@ function ShareButtons({ passport, passportFlag, passportName, destinations, resu
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 mt-1.5 z-20 bg-card border border-border rounded-xl shadow-lg p-2 flex flex-col gap-1 min-w-[180px]">
+          <div className="absolute right-0 mt-1.5 z-20 bg-card border border-border rounded-xl shadow-md ring-1 ring-[rgb(15_23_41/0.06)] p-2 flex flex-col gap-1 min-w-[180px]">
             <button
               onClick={copyLink}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-secondary/60 transition-colors text-left"
@@ -862,7 +862,7 @@ export default function HomePage() {
                   className={`flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
                       isSelected
                         ? "border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20"
-                        : `${config.border} ${config.bg} hover:brightness-[0.985]`
+                        : `${config.border} ${config.bg} hover:border-primary/40`
                     }`}>
                     <span className="text-2xl flex-shrink-0 leading-none">{r.destinationCountry.flag}</span>
                     <div className="flex-1 min-w-0">

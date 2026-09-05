@@ -162,7 +162,7 @@ export default function BlogPostPage() {
         )}
 
         {/* Title */}
-        <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground leading-tight mb-4">
+        <h1 className="font-serif text-3xl md:text-4xl font-semibold text-foreground leading-[1.1] tracking-[-0.018em] mb-4">
           {post.title}
         </h1>
 
@@ -183,14 +183,14 @@ export default function BlogPostPage() {
         <div
           className="prose prose-slate max-w-none
             prose-headings:font-serif prose-headings:text-foreground
-            prose-p:text-slate-700 prose-p:leading-relaxed
+            prose-p:text-foreground/85 prose-p:leading-relaxed
             prose-a:text-primary prose-a:underline-offset-2
             prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground
             prose-code:text-primary prose-code:bg-primary/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
-            prose-pre:bg-slate-900 prose-pre:text-slate-100
+            prose-pre:bg-[hsl(222_47%_11%)] prose-pre:text-white/90
             prose-img:rounded-xl
             prose-strong:text-foreground
-            prose-ul:text-slate-700 prose-ol:text-slate-700
+            prose-ul:text-foreground/85 prose-ol:text-foreground/85
             prose-hr:border-border"
           dangerouslySetInnerHTML={{ __html: html }}
         />

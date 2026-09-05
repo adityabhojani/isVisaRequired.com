@@ -63,7 +63,7 @@ function VisaCard({ visa }: { visa: DigitalNomadVisa }) {
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {visa.taxBenefits && (
-            <span className="hidden sm:flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+            <span className="hidden sm:flex items-center gap-1 text-xs font-semibold text-foreground bg-secondary border border-border px-2 py-0.5 rounded-full">
               Tax benefit
             </span>
           )}
@@ -108,7 +108,7 @@ function VisaCard({ visa }: { visa: DigitalNomadVisa }) {
 
           <div className="flex flex-wrap gap-2 mb-3">
             {visa.taxBenefits && (
-              <span className="flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+              <span className="flex items-center gap-1 text-xs font-medium text-foreground bg-secondary border border-border px-2.5 py-1 rounded-full">
                 <CheckCircle2 className="h-3 w-3" />
                 Tax Benefits
               </span>
@@ -186,9 +186,9 @@ export default function DigitalNomadPage() {
       <Header activeHref="/digital-nomad" />
 
       {/* Hero */}
-      <div className="bg-gradient-to-b from-violet-50/80 via-primary/4 to-transparent border-b border-border/50">
+      <div className="bg-secondary/40 border-b border-border/70">
         <div className="max-w-5xl mx-auto px-4 pt-12 pb-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-violet-100 text-violet-700 rounded-full px-3.5 py-1 text-xs font-semibold mb-4 border border-violet-200">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-3.5 py-1 text-xs font-semibold mb-4 border border-primary/20">
             <Laptop className="h-3 w-3" />
             {digitalNomadVisas.length} programs · 2026 edition
           </div>
@@ -206,9 +206,9 @@ export default function DigitalNomadPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-7">
           {[
             { label: "Total Programs", value: digitalNomadVisas.length.toString(), icon: Globe, color: "text-primary" },
-            { label: "With Tax Benefits", value: digitalNomadVisas.filter(v => v.taxBenefits).length.toString(), icon: CheckCircle2, color: "text-emerald-600" },
-            { label: "Free to Apply", value: digitalNomadVisas.filter(v => v.govFee === "Free").length.toString(), icon: DollarSign, color: "text-amber-600" },
-            { label: "10+ Year Programs", value: digitalNomadVisas.filter(v => v.duration.includes("10")).length.toString(), icon: Clock, color: "text-blue-600" },
+            { label: "With Tax Benefits", value: digitalNomadVisas.filter(v => v.taxBenefits).length.toString(), icon: CheckCircle2, color: "text-primary" },
+            { label: "Free to Apply", value: digitalNomadVisas.filter(v => v.govFee === "Free").length.toString(), icon: DollarSign, color: "text-primary" },
+            { label: "10+ Year Programs", value: digitalNomadVisas.filter(v => v.duration.includes("10")).length.toString(), icon: Clock, color: "text-primary" },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="bg-card rounded-2xl border border-border/70 p-4 shadow-sm text-center">
               <Icon className={`h-5 w-5 mx-auto mb-1.5 ${color}`} />
@@ -237,7 +237,7 @@ export default function DigitalNomadPage() {
                 onClick={() => setTaxOnly((o) => !o)}
                 className={`px-3 py-2 text-xs font-semibold rounded-xl border transition-colors ${
                   taxOnly
-                    ? "bg-emerald-600 text-white border-emerald-600"
+                    ? "bg-primary text-primary-foreground border-primary"
                     : "bg-secondary/50 text-foreground border-border hover:bg-secondary"
                 }`}
               >

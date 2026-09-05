@@ -117,7 +117,7 @@ export default function MapPage() {
     <div className="min-h-screen bg-background">
       <Header activeHref="/map" />
 
-      <div className="bg-gradient-to-b from-sky-50/80 via-primary/4 to-transparent border-b border-border/50">
+      <div className="bg-secondary/40 border-b border-border/70">
         <div className="max-w-6xl mx-auto px-4 pt-10 pb-8">
           <div className="flex flex-col sm:flex-row sm:items-end gap-4">
             <div className="flex-1">
@@ -195,7 +195,7 @@ export default function MapPage() {
         </div>
 
         {/* Map */}
-        <div className="relative bg-gradient-to-b from-sky-100/60 to-sky-50/30 rounded-2xl border border-border/70 overflow-hidden shadow-sm"
+        <div className="relative bg-secondary/40 rounded-2xl border border-border/70 overflow-hidden"
           style={{ height: "520px" }}
           onMouseMove={handleMouseMove}
           onMouseLeave={() => setTooltip(null)}>
@@ -265,7 +265,7 @@ export default function MapPage() {
           {/* Tooltip */}
           {tooltip && (
             <div
-              className="fixed z-50 pointer-events-none bg-popover border border-border rounded-xl shadow-xl px-3 py-2 text-sm"
+              className="fixed z-50 pointer-events-none bg-popover border border-border rounded-xl shadow-md px-3 py-2 text-sm"
               style={{ left: tooltip.x + 12, top: tooltip.y - 40 }}>
               <p className="font-semibold text-foreground">{tooltip.name}</p>
               {tooltip.req ? (

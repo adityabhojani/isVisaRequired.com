@@ -32,7 +32,7 @@ function getReciprocityStatus(a: VisaRequirement | undefined, b: VisaRequirement
 }
 
 const reciprocityLabels: Record<ReciprocityStatus, { label: string; color: string; bg: string; border: string; icon: string }> = {
-  mutual_free:    { label: "Mutual Visa-Free", color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-300", icon: "✅" },
+  mutual_free:    { label: "Mutual Visa-Free", color: "text-green-700", bg: "bg-green-50", border: "border-green-200", icon: "✅" },
   one_way_free:   { label: "One-way Free",     color: "text-amber-700",   bg: "bg-amber-50",   border: "border-amber-300",   icon: "↔️" },
   asymmetric:     { label: "One-way Free",     color: "text-amber-700",   bg: "bg-amber-50",   border: "border-amber-300",   icon: "↔️" },
   mutual_visa:    { label: "Both Need Visa",   color: "text-orange-700",  bg: "bg-orange-50",  border: "border-orange-300",  icon: "📋" },
@@ -182,7 +182,7 @@ export default function ReciprocityPage() {
       <Header activeHref="/reciprocity" />
 
       {/* Hero */}
-      <div className="bg-gradient-to-b from-blue-50/80 via-primary/4 to-transparent border-b border-border/50">
+      <div className="bg-secondary/40 border-b border-border/70">
         <div className="max-w-5xl mx-auto px-4 pt-12 pb-10 text-center">
           <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 rounded-full px-3.5 py-1 text-xs font-semibold mb-4 border border-blue-200">
             <ArrowLeftRight className="h-3 w-3" />
@@ -200,7 +200,6 @@ export default function ReciprocityPage() {
       <main className="max-w-5xl mx-auto px-4 py-8">
         {/* Selector card */}
         <div className="bg-card rounded-2xl border border-border/70 shadow-sm overflow-hidden mb-8">
-          <div className="h-1 bg-gradient-to-r from-blue-500 via-primary/70 to-violet-400/70" />
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-end">
               <div>
@@ -362,7 +361,7 @@ export default function ReciprocityPage() {
                       return (
                         <a key={row.country.code}
                           href={`/destination/${row.country.code}`}
-                          className={`flex items-center gap-3 p-3 rounded-xl border transition-all hover:brightness-[0.97] ${info.border} ${info.bg}`}>
+                          className={`flex items-center gap-3 p-3 rounded-xl border transition-colors hover:border-primary/40 ${info.border} ${info.bg}`}>
                           <span className="text-2xl flex-shrink-0">{row.country.flag}</span>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-foreground truncate">{row.country.name}</p>
