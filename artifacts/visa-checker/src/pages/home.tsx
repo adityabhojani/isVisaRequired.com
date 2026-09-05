@@ -47,21 +47,25 @@ const reqConfig: Record<VisaRequirement, {
   no_admission:    { label: "No Admission",     color: "text-red-700",    bg: "bg-red-50",    border: "border-red-200",    dotColor: "bg-red-500",    icon: XCircle },
 };
 
-function CountryCombobox({ value, onChange, countries, placeholder, label, isLoading, excludeCode }: {
+function CountryCombobox({ value, onChange, countries, placeholder, label, isLoading, excludeCode, open: openProp, onOpenChange }: {
   value: string; onChange: (code: string) => void; countries: Country[];
   placeholder: string; label: string; isLoading: boolean; excludeCode?: string;
+  open?: boolean; onOpenChange?: (o: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  // Optionally controlled so the CTA can open the right field instead of disabling itself.
+  const [openInner, setOpenInner] = useState(false);
+  const open = openProp ?? openInner;
+  const setOpen = onOpenChange ?? setOpenInner;
   const filtered = excludeCode ? countries.filter((c) => c.code !== excludeCode) : countries;
   const selected = countries.find((c) => c.code === value);
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</label>
+      <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{label}</label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" role="combobox" aria-expanded={open}
-            className="w-full justify-between h-12 text-left font-normal text-base border-border bg-card hover:bg-secondary/50">
+            className="w-full justify-between h-14 px-4 text-left font-normal text-base rounded-xl border-border/80 bg-secondary/40 hover:bg-secondary/70 data-[state=open]:bg-card data-[state=open]:ring-2 data-[state=open]:ring-primary/35 transition-colors">
             {selected ? (
               <span className="flex items-center gap-2">
                 <span className="text-xl">{selected.flag}</span>
@@ -73,7 +77,7 @@ function CountryCombobox({ value, onChange, countries, placeholder, label, isLoa
             <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[350px] p-0" align="start">
+        <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[280px] max-w-[calc(100vw-2rem)] p-0" align="start" sideOffset={6}>
           <Command>
             <CommandInput placeholder="Search countries..." className="h-10" />
             <CommandList>
@@ -96,28 +100,31 @@ function CountryCombobox({ value, onChange, countries, placeholder, label, isLoa
   );
 }
 
-function MultiCountrySelect({ selected, onAdd, onRemove, countries, isLoading, passportCode }: {
+function MultiCountrySelect({ selected, onAdd, onRemove, countries, isLoading, passportCode, open: openProp, onOpenChange }: {
   selected: string[]; onAdd: (code: string) => void; onRemove: (code: string) => void;
   countries: Country[]; isLoading: boolean; passportCode: string;
+  open?: boolean; onOpenChange?: (o: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [openInner, setOpenInner] = useState(false);
+  const open = openProp ?? openInner;
+  const setOpen = onOpenChange ?? setOpenInner;
   const available = countries.filter((c) => !selected.includes(c.code) && c.code !== passportCode);
   const selectedCountries = selected.map((code) => countries.find((c) => c.code === code)).filter(Boolean) as Country[];
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Destination Countries</label>
+      <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Where you're going</label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" role="combobox" aria-expanded={open}
-            className="w-full justify-between h-12 text-left font-normal text-base border-border bg-card hover:bg-secondary/50">
+            className="w-full justify-between h-14 px-4 text-left font-normal text-base rounded-xl border-border/80 bg-secondary/40 hover:bg-secondary/70 data-[state=open]:bg-card data-[state=open]:ring-2 data-[state=open]:ring-primary/35 transition-colors">
             {selected.length === 0
               ? <span className="text-muted-foreground">Add destination countries...</span>
               : <span className="text-muted-foreground">{selected.length} countr{selected.length > 1 ? "ies" : "y"} selected</span>}
             <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[350px] p-0" align="start">
+        <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[280px] max-w-[calc(100vw-2rem)] p-0" align="start" sideOffset={6}>
           <Command>
             <CommandInput placeholder="Search destinations..." className="h-10" />
             <CommandList>
@@ -141,8 +148,9 @@ function MultiCountrySelect({ selected, onAdd, onRemove, countries, isLoading, p
           {selectedCountries.map((c) => (
             <span key={c.code} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
               <span>{c.flag}</span><span>{c.name}</span>
-              <button onClick={() => onRemove(c.code)} className="ml-0.5 hover:opacity-70 transition-opacity">
-                <X className="h-3 w-3" />
+              <button type="button" onClick={() => onRemove(c.code)} aria-label={`Remove ${c.name}`}
+                className="ml-0.5 grid place-items-center h-6 w-6 rounded-full transition-colors hover:bg-primary/15 active:bg-primary/25">
+                <X className="h-3.5 w-3.5" />
               </button>
             </span>
           ))}
@@ -174,7 +182,7 @@ function ResultCard({ result, passport, isExpanded, onToggle }: {
   const Icon = config.icon;
 
   return (
-    <div className={`rounded-2xl border overflow-hidden transition-all duration-200 ${isExpanded ? "shadow-md ring-1 ring-black/5" : "shadow-sm hover:shadow-md"} ${config.border}`}>
+    <div className={`rounded-2xl border overflow-hidden transition-all duration-200 ${isExpanded ? "shadow-md ring-1 ring-[rgb(15_23_41/0.07)]" : "shadow-sm hover:shadow-md"} ${config.border}`}>
       <button
         onClick={onToggle}
         className={`w-full flex items-center gap-4 px-5 py-4 text-left transition-colors ${config.bg} hover:brightness-[0.97]`}
@@ -292,6 +300,9 @@ function ShareButtons({ passport, passportFlag, passportName, destinations, resu
   );
 }
 
+
+// Below this, the subscriber count is noise rather than proof and is hidden.
+const SOCIAL_PROOF_MIN = 50;
 
 // Passports that have an editorial roundup guide behind them (guidesData.ts).
 // Deliberately titled "Start with a passport", not "most popular" — we have no
@@ -442,6 +453,19 @@ export default function HomePage() {
     ? `Do ${passportCountry.name} passport holders need a visa for ${singleDest.name}? Check the requirement instantly — visa free, visa on arrival, e-visa, or visa required.`
     : `Check visa requirements instantly for any passport and destination. Find out if you need a visa, visa on arrival, e-visa, or can travel freely — covers ${COVERAGE.countries} countries worldwide.`;
 
+  // The CTA never disables. It used to grey out until both fields were chosen,
+  // which rendered the page's most important control as a periwinkle ghost on
+  // first paint and removed it from the tab order. handleCheck already guards
+  // an incomplete form; the button's job is to open whichever field is empty.
+  const [passportOpen, setPassportOpen] = useState(false);
+  const [destOpen, setDestOpen] = useState(false);
+  const ctaState = !passport ? "passport" : destinations.length === 0 ? "destination" : "ready";
+  const onCta = () => {
+    if (ctaState === "passport") { setPassportOpen(true); return; }
+    if (ctaState === "destination") { setDestOpen(true); return; }
+    handleCheck();
+  };
+
   useSEO({
     title: dynamicTitle,
     description: dynamicDesc,
@@ -534,31 +558,35 @@ export default function HomePage() {
       <Header activeHref="/" />
 
       {/* Hero strip */}
-      <div className="bg-gradient-to-b from-primary/8 via-primary/4 to-transparent border-b border-border/50">
-        <div className="max-w-5xl mx-auto px-4 pt-6 pb-6 md:pt-10 md:pb-8 text-center">
+      <div className="relative bg-[radial-gradient(125%_150%_at_50%_0%,hsl(222_89%_34%)_0%,hsl(222_89%_27%)_52%,hsl(222_47%_15%)_100%)]">
+        <div className="max-w-5xl mx-auto px-4 pt-6 pb-16 md:pt-12 md:pb-24 text-center">
           <a
             href="/methodology"
-            className="inline-flex items-center gap-2 bg-primary/12 text-primary rounded-full px-3.5 py-1 text-xs font-semibold mb-4 border border-primary/20 shadow-sm hover:bg-primary/20 transition-colors">
+            className="inline-flex items-center gap-2 bg-white/10 text-white/90 rounded-full px-3.5 py-1 text-xs font-semibold mb-3 border border-white/20 backdrop-blur-sm hover:bg-white/[0.18] transition-colors">
             <Shield className="h-3 w-3" />
             Data last reviewed {COVERAGE.lastReviewedLabel}
           </a>
-          <h1 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight tracking-tight">
+          <h1 className="font-serif text-[2.5rem] md:text-[3.25rem] font-semibold text-white mb-3 leading-[1.06] tracking-[-0.022em] text-balance">
             Do you need a visa?
           </h1>
-          <p className="text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
+          <p className="text-lg text-white/75 max-w-lg mx-auto leading-relaxed">
             Any passport, any destination — the rule in one tap.
           </p>
           {/* One line, real numbers. Fixed min-height so the async subscriber
               count cannot add a wrap line and shove the search card down. */}
-          <div className="mt-4 min-h-[20px] text-sm text-muted-foreground">
+          <div className="mt-4 min-h-[20px] text-sm text-white/65">
             <span className="tabular-nums">{COVERAGE.countries} countries</span>
-            <span className="mx-2 text-border">·</span>
+            <span className="mx-2 text-white/25">·</span>
             <span className="tabular-nums">{COVERAGE.pairsLabel} rules</span>
-            <span className="mx-2 text-border">·</span>
+            <span className="mx-2 text-white/25">·</span>
             <span>Free, no sign-up</span>
-            {(newsletterData?.count ?? 0) > 0 && (
+            {/* Only once the number reads as a community. The live page was
+                showing "1+ subscribed", which is worse than showing nothing:
+                social proof that resolves to one person actively costs
+                credibility. Real number, honest threshold. */}
+            {(newsletterData?.count ?? 0) >= SOCIAL_PROOF_MIN && (
               <>
-                <span className="mx-2 text-border">·</span>
+                <span className="mx-2 text-white/25">·</span>
                 <span className="tabular-nums">{newsletterData!.count.toLocaleString()}+ subscribed</span>
               </>
             )}
@@ -566,19 +594,20 @@ export default function HomePage() {
         </div>
       </div>
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="relative z-[1] max-w-5xl mx-auto px-4 pb-8 -mt-12 md:-mt-16">
         {/* Search Card */}
-        <Card className="shadow-lg border-border/70 mb-7 overflow-hidden bg-card/95">
-          <div className="h-1 bg-gradient-to-r from-primary via-primary/70 to-amber-400/70" />
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+        <Card className="relative rounded-2xl border-border/50 bg-card shadow-xl overflow-hidden">
+          <CardContent className="p-5 sm:p-7">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 mb-6">
               <CountryCombobox
                 value={passport}
                 onChange={(code) => { setPassport(code); setResults(null); setHighlightedCode(undefined); window.history.replaceState({}, "", window.location.pathname); }}
                 countries={countries}
                 placeholder="Select your passport..."
-                label="Your Passport"
+                label="Your passport"
                 isLoading={countriesLoading}
+                open={passportOpen}
+                onOpenChange={setPassportOpen}
               />
               <MultiCountrySelect
                 selected={destinations}
@@ -587,21 +616,27 @@ export default function HomePage() {
                 countries={countries}
                 isLoading={countriesLoading}
                 passportCode={passport}
+                open={destOpen}
+                onOpenChange={setDestOpen}
               />
             </div>
             <Button
-              onClick={handleCheck}
-              disabled={!passport || destinations.length === 0 || checkMutation.isPending}
-              className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shadow-primary/10">
+              onClick={onCta}
+              disabled={checkMutation.isPending}
+              className="w-full h-14 text-base font-semibold rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-[box-shadow,transform,background-color] duration-150 hover:bg-[hsl(222_89%_25%)] hover:shadow-primary/30 active:translate-y-px disabled:opacity-100 disabled:cursor-wait">
               {checkMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
                   Checking…
                 </span>
+              ) : ctaState === "passport" ? (
+                <span className="flex items-center gap-2"><ChevronDown className="h-4 w-4" />Choose your passport</span>
+              ) : ctaState === "destination" ? (
+                <span className="flex items-center gap-2"><ChevronDown className="h-4 w-4" />Add a destination</span>
               ) : (
                 <span className="flex items-center gap-2">
                   <Search className="h-4 w-4" />
-                  Check Visa Requirements
+                  {destinations.length === 1 ? "Check this destination" : `Check ${destinations.length} destinations`}
                 </span>
               )}
             </Button>
@@ -614,14 +649,14 @@ export default function HomePage() {
           </CardContent>
         </Card>
 
-        <AdSlot slotId="7432198541" size="responsive" className="my-4" />
+        {(results || showAllCountries) && <AdSlot slotId="7432198541" size="responsive" className="my-6" />}
 
         {/* World Map */}
         {passport && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <h2 className="font-semibold text-foreground">World Visa Map</h2>
+                <h2 className="text-base font-semibold text-foreground">World Visa Map</h2>
                 {allLoading ? (
                   <span className="inline-block h-4 w-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                 ) : (
@@ -637,8 +672,9 @@ export default function HomePage() {
                 />
               )}
             </div>
+            <div className="max-w-4xl mx-auto">
             <Suspense fallback={
-                <div className="h-64 bg-muted/30 rounded-2xl border border-border/70 flex items-center justify-center text-muted-foreground text-sm">
+                <div className="aspect-[2/1] bg-muted/30 rounded-2xl border border-border/70 flex items-center justify-center text-muted-foreground text-sm">
                 <span className="animate-pulse">Loading map…</span>
               </div>
             }>
@@ -649,6 +685,7 @@ export default function HomePage() {
                 highlightedCode={highlightedCode}
               />
             </Suspense>
+            </div>
           </div>
         )}
 
@@ -734,9 +771,9 @@ export default function HomePage() {
 
             {results.length > 0 && passportCountry && (
               <div className="mt-5 pt-5 border-t border-border/60">
-                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                <h3 className="text-base font-semibold text-foreground mb-4">
                   Keep going
-                </p>
+                </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {keepGoingTiles.map((t) => (
                     <a
@@ -776,7 +813,7 @@ export default function HomePage() {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <h2 className="font-serif text-xl font-bold text-foreground mb-1">
+                <h2 className="font-serif text-2xl font-semibold text-foreground mb-1">
                   All Countries — {countries.find((c) => c.code === passport)?.flag} {countries.find((c) => c.code === passport)?.name} Passport
                 </h2>
                 <div className="flex flex-wrap gap-1.5">
@@ -843,7 +880,7 @@ export default function HomePage() {
             </div>
 
             {destinations.length > 0 && (
-              <div className="sticky bottom-4">
+              <div className="sticky bottom-4 z-20">
                 <Button
                   onClick={handleCheck}
                   disabled={checkMutation.isPending}
@@ -863,12 +900,12 @@ export default function HomePage() {
             page used to end here for anyone who didn't immediately pick a
             passport, with no route into the 37,830 pair pages, 195 hubs or the
             guides. Static links — no fetch, no layout shift, crawlable. */}
-        <section className="mt-10 pt-8 border-t border-border/60">
+        <section id="explore" className="mt-14 -mx-4 sm:mx-0 sm:rounded-3xl bg-secondary/60 px-4 sm:px-7 py-9 sm:py-11 border-t sm:border border-border/70 shadow-[inset_0_2px_4px_rgb(15_23_41/0.05)]">
           {!passport && (
             <div className="mb-8">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+              <h2 className="text-base font-semibold text-foreground mb-4">
                 Start with a passport
-              </p>
+              </h2>
               <div className="flex gap-2 overflow-x-auto snap-x pb-1 sm:flex-wrap sm:overflow-visible">
                 {START_PASSPORTS.map((p) => (
                   <button
@@ -888,13 +925,13 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {EXPLORE_PANELS.map((panel) => (
-              <div key={panel.heading} className="bg-card border border-border rounded-xl p-5">
-                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+              <div key={panel.heading} className="rounded-xl bg-card p-6 shadow-sm ring-1 ring-[rgb(15_23_41/0.06)] hover:shadow-md transition-shadow">
+                <h2 className="text-base font-semibold text-foreground mb-4">
                   {panel.heading}
-                </p>
+                </h2>
                 <div className="flex flex-col gap-2">
                   {panel.links.map((l) => (
-                    <a key={l.href} href={l.href} className="text-sm text-foreground hover:text-primary transition-colors">
+                    <a key={l.href} href={l.href} className="-mx-2 flex items-center rounded-lg px-2 py-2.5 min-h-11 text-sm text-muted-foreground hover:bg-secondary/70 hover:text-foreground active:bg-secondary transition-colors">
                       {l.label}
                     </a>
                   ))}
@@ -903,7 +940,9 @@ export default function HomePage() {
             ))}
           </div>
 
-          <p className="mt-6 text-xs text-muted-foreground leading-relaxed">
+          <AdSlot slotId="7432198541" size="responsive" className="mt-8" />
+
+          <p className="mt-8 text-sm text-muted-foreground leading-relaxed max-w-[62ch]">
             Built from an open base dataset, corrected against official government portals, and
             last reviewed {COVERAGE.lastReviewedLabel}. We're independent — not a visa agency, and
             we never charge for applications.{" "}

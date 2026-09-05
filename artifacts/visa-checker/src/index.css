@@ -69,6 +69,22 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Shadow scale. Tailwind v4 only generates shadow-* utilities from variables
+   registered in a plain @theme block — the previous :root declarations were
+   never compiled, so every shadow on the site was Tailwind's stock pure-black,
+   which reads grey and muddy on this cool near-white ground. rgb(15 23 41) is
+   --foreground (hsl 222 47% 11%), so shadows now share the page's own hue. */
+@theme {
+  --shadow-2xs: 0 1px 2px 0 rgb(15 23 41 / 0.04);
+  --shadow-xs: 0 1px 3px 0 rgb(15 23 41 / 0.06);
+  --shadow-sm: 0 2px 4px -1px rgb(15 23 41 / 0.06), 0 1px 2px -1px rgb(15 23 41 / 0.05);
+  --shadow: 0 4px 8px -2px rgb(15 23 41 / 0.07), 0 2px 4px -2px rgb(15 23 41 / 0.05);
+  --shadow-md: 0 8px 16px -4px rgb(15 23 41 / 0.08), 0 2px 6px -2px rgb(15 23 41 / 0.05);
+  --shadow-lg: 0 18px 32px -8px rgb(15 23 41 / 0.12), 0 6px 10px -6px rgb(15 23 41 / 0.07);
+  --shadow-xl: 0 28px 48px -12px rgb(15 23 41 / 0.16), 0 10px 18px -8px rgb(15 23 41 / 0.08);
+  --shadow-2xl: 0 40px 64px -12px rgb(15 23 41 / 0.20);
+}
+
 /* LIGHT MODE */
 :root {
   --button-outline: rgba(0,0,0, .10);
@@ -105,7 +121,7 @@
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   --input: 214 32% 91%;
-  --ring: 222 89% 30%;
+  --ring: 199 89% 48%; /* --accent; was identical to --primary, so focus rings were invisible on primary buttons */
   --chart-1: 199 89% 48%;
   --chart-2: 142 71% 45%;
   --chart-3: 38 92% 50%;
@@ -116,14 +132,6 @@
   --app-font-serif: 'Playfair Display', Georgia, serif;
   --app-font-mono: Menlo, monospace;
   --radius: .75rem;
-  --shadow-2xs: 0px 1px 2px 0px rgba(0,0,0,0.05);
-  --shadow-xs: 0px 1px 3px 0px rgba(0,0,0,0.08);
-  --shadow-sm: 0px 2px 4px -1px rgba(0,0,0,0.06), 0px 1px 2px -1px rgba(0,0,0,0.06);
-  --shadow: 0px 4px 6px -1px rgba(0,0,0,0.08), 0px 2px 4px -2px rgba(0,0,0,0.05);
-  --shadow-md: 0px 8px 12px -2px rgba(0,0,0,0.08), 0px 4px 6px -2px rgba(0,0,0,0.05);
-  --shadow-lg: 0px 16px 24px -4px rgba(0,0,0,0.10), 0px 8px 12px -4px rgba(0,0,0,0.05);
-  --shadow-xl: 0px 24px 40px -8px rgba(0,0,0,0.12), 0px 12px 20px -4px rgba(0,0,0,0.06);
-  --shadow-2xl: 0px 40px 64px -12px rgba(0,0,0,0.16);
   --tracking-normal: -0.01em;
   --spacing: 0.25rem;
 
@@ -151,4 +159,19 @@
     @apply font-sans antialiased bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
   }
+}
+
+/* hover-elevate / active-elevate-2 are appended to every Button and Badge by
+   the primitives, but no rule ever existed for them — buttons and comboboxes
+   had no hover or press feedback at all. The :active half is the first touch
+   feedback the comboboxes have ever had on a phone. */
+@layer utilities {
+  .hover-elevate, .active-elevate-2 { position: relative; }
+  .hover-elevate::after, .active-elevate-2::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit;
+    pointer-events: none; background: var(--elevate-1); opacity: 0;
+    transition: opacity .15s ease;
+  }
+  @media (hover: hover) { .hover-elevate:hover::after { opacity: 1; } }
+  .active-elevate-2:active::after { background: var(--elevate-2); opacity: 1; }
 }

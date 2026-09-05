@@ -46,7 +46,7 @@ export function Header({ activeHref = "/", items = DEFAULT_ITEMS, extra }: Heade
   const isMoreActive = MORE_ITEMS.some((i) => i.href === activeHref);
 
   return (
-    <header className="border-b border-border/70 bg-card/85 backdrop-blur-md sticky top-0 z-10 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+    <header className="border-b border-border/70 bg-card/85 backdrop-blur-md sticky top-0 z-40 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
       <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-2">
         <a href="/" className="flex items-center gap-2.5 group flex-shrink-0">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">

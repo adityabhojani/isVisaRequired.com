@@ -31,7 +31,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="mt-16 border-t border-border">
+    <footer className="border-t border-border">
       {/* Newsletter bar — gradient accent */}
       <div className="bg-gradient-to-r from-primary/8 via-primary/5 to-transparent border-b border-border">
         <div className="max-w-5xl mx-auto px-4 py-7">
