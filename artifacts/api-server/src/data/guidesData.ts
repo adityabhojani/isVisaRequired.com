@@ -188,6 +188,201 @@ export const GUIDES: Guide[] = [
   },
   {
     kind: "article",
+    slug: "why-airlines-deny-boarding",
+    title: "Why Airlines Refuse to Board You (And Why It Isn't the Border's Call)",
+    description: "An airline can refuse to board you even when the destination would have let you in. Why check-in and immigration are two different decisions, what the agent is reading, and what to do at the desk.",
+    h1: "Why airlines refuse to board you — and why it isn't the border's decision",
+    intro:
+      "Most travellers assume one authority decides whether they can fly: the country they are going to. In reality there are two decisions, made by two different parties, at two different moments — and the first one happens at the check-in desk, hours before any immigration officer sees you. Understanding the difference explains almost every story that begins \"but the embassy told me it was fine\".",
+    sections: [
+      {
+        h2: "Two decisions, not one",
+        html: `<p>The airline decides whether to <strong>carry</strong> you. The destination decides whether to <strong>admit</strong> you. They are separate judgements with separate rules, and the airline's comes first.</p>
+<p>US Customs and Border Protection states the distinction plainly for its own pre-travel scheme: authorisation via ESTA <em>"does not determine whether a traveler is admissible to the United States"</em>, because CBP officers <em>"determine admissibility upon travelers' arrival"</em>. Clearance to board and permission to enter are simply not the same thing.</p>
+<p>This is why a boarding refusal is <em>not</em> a finding that you would have been turned away. It is a commercial risk decision made by a company that pays if it guesses wrong.</p>`,
+      },
+      {
+        h2: "Why the airline cares so much",
+        html: `<p>If you are refused entry, the airline that brought you is generally the one that has to take you back — and it pays for it. That obligation is written into binding law, not airline policy.</p>
+<p>In the EU, Council Directive 2001/51/EC supplements Article 26 of the Schengen Convention and requires that a carrier unable to return a refused traveller must <em>"find means of onward transportation immediately and to bear the cost thereof"</em>, and where that is not immediately possible, <em>"assume responsibility for the costs of the stay and return"</em>. The same duty appears in ICAO Annex 9 (Facilitation), Chapter 5, which governs how states and operators handle inadmissible persons.</p>
+<p>On top of the return cost, national law adds penalties for carrying someone without the documents they needed:</p>
+<ul>
+<li><strong>United States</strong> — 8 U.S.C. § 1323 sets a fine of <strong>$3,000</strong> for each passenger brought without a valid passport and unexpired visa where one was required.</li>
+<li><strong>United Kingdom</strong> — Home Office guidance states carriers may become liable for a charge of <strong>£2,000</strong> for every passenger arriving without a valid immigration document or the required visa, ETA or permission, under section 40 of the Immigration and Asylum Act 1999.</li>
+<li><strong>European Union</strong> — Directive 2001/51/EC does not fine carriers itself; it sets floors national penalties must meet, including a maximum <em>"not less than EUR 5000"</em> per person or a lump sum <em>"not less that EUR 500000"</em> per infringement.</li>
+</ul>
+<p>Note what those penalties attach to: carrying a passenger <em>without the required documents</em>. That is a document test the airline can apply at a desk — which is exactly why the desk applies it strictly.</p>`,
+      },
+      {
+        h2: "What the agent is actually looking at",
+        html: `<p>The check-in agent is almost certainly not reading immigration law. They are reading a screen.</p>
+<p>The industry standard is <strong>Timatic</strong>, which IATA describes as <em>"a leading provider of real-time information on travel document requirements for international air travel"</em>. IATA also sells <strong>Timatic AutoCheck</strong>, an API that automates the document check inside check-in and booking systems and which IATA says <em>"is already integrated with all other major Departure Control Systems"</em>.</p>
+<p>So when an agent says "the system won't let me board you", that is usually literal. The consequence matters: you are arguing with a database entry, not with a person's reading of the rules — and the agent frequently cannot override it.</p>`,
+      },
+      {
+        h2: "Why the airline can be stricter than the country itself",
+        html: `<p>Because the risk is asymmetric. If the airline wrongly refuses you, it loses one fare. If it wrongly carries you, it pays the fine, the return flight, and sometimes your costs in the meantime.</p>
+<p>UK Home Office guidance to carriers is explicit that <em>"the responsibility for deciding whether to carry the person rests with you as the carrying company in every case"</em> — and that even after seeking official advice, a carrier is <em>"not bound to act on the advice given"</em>. The airline owns the decision, so the airline sets its own tolerance.</p>
+<p>The industry term for the outcome everyone is trying to avoid is an <strong>INAD</strong>. IATA adopts the ICAO definition: an inadmissible person is <em>"a person who is or will be refused admission to a State by its authorities"</em> — note that it turns on the destination's decision, not the airline's.</p>`,
+      },
+      {
+        h2: "What to do at the desk when you think they're wrong",
+        html: `<p>Arguing the general principle never works. Being specific sometimes does.</p>
+<ol>
+<li><strong>Ask which requirement you are failing.</strong> Not "why can't I fly" but "which document requirement is the system flagging?" You cannot fix an objection you cannot name.</li>
+<li><strong>Produce the destination government's own page.</strong> Have it saved offline before you travel. A screenshot of an official immigration site is the only evidence likely to move a desk.</li>
+<li><strong>Ask for a supervisor or the airline's document-check desk.</strong> Larger carriers have a team that can query the entry behind the screen.</li>
+<li><strong>Accept that the airline's answer is final at that moment.</strong> There is no appeal before departure. If you are right, the remedy is a complaint and a refund claim afterwards — not the flight you are standing at.</li>
+</ol>
+<p>The far better strategy is not to arrive with a debatable case. Check your exact pairing with our <a href="/">visa checker</a>, and read the two rules that cause most refusals: <a href="/guides/six-month-passport-rule">the six-month passport rule</a> and <a href="/guides/proof-of-onward-travel">what counts as proof of onward travel</a>.</p>`,
+      },
+      {
+        h2: "One thing that is not the airline's job",
+        html: `<p>A common worry is that a visa which does not match your stated purpose will be caught at check-in. For a valid physical visa, that is generally not what the desk is checking. UK Home Office guidance tells carriers that in most cases <em>"you need not be concerned about the purpose for which the visa was issued, such as 'Visit' or 'Student'"</em>.</p>
+<p>Purpose is assessed at the <strong>border</strong>, by an immigration officer, where admissibility is actually decided. Travelling on a visa that does not match what you intend to do is a real risk — just not usually a check-in one.</p>`,
+      },
+    ],
+    faqs: [
+      { q: "Can an airline refuse to board me even if I have a valid visa?", a: "Yes. The airline decides whether to carry you and the destination decides whether to admit you; those are separate decisions. UK Home Office guidance states the decision to carry rests with the carrier in every case, and that a carrier is not bound to follow official advice it seeks." },
+      { q: "Why do airlines check visas at all?", a: "Because they carry the cost and the penalty. EU law requires a carrier to arrange and pay for a refused traveller's return, and national law adds fines — $3,000 per passenger under 8 U.S.C. § 1323 in the US, and £2,000 under UK Home Office charging guidance." },
+      { q: "What system do airlines use to check travel documents?", a: "Most use Timatic, IATA's travel-document requirements database, often through Timatic AutoCheck — an API integrated into departure control systems. When an agent says the system will not let them board you, that is usually what they mean." },
+      { q: "Does being denied boarding mean I would have been refused entry?", a: "No. It means the airline judged the risk unacceptable. Admissibility is decided by a border officer on arrival, and CBP states explicitly that pre-travel authorisation does not determine admissibility." },
+      { q: "What is an INAD?", a: "Airline shorthand for an inadmissible passenger. IATA adopts the ICAO definition: a person who is or will be refused admission to a State by its authorities. Someone stopped at the gate and never flown is a different category." },
+      { q: "What should I do if I am refused boarding and believe it is a mistake?", a: "Ask which specific requirement is being flagged, show the destination government's own published rule, and ask for a supervisor or the airline's document desk. There is no appeal before departure, so if you are right the remedy is a complaint and refund claim afterwards." },
+    ],
+  },
+  {
+    kind: "article",
+    slug: "new-passport-old-visa",
+    title: "I Renewed My Passport — Are My Visas Still Valid? (2026)",
+    description: "A visa sticker in your old passport usually still works. An electronic authorisation like ESTA, eTA or ETIAS usually does not. The one distinction that explains what survives a passport renewal.",
+    h1: "I renewed my passport — are my visas still valid?",
+    intro:
+      "One distinction answers almost every version of this question. A visa sticker is issued to <em>you</em> and stays usable in the old book. An electronic authorisation is bound to the <em>travel document</em> you applied with, and does not survive being replaced. Once you know which kind you hold, the rest follows.",
+    sections: [
+      {
+        h2: "The rule in one line",
+        html: `<p><strong>Stickers travel with the person. Electronic authorisations travel with the document.</strong></p>
+<p>A physical visa in an expired passport is generally still usable — you simply carry both books. An ESTA, eTA, ETA or ETIAS approval is tied to the passport you applied with, so a new passport means a new application. Everything below is that principle applied scheme by scheme.</p>`,
+      },
+      {
+        h2: "A visa sticker in an old passport",
+        html: `<p>For the United States, a valid visa in an expired passport can still be used. The US Embassy's guidance is that you may travel with both passports <em>"as long as the visa is valid, not damaged, and is the appropriate type of visa required for"</em> your trip, and that both should be from the same country. You present the expired book containing the visa alongside your new valid passport.</p>
+<p><strong>Do not remove the sticker.</strong> The same guidance is blunt: <em>"Do not try to remove the visa from your old passport and stick it into the new unexpired passport. If you do this, your visa will no longer be valid."</em> Cutting, peeling or transferring a visa destroys it. Leave it where it is.</p>
+<p>Two practical cautions. First, some passport authorities cancel an old book by clipping or punching it, which can damage the visa page — cancellation methods differ by issuing country, so check with whoever issues your passport before handing it over. Second, this is the US rule; other countries have their own, so confirm with the destination before relying on it.</p>`,
+      },
+      {
+        h2: "Electronic authorisations: what a new passport breaks",
+        html: `<p>Each of these is linked to the document you applied with, and each has its own official wording:</p>
+<ul>
+<li><strong>ESTA (United States)</strong> — CBP requires an approved ESTA for the specific passport you plan to travel on, and states that travellers who acquire a new passport must submit a new ESTA application. A new application means paying the fee again.</li>
+<li><strong>eTA (Canada)</strong> — IRCC states an eTA is <em>"electronically linked to a traveller's passport"</em>, is valid up to five years or until that passport expires, whichever comes first, and that <em>"if you get a new passport, you need to get a new eTA"</em>.</li>
+<li><strong>ETA (United Kingdom)</strong> — GOV.UK states an ETA <em>"lasts for 2 years and is linked to your passport"</em>, and that <em>"if your passport has expired or changed, you'll need to apply for a new ETA"</em>. You must travel on the passport you applied with.</li>
+<li><strong>ETIAS (Europe)</strong> — the official EU site states an ETIAS authorisation <em>"is linked to the travel document"</em> and that you must apply for a new one <em>"if you changed your travel document for any reason"</em>. It will be valid three years or until that document expires, whichever comes first. Note the EU's wording is "travel document", not "passport number".</li>
+</ul>
+<p>For background on how these schemes differ from visas, see <a href="/guides/visa-on-arrival-vs-evisa-vs-eta">visa on arrival vs eVisa vs ETA</a>, or the individual explainers under <a href="/travel-authorization">travel authorisations</a>.</p>`,
+      },
+      {
+        h2: "Australia is the exception worth knowing",
+        html: `<p>Australia does not treat all of its schemes the same way, and generalising here will get you the wrong answer.</p>
+<p>For the <strong>Electronic Travel Authority (subclass 601)</strong>, Home Affairs states an existing ETA cannot be transferred to a new passport and you must apply for a new ETA using the new one.</p>
+<p>For <strong>other Australian visas</strong> — including the eVisitor (subclass 651), which Home Affairs does not exclude from this process — you instead <strong>notify the department of your new passport details</strong> so the existing visa can be linked to the new document. You do not reapply.</p>
+<p>So the honest summary is: check which Australian authorisation you actually hold, because one requires a fresh application and the other requires a form.</p>`,
+      },
+      {
+        h2: "ETIAS is not yet running",
+        html: `<p>Because this question comes up constantly: as things stand, the official EU site states that ETIAS <em>"is currently not in operation and no applications for travel authorisations are collected at this point"</em>, and that the EU will announce the specific start date in advance.</p>
+<p>The European Commission has indicated a start in the last quarter of 2026, but no exact date has been announced and the timeline has moved more than once. Treat any specific launch date you see elsewhere as unconfirmed — and do not confuse ETIAS with the Entry/Exit System, which is a separate border-registration programme.</p>`,
+      },
+      {
+        h2: "A checklist before you fly on a renewed passport",
+        html: `<ol>
+<li><strong>Sort what you hold into two piles</strong> — physical stickers, and electronic approvals.</li>
+<li><strong>Stickers:</strong> carry both passports, check the visa is undamaged and still valid, and never remove it.</li>
+<li><strong>Electronic approvals:</strong> assume each needs a fresh application, and budget for the fee and processing time again.</li>
+<li><strong>Australia:</strong> identify whether you hold an ETA 601 (reapply) or another visa (notify).</li>
+<li><strong>Re-check the requirement itself</strong> for your new document with the <a href="/">visa checker</a> — rules change independently of your passport.</li>
+</ol>
+<p>While you are at it, check the validity window on the new book against <a href="/guides/six-month-passport-rule">the six-month passport rule</a>, and make sure you know the difference between <a href="/guides/visa-validity-vs-duration-of-stay">visa validity and permitted stay</a>.</p>`,
+      },
+    ],
+    faqs: [
+      { q: "Can I travel with a visa in my old, expired passport?", a: "For the United States, yes — carry both the expired passport containing the visa and your new valid passport. US Embassy guidance conditions this on the visa still being valid, undamaged, and the correct type, with both passports from the same country. Other countries set their own rules, so confirm with the destination." },
+      { q: "Can I move a visa sticker into my new passport?", a: "No. US Embassy guidance states that removing a visa from an old passport and placing it in a new one makes the visa no longer valid. Leave it in the original book and carry both." },
+      { q: "Do I need a new ESTA if I get a new passport?", a: "Yes. CBP requires an approved ESTA for the specific passport you travel on, and states that travellers who acquire a new passport must submit a new ESTA application. The fee applies again." },
+      { q: "Does a new passport invalidate my Canadian eTA or UK ETA?", a: "Effectively, yes. IRCC states an eTA is electronically linked to your passport and that a new passport requires a new eTA. GOV.UK states a UK ETA is linked to your passport and that if it has expired or changed you must apply for a new ETA." },
+      { q: "What about ETIAS after a passport renewal?", a: "The official EU site states an ETIAS authorisation is linked to the travel document and that you must apply for a new one if you change that document for any reason. ETIAS is not yet in operation and no start date has been announced." },
+      { q: "I have an Australian eVisitor — do I reapply after renewing my passport?", a: "Not usually. Home Affairs requires a fresh application only for the Electronic Travel Authority (subclass 601); for other visas you notify the department of your new passport details so the existing visa can be linked to it." },
+    ],
+  },
+  {
+    kind: "article",
+    slug: "which-passport-to-use-dual-citizenship",
+    title: "Dual Nationality: Which Passport Do You Actually Travel On?",
+    description: "Holding two passports means choosing one at booking, one at check-in and one at the border — and they can legitimately differ. The rules that are real, and the ones the internet invented.",
+    h1: "Dual nationality: which passport do you actually travel on?",
+    intro:
+      "If you hold two passports, almost every visa tool — including ours — asks you for one nationality. That is the one question a requirements matrix cannot answer for you. The good news is that the decision follows a short rule, and several of the constraints people worry about turn out not to exist.",
+    sections: [
+      {
+        h2: "The working rule",
+        html: `<p><strong>Use your own country's passport when entering that country. Use whichever passport gives you the easiest entry everywhere else.</strong></p>
+<p>The second half is where the value is: if one of your passports needs a visa for your destination and the other does not, you travel on the one that does not. Run both pairings through the <a href="/">visa checker</a> and compare — that is a two-minute check that can save an entire application.</p>`,
+      },
+      {
+        h2: "Countries that require their own passport",
+        html: `<p>Some states genuinely do require their nationals to use their own document. These are the documented ones:</p>
+<ul>
+<li><strong>United States</strong> — 8 U.S.C. § 1185(b) makes it unlawful for a US citizen to enter or depart the United States without a valid US passport, and the implementing regulation at 22 CFR § 53.1 repeats it. Both are qualified: the statute opens <em>"Except as otherwise provided by the President"</em>, and the regulation says <em>"unless excepted under 22 CFR 53.2"</em>. So the rule is strong, but not absolute on its face.</li>
+<li><strong>Canada</strong> — IRCC states that Canadian citizens, <em>"including dual citizens, need to fly to Canada with a valid Canadian passport"</em>. There is one exception: Canadian-American dual citizens may fly to Canada on a valid US passport. Note this is an <em>air travel</em> rule; do not extend it to land or sea crossings.</li>
+<li><strong>Australia</strong> — the Australian Government states that Australian citizens who are dual nationals <em>"are required to depart and enter Australia on their Australian passport"</em>, and that an Australian citizen cannot be granted a visa for Australia in a foreign passport. This applies whether or not you currently hold an Australian passport.</li>
+</ul>
+<p>If your other nationality is not on a list like this, check that country's own immigration authority rather than assuming.</p>`,
+      },
+      {
+        h2: "Two rules the internet invented",
+        html: `<p><strong>"You must enter and leave a country on the same passport."</strong> As a universal legal rule, this is not true. IATA's guidance to carriers is that passengers can generally choose which passport to present at a given border crossing, and ICAO's Facilitation Manual states that <em>"Passengers can legitimately travel with multiple travel documents"</em>, naming dual nationals as the common example. What is real is narrower: some states require their own nationals to use their national passport both ways — the examples above. For third countries, using the same document each way is sound <em>practical</em> advice, because your entry record and any visa are attached to the document you arrived on.</p>
+<p><strong>"The passport you gave the airline must match the one you show at the border."</strong> Also not a legal requirement for you. ICAO's Facilitation Manual explains that the intent of the relevant Annex 9 standard is to relieve the airline of liability when a passenger uses multiple travel documents during one journey, and recommends that states reconcile differences <em>"by comparing key biographical data, such as name, date of birth and sex, as opposed to travel document details"</em>. In the US, the carrier's advance-passenger-information duty attaches to the document presented to the carrier, not the one later shown to an officer. A mismatch can cause delay while it is reconciled; it is not unlawful for you.</p>`,
+      },
+      {
+        h2: "The three moments where a passport is chosen",
+        html: `<p>It helps to see that a single journey has three separate document moments, and they do not have to agree:</p>
+<ol>
+<li><strong>Booking and advance passenger data</strong> — the document you give the airline. This drives the automated document check, so give the passport that makes your entry look correct for the destination.</li>
+<li><strong>Check-in</strong> — where that check is actually run. If you are boarding on a passport that needs no visa, that is the one to present.</li>
+<li><strong>The border</strong> — where admission is decided, and where your own country's rule (if any) applies.</li>
+</ol>
+<p>Because the airline's decision and the border's decision are separate, it is worth understanding <a href="/guides/why-airlines-deny-boarding">why airlines refuse to board people</a> before you plan an itinerary that leans on two documents.</p>`,
+      },
+      {
+        h2: "The real risk nobody mentions",
+        html: `<p>It is not a fine. No official source we could find names a country that penalises a dual national for presenting the "wrong" passport, and you should be sceptical of pages that claim otherwise without citing one.</p>
+<p>The genuine consequence is <strong>consular</strong>. A country may not recognise your other nationality — particularly if you did not enter on that country's passport — which can limit the assistance your other government is able to provide if something goes wrong. If you are travelling somewhere where that matters, that is the consideration to weigh, not an imagined penalty.</p>
+<p>The other practical risk is administrative: entry stamps, permitted stay and any visa are tied to the document you arrived on. Mixing documents mid-trip is how people lose track of their own permitted stay — see <a href="/guides/visa-validity-vs-duration-of-stay">visa validity vs duration of stay</a>.</p>`,
+      },
+      {
+        h2: "How to decide, in order",
+        html: `<ol>
+<li><strong>Are you entering a country you are a citizen of?</strong> Use that country's passport, and check whether it is legally required.</li>
+<li><strong>Otherwise, compare.</strong> Check each of your nationalities against the destination in the <a href="/">visa checker</a>.</li>
+<li><strong>Pick the easier one</strong> — visa-free beats eVisa beats embassy visa. Then check <a href="/guides/six-month-passport-rule">validity</a> on that specific book.</li>
+<li><strong>Use it consistently for that leg</strong> — booking, check-in and border — so your entry record matches your documents.</li>
+<li><strong>Check the exit rule of your own country</strong> if you are departing one you are a citizen of.</li>
+</ol>
+<p>Curious how your two passports actually compare in reach? The <a href="/reports/passport-power-2026">Passport Power Report</a> ranks all 195 by how many destinations they open without an advance visa.</p>`,
+      },
+    ],
+    faqs: [
+      { q: "Which passport should I use when travelling as a dual citizen?", a: "Use your own country's passport to enter that country, and whichever passport gives the easiest entry elsewhere. If one nationality is visa-free for your destination and the other is not, travel on the visa-free one." },
+      { q: "Do I have to enter and leave a country on the same passport?", a: "Not as a universal legal rule. IATA states passengers can generally choose which passport to present, and ICAO notes travellers can legitimately hold multiple documents. Some countries do require their own nationals to use their national passport both ways — the US, Australia, and Canada for air travel." },
+      { q: "Must the passport I book with match the one I show at the border?", a: "It is not unlawful for you if they differ. ICAO guidance says the relevant standard exists to relieve airlines of liability when a passenger uses multiple documents on one journey, and recommends reconciling by name and date of birth rather than document number. Expect delay, not a penalty." },
+      { q: "Can US dual citizens enter the United States on their other passport?", a: "8 U.S.C. § 1185(b) and 22 CFR § 53.1 make it unlawful for a US citizen to enter or depart the US without a valid US passport, though both are written with exceptions. Plan on using your US passport." },
+      { q: "Can a Canadian dual citizen fly to Canada without a Canadian passport?", a: "Generally no. IRCC states Canadian citizens, including dual citizens, need a valid Canadian passport to fly to Canada. Canadian-American dual citizens are the exception and may travel on a valid US passport. This applies to air travel." },
+      { q: "Is there a penalty for using the wrong passport as a dual national?", a: "No official source we found names a country that penalises this. The real consequence is consular: a country may not recognise your other nationality, which can limit the help your other government can give — especially if you did not enter on its passport." },
+    ],
+  },
+  {
+    kind: "article",
     slug: "six-month-passport-rule",
     title: "The Six-Month Passport Rule, Explained (2026)",
     description: "Most countries want your passport valid six months beyond your trip — but the rule isn't universal, and Europe's is different. What the rule means, who enforces it, and how to check yours.",
