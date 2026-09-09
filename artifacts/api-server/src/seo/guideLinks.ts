@@ -27,6 +27,8 @@ const EVERGREEN: GuideLink[] = [
   { href: "/guides/single-entry-vs-multiple-entry-visas", label: "Single vs multiple entry", sub: "A day trip can use up your visa" },
   { href: "/guides/can-i-leave-the-airport-during-a-layover", label: "Leaving the airport on a layover", sub: "Twelve major hubs" },
   { href: "/guides/visa-on-arrival-vs-evisa-vs-eta", label: "Visa on arrival vs eVisa vs ETA", sub: "How the categories differ" },
+  { href: "/guides/eu-entry-exit-system-ees", label: "Europe's Entry/Exit System", sub: "The passport stamp is gone" },
+  { href: "/guides/damaged-passport-travel", label: "Is your passport too damaged?", sub: "Valid is not the same as usable" },
 ];
 
 // The guide that speaks most directly to a given verdict.

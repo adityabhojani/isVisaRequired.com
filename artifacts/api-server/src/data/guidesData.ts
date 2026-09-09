@@ -188,6 +188,143 @@ export const GUIDES: Guide[] = [
   },
   {
     kind: "article",
+    slug: "eu-entry-exit-system-ees",
+    title: "The EU Entry/Exit System (EES): What Changed at Europe's Borders",
+    description: "Since 10 April 2026 the EES has replaced passport stamping across all Schengen countries. What is recorded, who it applies to, what happens on your first crossing, and why it is not ETIAS.",
+    h1: "The EU Entry/Exit System: what changed at Europe's borders",
+    intro:
+      "If you have travelled to Europe recently and nobody stamped your passport, this is why. The Entry/Exit System became fully operational on 10 April 2026, and it replaced the ink stamp with a digital record of every entry and exit. It is not a visa, it is not something you apply for, and it is not ETIAS — three confusions worth clearing up before your next trip.",
+    sections: [
+      {
+        h2: "What the EES actually is",
+        html: `<p>The European Commission describes it as <em>"an automated IT system for registering non-EU nationals travelling for a short stay, each time they cross the external borders of 29 European countries"</em>.</p>
+<p>In plain terms: instead of a border officer inking a stamp into your passport, the border system now creates a digital record of who you are, which document you are carrying, and exactly when you entered and left.</p>
+<p>Two dates matter. Operations began progressively on <strong>12 October 2025</strong>, and the Commission confirmed that <strong>10 April 2026</strong> <em>"marks a significant milestone in European border security as the Entry/Exit System (EES) becomes fully operational across all Schengen countries"</em>. It is now deployed across all Schengen external border crossing points.</p>`,
+      },
+      {
+        h2: "The stamp is gone",
+        html: `<p>This is the change travellers actually notice. The Commission puts it directly: <em>"Passport stamps are being replaced with digital records of entries and exits of non-EU nationals coming for short stays."</em></p>
+<p>That has a practical consequence worth understanding. The stamp was, for many people, their only record of when a stay began — the thing you counted days from. That evidence now lives in the system rather than in your passport, and the system is explicitly designed to do the counting: the Commission says it enables <em>"automatic detection of overstayers"</em>.</p>
+<p>If you have been keeping track of your Schengen days by flicking through stamps, that method has stopped working. Keep your own record — boarding passes, tickets, accommodation bookings — and understand how the allowance works in the first place. Our <a href="/guides/visa-validity-vs-duration-of-stay">visa validity vs duration of stay</a> guide covers the rolling 90/180 rule that the EES is now measuring you against.</p>`,
+      },
+      {
+        h2: "What gets recorded",
+        html: `<p>The Commission states that the system <em>"registers the person's name, travel document data, biometric data (fingerprints and captured facial images) and the date and place of entry and exit"</em>, along with any refusals of entry.</p>
+<p>So each crossing produces a record containing:</p>
+<ul>
+<li>Your <strong>name</strong> and the <strong>data from your travel document</strong>;</li>
+<li><strong>Biometrics</strong> — fingerprints and a facial image;</li>
+<li>The <strong>date and place</strong> of entry and of exit;</li>
+<li>Any <strong>refusal of entry</strong>.</li>
+</ul>
+<p>The first crossing after the system started is the slow one, because that is when your biometrics are enrolled. Later crossings are matched against the record already held, which is what makes the automated gates possible — the Commission notes the system <em>"allows a wider use of automated border control and self-service systems, which are quicker and more comfortable for the traveller"</em>.</p>`,
+      },
+      {
+        h2: "Who it applies to",
+        html: `<p>Non-EU nationals travelling for a <strong>short stay</strong> into the 29 participating European countries. It covers you whether you are visa-exempt or travelling on a Schengen visa — the register is about the crossing, not about how you were authorised to make it.</p>
+<p>There is one documented exemption worth knowing, and it is narrower than people assume. Article 17(3) of Regulation (EU) 2017/2226 provides that <em>"Children under the age of 12 shall be exempt from the requirement to give fingerprints."</em></p>
+<p>Read that precisely: it exempts <strong>fingerprints only</strong>. Nothing exempts any age group from the facial image, so a young child is still photographed at the border. If you are travelling with children, see <a href="/guides/do-children-need-their-own-visa">do children need their own visa</a> — the same principle applies there, since these systems attach to a document rather than to a family.</p>`,
+      },
+      {
+        h2: "EES is not ETIAS — the confusion that costs money",
+        html: `<p>These two are constantly conflated, including by sites selling application services. They are different things doing different jobs:</p>
+<ul>
+<li><strong>EES</strong> is a <em>border system</em>. It runs at the crossing point. You do not apply for it, you cannot pay for it, and there is no form. You simply encounter it when you arrive.</li>
+<li><strong>ETIAS</strong> is a <em>travel authorisation</em> you would apply for before departure. And as things stand, the official EU position is that ETIAS <em>"is currently not in operation and no applications for travel authorisations are collected at this point"</em>, with the start date to be announced several months ahead of launch.</li>
+</ul>
+<p><strong>So if a website is offering to sell you an EES registration, or an ETIAS right now, it is not offering you something that exists.</strong> Our <a href="/travel-authorization/etias">ETIAS guide</a> tracks the scheme's actual status, and <a href="/travel-authorization">the travel-authorisation section</a> covers the schemes that are genuinely running today.</p>`,
+      },
+      {
+        h2: "What this means for your next trip",
+        html: `<ol>
+<li><strong>Allow more time on your first crossing</strong> since the system started, because biometric enrolment happens then.</li>
+<li><strong>Do not expect a stamp</strong>, and do not ask for one as proof — the digital record is now the proof.</li>
+<li><strong>Keep your own arrival and departure evidence.</strong> Boarding passes and bookings are how you reconstruct your own history if a count is ever disputed.</li>
+<li><strong>Count your days deliberately.</strong> Overstay detection is now automatic, which removes the margin that patchy stamping used to leave.</li>
+<li><strong>Ignore anyone selling an EES registration.</strong> There is nothing to buy.</li>
+</ol>
+<p>None of this changes whether you need a visa in the first place — that still depends on your nationality and destination. Check your exact pairing with the <a href="/">visa checker</a>.</p>`,
+      },
+    ],
+    faqs: [
+      { q: "When did the EU Entry/Exit System start?", a: "Operations began progressively on 12 October 2025, and the European Commission confirmed the system became fully operational across all Schengen countries on 10 April 2026." },
+      { q: "Do I still get a passport stamp when entering Europe?", a: "No. The Commission states that passport stamps are being replaced with digital records of entries and exits of non-EU nationals coming for short stays. Your entry and exit are recorded in the system instead." },
+      { q: "What data does the EES record?", a: "The Commission states the system registers the person's name, travel document data, biometric data — fingerprints and captured facial images — and the date and place of entry and exit, along with any refusals of entry." },
+      { q: "Do I need to apply for the EES?", a: "No. The EES is a border system, not a travel authorisation. There is no application, no form and no fee. You encounter it when you cross the border. Anyone selling an EES registration is selling something that does not exist." },
+      { q: "Is the EES the same as ETIAS?", a: "No. EES is a border registration system that is operational now. ETIAS is a separate pre-travel authorisation, and the official EU site states it is currently not in operation with no applications being collected." },
+      { q: "Do children have to give fingerprints for the EES?", a: "Article 17(3) of Regulation (EU) 2017/2226 exempts children under 12 from giving fingerprints. That exemption covers fingerprints only — the facial image is still taken, so a young child is still photographed at the border." },
+    ],
+  },
+  {
+    kind: "article",
+    slug: "damaged-passport-travel",
+    title: "Damaged Passport: Will You Be Turned Away? (2026)",
+    description: "A passport can be in date and still be refused. What officially counts as damage versus normal wear, who gets to decide, and what to do if yours is marginal.",
+    h1: "Damaged passport: will you be turned away?",
+    intro:
+      "A passport that is perfectly valid on paper can still stop your trip, because \"damaged\" is not a question about the expiry date — it is a question about whether the document still works. And it is judged by three different parties, applying three different tests, at three different moments.",
+    sections: [
+      {
+        h2: "The definition worth memorising",
+        html: `<p>HM Passport Office puts it in one line, and it is the clearest official statement of the test: <em>"A damaged passport is one which the customer cannot use as proof of identity because of its condition."</em></p>
+<p>That reframes the whole question. It is not about how battered the book looks or how much you paid for it. It is about whether someone can still reliably confirm you are you, and confirm the document is genuine.</p>`,
+      },
+      {
+        h2: "What counts as normal wear",
+        html: `<p>Passports are meant to be used, and officials expect them to show it. HM Passport Office guidance treats a passport as acceptably worn where <em>"the personal details page of the passport is legible (readable)"</em> and where <em>"there are minor tears around the edges of pages or the cover (indicating normal use)"</em>.</p>
+<p>The same guidance notes that wear <em>"is more likely if the customer travels extensively"</em>, and that the stamps and visas inside actually help the assessment — a heavily travelled passport is expected to look heavily travelled.</p>
+<p>So a soft cover, curled corners, or a slightly frayed edge are not the problem. Legibility is.</p>`,
+      },
+      {
+        h2: "What counts as damage",
+        html: `<p>The same UK guidance lists specific failure modes. These are the ones that get passports rejected:</p>
+<ul>
+<li><strong>Laminate lifting</strong> — <em>"laminate peeling or lifting away from the personal details page"</em>. This is the big one, because it looks minor and reads as possible tampering.</li>
+<li><strong>Missing or detached pages</strong>.</li>
+<li><strong>Water, chemical or ink damage</strong> — the guidance cites <em>"damage or discolouration to any part of the passport caused, for example, by: water, chemical or ink spills, tears, rips, bite marks"</em>.</li>
+<li><strong>Chip damage</strong> — where <em>"the chip or antenna shows through the endpaper on back cover"</em> of an e-passport.</li>
+</ul>
+<p>Note how many of these are things that happen quietly: a bottle leaks in a bag, a passport goes through a wash, a toddler gets hold of it. None of them changes the expiry date, and all of them can end a trip.</p>`,
+      },
+      {
+        h2: "Three parties can stop you, and they judge differently",
+        html: `<p>This is the part most articles miss, and it explains contradictory experiences.</p>
+<ol>
+<li><strong>Your passport authority</strong> decides whether to replace the document. In the UK, a damaged passport is cancelled — the guidance notes <em>"We return damaged passports to the customer in most cases"</em>, but destroys them where there appears to be fraudulent tampering or extreme damage. Canada's approach differs: IRCC's guidance contemplates that a damaged passport may still be valid, requiring a declaration form alongside a renewal rather than treating it as automatically void.</li>
+<li><strong>The airline</strong> decides whether to carry you — a commercial judgement made under threat of a penalty, and one where UK Home Office guidance is explicit that <em>"the responsibility for deciding whether to carry the person rests with you as the carrying company in every case"</em>. See <a href="/guides/why-airlines-deny-boarding">why airlines refuse to board you</a>.</li>
+<li><strong>The border officer</strong> decides whether to admit you, and is the one person who can inspect the document properly.</li>
+</ol>
+<p>Because the tests differ, "my passport office said it was fine" does not bind the airline, and boarding successfully does not guarantee admission.</p>`,
+      },
+      {
+        h2: "Damage can destroy a visa, not just a passport",
+        html: `<p>An underrated consequence. If you hold a visa sticker in an older passport, the condition of <em>that page</em> matters independently.</p>
+<p>US Embassy guidance on using a visa in an expired passport conditions it on the visa being valid, <strong>not damaged</strong>, and the correct type. So water damage across a visa page can invalidate the visa while leaving the passport itself perfectly usable.</p>
+<p>This is also why you must never try to move a sticker: the same guidance warns that removing a visa from an old passport and placing it in a new one makes it no longer valid. More on this in <a href="/guides/new-passport-old-visa">what a passport renewal does to visas you already hold</a>.</p>`,
+      },
+      {
+        h2: "What to do if yours is marginal",
+        html: `<ol>
+<li><strong>Look at the personal details page first.</strong> If it is fully legible and the laminate is flat and intact, you are probably in wear-and-tear territory.</li>
+<li><strong>Check the laminate edges and the back cover.</strong> Lifting film and a visible chip outline are the two things that read as tampering.</li>
+<li><strong>Replace it early if in doubt.</strong> A replacement costs a fee; a refused boarding costs the trip. Damaged-passport applications can also attract extra scrutiny — Canada notes the circumstances may be reviewed before a replacement is issued, which takes time.</li>
+<li><strong>Never repair it yourself.</strong> Tape, glue or trimming turn an arguable passport into an obviously altered one.</li>
+<li><strong>If you must travel on it, carry corroboration</strong> — a second photo ID and your itinerary. It will not override a refusal, but it helps at the margin.</li>
+</ol>
+<p>While you are checking the document, check the dates too: see <a href="/guides/six-month-passport-rule">the six-month passport rule</a>, which turns away far more travellers than damage does.</p>`,
+      },
+    ],
+    faqs: [
+      { q: "What officially counts as a damaged passport?", a: "HM Passport Office defines it as a passport the holder cannot use as proof of identity because of its condition. Its examples include laminate peeling from the personal details page, missing or detached pages, water, chemical or ink damage, tears, rips and bite marks, and a chip or antenna showing through the back cover." },
+      { q: "Is normal wear and tear a problem?", a: "Generally no. UK guidance treats a passport as acceptably worn where the personal details page is legible and there are only minor tears around the edges of pages or the cover, and notes that wear is expected in a passport belonging to someone who travels extensively." },
+      { q: "Can an airline refuse to board me over a damaged passport?", a: "Yes. The airline makes its own decision about whether to carry you — UK Home Office guidance states the responsibility for deciding rests with the carrier in every case. That decision is separate from whether the destination would have admitted you." },
+      { q: "Is a damaged passport automatically invalid?", a: "It depends on the issuing country. The UK cancels damaged passports, returning them to the holder in most cases but destroying them where there is apparent tampering or extreme damage. Canada's guidance contemplates a damaged passport still being valid, with a declaration form submitted alongside a renewal." },
+      { q: "Can water damage invalidate my visa?", a: "It can. US Embassy guidance on using a visa in an expired passport requires the visa to be valid, undamaged and the correct type — so damage to the visa page can destroy the visa even if the passport itself is usable." },
+      { q: "Should I repair a damaged passport myself?", a: "No. Tape, glue or trimming make the document look altered, which is far worse than wear. If the condition is genuinely marginal, apply for a replacement and allow extra time, since the circumstances of the damage may be reviewed." },
+    ],
+  },
+  {
+    kind: "article",
     slug: "do-children-need-their-own-visa",
     title: "Do Babies and Children Need Their Own Visa? (2026)",
     description: "Yes — including a lap infant who pays no fare. Travel authorisations attach to a passport, not to a family. What each scheme requires for children, and the passport-validity trap parents miss.",
