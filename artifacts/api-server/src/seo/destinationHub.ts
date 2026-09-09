@@ -3,6 +3,7 @@
 // nationalities can enter {country} visa-free / on arrival / with an eVisa, plus
 // the country's entry requirements (passport validity, funds, insurance,
 // pre-authorisation). Real data only; links to the per-pair pages.
+import { guideLinksForHub } from "./guideLinks";
 import type { CountryData } from "../data/countries";
 import { countries } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
@@ -92,6 +93,7 @@ export function renderDestinationHub(to: CountryData): string {
 <p class="lead">Do you need a visa for ${esc(to.name)}? It depends on your nationality. ${vf} passports can enter ${esc(to.name)} visa-free, ${voa} get a visa on arrival, ${ev} need an eVisa or travel authorisation, and ${vr} must apply for a visa in advance. Find your passport below, or review ${esc(to.name)}'s general entry requirements.</p>
 <div class="stats">${statCards}</div>
 <p><a class="cta" href="/?destinations=${to.code}">Check ${esc(to.name)} for your passport →</a></p>
+${(() => { const gs = guideLinksForHub(to.code); return `<section class="keep"><h2>Before you travel</h2><div class="tiles">${gs.map((g) => `<a href="${g.href}">${g.label}${g.sub ? `<small>${g.sub}</small>` : ""}</a>`).join("")}<a href="/guides">All visa &amp; travel guides<small>Twelve explainers</small></a></div></section>`; })()}
 
 <h2>${esc(to.name)} entry requirements (all travellers)</h2>
 <div class="card" style="padding:0;overflow-x:auto"><table><tbody>

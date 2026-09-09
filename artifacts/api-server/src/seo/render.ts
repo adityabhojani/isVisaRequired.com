@@ -6,6 +6,7 @@
 // page is CDN-cached (see Cache-Control in the route), so serving ~38k pages
 // on-demand is cheap.
 
+import { guideLinksForPair } from "./guideLinks";
 import { FONT_LINKS, BASE_STYLE, renderHeader, renderFooter, renderKeepGoing } from "./shell";
 import { countries, type CountryData } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
@@ -113,11 +114,7 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
         ? `≈ US$${detail.feeUSD}`
         : "Varies — check official portal";
   const processing = detail.processingDays || "Varies";
-  const keepGuide =
-    requirement === "visa_free" ? { href: "/guides/six-month-passport-rule", label: "Is your passport valid long enough?" }
-    : requirement === "visa_required" ? { href: "/guides/proof-of-onward-travel", label: "What counts as proof of onward travel" }
-    : requirement === "no_admission" ? { href: "/guides", label: "Browse our visa guides" }
-    : { href: "/guides/visa-on-arrival-vs-evisa-vs-eta", label: "Visa on arrival vs eVisa vs ETA" };
+  const [keepGuide, keepGuide2] = guideLinksForPair(requirement, `${from.code}${to.code}`);
   const answer = answerSentence(requirement, from.name, to.name);
 
   const canonical = `${SITE_ORIGIN}${pairPath(from, to)}`;
@@ -358,8 +355,8 @@ ${touristBlock}
 ${renderKeepGoing([
   { href: `/countries/${slugify(to.name)}`, label: `Who else can enter ${esc(to.name)}?`, sub: "Every nationality, one page" },
   { href: `/visa-requirements/${slugify(from.name)}`, label: `All destinations for ${esc(from.name)}`, sub: "Visa-free, on arrival, eVisa" },
-  { href: keepGuide.href, label: keepGuide.label, sub: "Read before you book" },
-  { href: `/?passport=${esc(from.code)}&destinations=${esc(to.code)}`, label: "Plan a multi-country trip", sub: "Add more destinations" },
+  { href: keepGuide.href, label: keepGuide.label, sub: keepGuide.sub },
+  { href: keepGuide2.href, label: keepGuide2.label, sub: keepGuide2.sub },
 ])}
 <section class="card related">
   <h2>Explore full guides</h2>

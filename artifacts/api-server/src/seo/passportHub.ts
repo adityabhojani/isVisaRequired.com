@@ -8,6 +8,7 @@ import { getDefaultEntry } from "../data/visaData";
 import { slugify, pairPath } from "./render";
 import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED, REQ_LABEL, REQ_COLOR } from "./hubLayout";
 import { GUIDES } from "../data/guidesData";
+import { guideLinksForHub } from "./guideLinks";
 
 const YEAR = "2026";
 const CATS: { key: string; heading: string; blurb: (n: string) => string }[] = [
@@ -101,6 +102,7 @@ export function renderPassportHub(from: CountryData): string {
 <p class="lead">Where can ${esc(from.name)} passport holders travel in ${YEAR}? This page lists the visa requirement for every country — ${vf} visa-free, ${voa} visa on arrival, ${ev} eVisa and ${vr} requiring a visa in advance. Select any destination for full details: visa type, permitted stay, fees, required documents and the official application link.</p>
 <div class="stats">${statCards}</div>
 <p><a class="cta" href="/?passport=${from.code}">Check a specific destination in the visa tool →</a></p>
+${(() => { const gs = guideLinksForHub(from.code); return `<section class="keep"><h2>Before you travel</h2><div class="tiles">${gs.map((g) => `<a href="${g.href}">${g.label}${g.sub ? `<small>${g.sub}</small>` : ""}</a>`).join("")}<a href="/guides">All visa &amp; travel guides<small>Twelve explainers</small></a></div></section>`; })()}
 ${guideCta}
 ${sections}
 <h2>Frequently asked questions</h2>
