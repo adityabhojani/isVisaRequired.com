@@ -399,8 +399,8 @@ export const GUIDES: Guide[] = [
         h2: "Who actually enforces it",
         html: `<p>Two separate parties check, and either can stop you:</p>
 <ul>
-<li><strong>The airline, at check-in.</strong> Airlines are fined by destination countries for carrying inadmissible passengers, so they enforce document rules strictly and sometimes conservatively. Most refusals happen here, before you ever reach immigration.</li>
-<li><strong>The border officer, on arrival.</strong> The final decision on entry is always theirs.</li>
+<li><strong>The airline, at check-in.</strong> Airlines face financial penalties under national law for carrying passengers who lack the documents they needed, so they enforce document rules strictly and sometimes conservatively. Most refusals happen here, before you ever reach immigration — see <a href="/guides/why-airlines-deny-boarding">why airlines refuse to board you</a>.</li>
+<li><strong>The border officer, on arrival.</strong> The final decision on entry is always theirs — and it is a <a href="/guides/why-airlines-deny-boarding">separate decision from the airline's</a>.</li>
 </ul>
 <p>This is why "the embassy told me it was fine" does not help at the airport — the airline applies its own reading of the rule, and you will not be at the border to argue.</p>`,
       },
@@ -425,14 +425,14 @@ export const GUIDES: Guide[] = [
 <li>Find your passport's <strong>expiry date</strong> and, for Europe, its <strong>issue date</strong>.</li>
 <li>Count forward six months from your planned <strong>arrival</strong> date. If your passport expires before that, treat it as a problem.</li>
 <li>Check the destination's own rule on your <a href="/countries">destination guide</a> and confirm it on the country's official immigration site.</li>
-<li>If you are close to the line, renew before booking anything non-refundable. Renewal is far cheaper than a missed flight.</li>
+<li>If you are close to the line, renew before booking anything non-refundable. Renewal is far cheaper than a missed flight — but check first <a href="/guides/new-passport-old-visa">what a renewal does to visas you already hold</a>.</li>
 </ol>
-<p>Also worth checking at the same time: whether you need a visa at all. Our <a href="/">free visa checker</a> gives you the requirement for your exact passport and destination in one step.</p>`,
+<p>Also worth checking at the same time: whether you need a visa at all. Our <a href="/">free visa checker</a> gives you the requirement for your exact passport and destination in one step — and if you hold two passports, <a href="/guides/which-passport-to-use-dual-citizenship">check which one to travel on</a> first.</p>`,
       },
     ],
     faqs: [
       { q: "Is the six-month passport rule counted from arrival or departure?", a: "For most countries that apply it, the six months are counted from your date of arrival, not the date you leave. The Schengen Area is different: it requires three months of validity beyond your intended departure from the Schengen Area." },
-      { q: "Can an airline refuse to board me even if the country would let me in?", a: "Yes. Airlines are fined for carrying passengers who are refused entry, so they enforce document rules themselves and sometimes more strictly than the border. Most passport-validity refusals happen at check-in." },
+      { q: "Can an airline refuse to board me even if the country would let me in?", a: "Yes. Airlines face penalties under national law for carrying improperly documented passengers, so they enforce document rules themselves and sometimes more strictly than the border. Most passport-validity refusals happen at check-in." },
       { q: "My passport is valid but was issued more than ten years ago. Is that a problem?", a: "For the Schengen Area, yes. Your passport must have been issued within the previous ten years as well as being valid three months beyond departure. This affects passports that had extra months carried over from a previous document." },
       { q: "Do I need blank pages as well as validity?", a: "Often, yes. The Schengen Area requires at least two blank pages, and many other countries expect one or two for stamps or visas. A passport that is full can be refused even when the expiry date is fine." },
       { q: "What should I do if my passport is close to the limit?", a: "Renew before booking non-refundable travel. If you have already booked, check the destination's official immigration website and your airline's document policy, and allow time for renewal — processing can take weeks." },
@@ -512,7 +512,7 @@ export const GUIDES: Guide[] = [
 <li><strong>A confirmed bus, train or ferry booking</strong> leaving the country, where land or sea exit is realistic. This is commonly accepted overland in regions like Southeast Asia and Europe, though airline staff vary in how readily they accept it.</li>
 <li><strong>A residence permit or visa for another country</strong>, which shows where you are entitled to go next.</li>
 </ul>
-<p>The common thread is that the booking is <strong>confirmed, in your name, and dated inside your permitted stay</strong>.</p>`,
+<p>The common thread is that the booking is <strong>confirmed, in your name, and dated inside your permitted stay</strong>. This check happens at the airline desk, not the border — <a href="/guides/why-airlines-deny-boarding">the two decisions are separate</a>, and the airline's comes first.</p>`,
       },
       {
         h2: "What usually does not count",
@@ -544,7 +544,7 @@ export const GUIDES: Guide[] = [
       { q: "Does a bus or train ticket count as onward travel?", a: "Frequently yes, where leaving overland is realistic — for example within Europe or Southeast Asia. It must be a confirmed booking in your name, dated within your permitted stay. Acceptance varies between airlines." },
       { q: "Can I show a ticket dated after my permitted stay ends?", a: "No — that actively works against you, because it shows an intention to stay longer than allowed. Your onward booking should fall inside the permitted stay for your nationality and destination." },
       { q: "Are 'rented' or temporary onward tickets a good idea?", a: "No. Presenting a booking you know will be cancelled is a misrepresentation to a border authority. If it is discovered, the outcome — refusal of entry, a removal record, and disclosure obligations on future visa applications — is far costlier than buying a genuine cheap ticket." },
-      { q: "Who actually checks — the airline or immigration?", a: "Both can, but in practice the airline checks first, at check-in, because it carries the financial penalty for inadmissible passengers. Most refusals happen there rather than at the border." },
+      { q: "Who actually checks — the airline or immigration?", a: "Both can, but in practice the airline checks first, at check-in, because it carries the financial penalty for improperly documented passengers. Most refusals happen there rather than at the border." },
     ],
   },
   {
@@ -583,7 +583,7 @@ export const GUIDES: Guide[] = [
 <li><strong>The duration of stay</strong>, which is a separate limit that applies to <em>each</em> entry — see our guide to <a href="/guides/visa-validity-vs-duration-of-stay">visa validity versus duration of stay</a>.</li>
 <li><strong>Whether you need a visa for the side trip too</strong>. You can check any pairing with our <a href="/">visa checker</a>.</li>
 </ol>
-<p>If your visa is single entry and your plans change, apply for a new visa before leaving rather than hoping to be re-admitted at the border.</p>`,
+<p>If your visa is single entry and your plans change, apply for a new visa before leaving rather than hoping to be re-admitted at the border. And if you renew your passport mid-trip, check <a href="/guides/new-passport-old-visa">whether the visa survives the new book</a>.</p>`,
       },
     ],
     faqs: [
@@ -636,6 +636,7 @@ export const GUIDES: Guide[] = [
 <li><strong>Read that country's transit guide</strong> in our <a href="/transit-visa">transit visa section</a>, which covers all twelve major connecting hubs.</li>
 <li><strong>Check whether you need entry permission</strong> for that country with our <a href="/">visa checker</a>, treating the transit country as your destination.</li>
 <li><strong>Leave enough time.</strong> If you must clear immigration, collect bags and re-check them, a connection that looks generous on paper can be tight.</li>
+<li><strong>Expect the check at the departure gate.</strong> Transit documents are verified by the airline before you fly — <a href="/guides/why-airlines-deny-boarding">why airlines refuse to board you</a> explains who decides what.</li>
 </ol>`,
       },
     ],
