@@ -188,6 +188,246 @@ export const GUIDES: Guide[] = [
   },
   {
     kind: "article",
+    slug: "do-children-need-their-own-visa",
+    title: "Do Babies and Children Need Their Own Visa? (2026)",
+    description: "Yes — including a lap infant who pays no fare. Travel authorisations attach to a passport, not to a family. What each scheme requires for children, and the passport-validity trap parents miss.",
+    h1: "Do babies and children need their own visa?",
+    intro:
+      "The answer is structural and it applies to every nationality at once: a visa or travel authorisation attaches to a <em>travel document</em>, not to a family. If your child holds their own passport, your child needs their own authorisation — including the lap infant who paid no fare. What varies is only the paperwork, the fee and the biometrics.",
+    sections: [
+      {
+        h2: "One traveller, one authorisation",
+        html: `<p>Every major electronic scheme says this in its own words, and none of them makes an exception for age:</p>
+<ul>
+<li><strong>ESTA (United States)</strong> — CBP states that accompanied and unaccompanied children, regardless of age, are required to have their own ESTA approval, and adds that <em>"even non-ticketed infants are required to have an approved travel authorization"</em> if they do not hold a visa.</li>
+<li><strong>UK ETA</strong> — GOV.UK is blunt: <em>"Each person travelling needs an ETA, including babies and children."</em></li>
+<li><strong>Canada eTA</strong> — IRCC states that all eTA-required travellers, regardless of their age, need an eTA, and that to apply for your child you must submit a separate application form.</li>
+<li><strong>Australia ETA (subclass 601)</strong> — the Department of Home Affairs states you cannot include family members in your application, and that each family member <em>"including those listed on your passport, must submit a separate application"</em>.</li>
+<li><strong>ETIAS (Europe)</strong> — Article 17(1) of Regulation (EU) 2018/1240 requires each applicant to submit a completed application form, with a minor's form signed electronically by a person holding parental authority or guardianship.</li>
+</ul>
+<p>So the count is simple: passports in the family, authorisations needed.</p>`,
+      },
+      {
+        h2: "But you can usually do the paperwork together",
+        html: `<p>A common misreading of the above is that every application must be filed separately, one at a time. That is not right either, and it matters when you are filling in five forms at midnight.</p>
+<p>ESTA allows a group submission — CBP states the system <em>"allows for one payment for a group of two or more applications submitted at the same time"</em>, and notes the people in the group are not required to travel together. ETIAS expressly permits someone else to file on the applicant's behalf: Article 15(4) of Regulation (EU) 2018/1240 allows applications to be submitted <em>"by the applicant or by a person or a commercial intermediary authorised by the applicant"</em>. GOV.UK simply says <em>"You can apply for other people."</em></p>
+<p>Canada is the outlier in the other direction: IRCC states you can only apply and pay for one person at a time.</p>
+<p>The distinction to hold on to is this: <strong>the paperwork can often be batched, but the outcome never is.</strong> No scheme issues one authorisation covering several people. Each traveller still receives their own, tied to their own passport.</p>`,
+      },
+      {
+        h2: "If your child is listed on your passport",
+        html: `<p>Older passports sometimes endorsed children on a parent's book. Where that is still the case, it does not help — it actively hurts.</p>
+<p>CBP states that children listed on their parents' passports do not qualify for ESTA and must have their own unexpired passport. Australia, as above, requires a separate application from each family member <em>including those listed on your passport</em>.</p>
+<p>Within the EU the practice has been legislated away: Regulation (EC) No 444/2009 amended the passport standards so that passports and travel documents <em>"shall be issued as individual documents"</em>, a principle its recital calls "one person-one passport" and records as also being recommended by ICAO. If your family travels on EU passports, each child already has their own book.</p>
+<p>We have not verified that every country in the world has done the same, so we will not claim it. The practical rule stands regardless: if your child does not have their own passport, that is the first thing to fix.</p>`,
+      },
+      {
+        h2: "The trap parents actually hit: shorter passports",
+        html: `<p>This is the one that catches families at the airport, and it is a consequence of a rule nobody thinks to apply to a toddler.</p>
+<p>Children's passports are issued for shorter terms. The period is set by the issuing country, not by any international standard:</p>
+<ul>
+<li><strong>United States</strong> — 22 CFR 51.4 provides that a passport issued to an applicant under 16 is valid for <strong>five years</strong>, against ten for applicants 16 or older.</li>
+<li><strong>United Kingdom</strong> — GOV.UK: a child passport is valid for <strong>five years</strong>, with adult procedure from age 16.</li>
+<li><strong>Canada</strong> — a child passport is valid for a maximum of <strong>five years</strong>, and stays valid to its expiry date even after the child turns 16.</li>
+<li><strong>Australia</strong> — the Australian Passport Office issues passports valid up to <strong>five years</strong> for children aged 0 to 15, and up to ten years for those aged 16 or 17.</li>
+</ul>
+<p>Now combine that with entry rules. The Schengen Borders Code (Regulation (EU) 2016/399, Article 6) requires a travel document valid at least three months beyond intended departure and issued within the previous ten years — and there is <strong>no age exemption</strong> anywhere in that article, because the condition attaches to the document. Many other countries apply a six-month rule the same way.</p>
+<p>A five-year book runs out of runway far sooner than yours. Check the child's expiry date first, not last — see <a href="/guides/six-month-passport-rule">the six-month passport rule</a> for how the arithmetic works.</p>`,
+      },
+      {
+        h2: "Fees: two European schemes discount by age, the rest do not",
+        html: `<p>Age concessions exist, but only in Europe, and only in two places.</p>
+<p><strong>ETIAS</strong> waives its fee for applicants under 18 and over 70 at the time of application — Article 18(2) of Regulation (EU) 2018/1240. For a <strong>Schengen visa</strong>, Article 16 of the Visa Code waives the fee for children under six, and sets a reduced rate for children from six to under twelve.</p>
+<p>ESTA, the UK ETA, the Canada eTA and the Australian ETA publish no age concession — a baby costs the same as an adult.</p>
+<p>We deliberately publish no amounts here. Fees change, and several currently circulating figures are already out of date. Check the official portal for the current price before you pay.</p>`,
+      },
+      {
+        h2: "Biometrics: four authorities, four different ages",
+        html: `<p>There is no single children's biometric exemption, and assuming one will surprise you at an appointment:</p>
+<ul>
+<li><strong>EU Entry/Exit System</strong> — Regulation (EU) 2017/2226, Article 17(3): <em>"Children under the age of 12 shall be exempt from the requirement to give fingerprints."</em> Note this is a fingerprint exemption only; nothing exempts any age group from the facial image, so an infant is still photographed.</li>
+<li><strong>Schengen visa</strong> — Visa Code Article 13(7) exempts children under 12 from giving fingerprints.</li>
+<li><strong>United Kingdom</strong> — Home Office guidance states children under five are exempt from fingerprints but must still provide a digitised facial image.</li>
+<li><strong>United States</strong> — the long-standing under-14 concession has been withdrawn. US Mission guidance states that since 2 September 2025, applicants under 14 and over 80 are not exempt and must attend in person.</li>
+</ul>
+<p>If you are planning around an appointment, check the specific authority's current rule rather than a number you remember.</p>`,
+      },
+      {
+        h2: "A checklist before you book",
+        html: `<ol>
+<li><strong>Does each child hold their own passport?</strong> If not, that comes first.</li>
+<li><strong>Check each child's expiry date</strong> against the destination's validity rule — the five-year book is the usual problem.</li>
+<li><strong>Count authorisations by passport, not by adult.</strong> Infants included.</li>
+<li><strong>Batch the paperwork where the scheme allows it</strong>, but expect a separate approval per child.</li>
+<li><strong>Check whether the child must attend in person</strong> for biometrics before you assume it is a parent-only errand.</li>
+</ol>
+<p>Then run the family's actual pairing through the <a href="/">visa checker</a> — the per-destination requirement for a child is the same as the adult's, so one check covers everyone holding that nationality.</p>`,
+      },
+    ],
+    faqs: [
+      { q: "Do babies need their own visa or travel authorisation?", a: "Yes. CBP states that even non-ticketed infants require an approved travel authorisation if they do not hold a visa, and GOV.UK states each person travelling needs an ETA, including babies and children. Authorisations attach to a passport, not to a family." },
+      { q: "Can I add my children to my own ESTA or ETA application?", a: "No scheme issues one authorisation covering several people. Some do let you batch the paperwork: CBP allows one payment for a group of applications submitted together, ETIAS allows a third party to submit on an applicant's behalf, and GOV.UK says you can apply for other people. Canada requires one application at a time." },
+      { q: "My child is listed on my passport — is that enough?", a: "No, and it can disqualify them. CBP states children listed on a parent's passport do not qualify for ESTA and must have their own unexpired passport, and Australia requires a separate application from each family member including those listed on your passport." },
+      { q: "How long is a child's passport valid?", a: "Shorter than an adult's, and it is set by the issuing country. Five years is typical for young children in the US (22 CFR 51.4), the UK, Canada and Australia — against ten years for adults. That shorter term is what usually trips families up against validity rules." },
+      { q: "Do children pay a reduced visa fee?", a: "Only in two European schemes. ETIAS waives its fee for applicants under 18 under Article 18 of Regulation (EU) 2018/1240, and the Schengen Visa Code waives it for children under six with a reduced rate to age twelve. ESTA, the UK ETA, the Canada eTA and the Australian ETA publish no age concession." },
+      { q: "Do children have to give fingerprints?", a: "It depends entirely on the authority. The EU Entry/Exit System and the Schengen visa exempt under-12s from fingerprints but not from a facial image; the UK exempts under-5s from fingerprints only; and the US withdrew its under-14 concession from 2 September 2025." },
+    ],
+  },
+  {
+    kind: "article",
+    slug: "how-early-to-apply-for-a-visa",
+    title: "How Early Should You Apply for a Visa — and Can You Apply Too Early?",
+    description: "Yes, you can apply too early. There are two clocks: the earliest date a country lets you lodge, and a validity clock that for many e-visas starts at approval rather than arrival.",
+    h1: "How early should you apply for a visa — and can you apply too early?",
+    intro:
+      "Almost everyone asks the first half of this question and almost nobody asks the second. You can indeed apply too early — because for a large number of schemes the validity clock starts when the authorisation is <em>granted</em>, not when you land. Get that wrong and an approval you were proud of expires before your trip.",
+    sections: [
+      {
+        h2: "There are two clocks, not one",
+        html: `<p><strong>Clock one — the lodgement window.</strong> How early the issuing state will accept an application at all. Some publish a hard limit; some publish none.</p>
+<p><strong>Clock two — the validity window.</strong> When the thing you are granted starts and stops counting. For a traditional embassy visa this usually runs from a date printed on the visa. For many electronic authorisations, it runs from <em>approval</em>.</p>
+<p>Applying early is free when only clock one exists. It is expensive when clock two starts at grant, because every week you gain in reassurance is a week you lose off the far end. See <a href="/guides/visa-validity-vs-duration-of-stay">visa validity vs duration of stay</a> for why these two are so often confused.</p>`,
+      },
+      {
+        h2: "How early each system lets you lodge",
+        html: `<ul>
+<li><strong>Schengen</strong> — Article 9(1) of the Visa Code (Regulation (EC) No 810/2009, as amended) sets both ends: applications <em>"shall be lodged no more than six months ... before the start of the intended visit, and, as a rule, no later than 15 calendar days before"</em> it. Seafarers on duty may lodge up to nine months ahead, and a consulate may accept a later application in justified cases of urgency. If you have seen "three months" quoted, that is the superseded pre-2020 wording.</li>
+<li><strong>United Kingdom (Standard Visitor)</strong> — GOV.UK: <em>"The earliest you can apply is 3 months before you travel."</em></li>
+<li><strong>United States (B1/B2)</strong> — no maximum lead time is published. US Mission guidance is simply to apply as soon as you know you will travel. The binding constraint is the interview appointment calendar, which differs by post.</li>
+<li><strong>India e-Visa</strong> — the Bureau of Immigration's portal states an application may be made a minimum of four days in advance and up to <strong>120 days</strong> ahead of the proposed date of travel.</li>
+<li><strong>ESTA</strong> — CBP states applications may be submitted at any time prior to travel, and recommends applying as soon as you begin planning or before buying tickets.</li>
+</ul>
+<p>Note that "no published limit" is not the same as "no limit". It means no authority has committed to one, so do not build a plan around a number nobody published.</p>`,
+      },
+      {
+        h2: "The clock that starts at grant",
+        html: `<p>This is the half that costs people money, and the examples are unambiguous:</p>
+<ul>
+<li><strong>ESTA</strong> — the official site states authorisations are <em>"valid for two years from the date of authorization, or until your passport expires, whichever comes first"</em>. Approve it eighteen months before a trip and you have six months of cover left.</li>
+<li><strong>India e-Tourist Visa (1-year and 5-year) and e-Business Visa</strong> — validity runs <em>"from the date of grant"</em>. The 30-day e-Tourist Visa behaves differently: it runs 30 days from first arrival, but your first arrival must fall between issue and expiry, so an issue-anchored outer window still applies. The e-Medical, e-Medical Attendant and e-Conference visas run from arrival. Never treat "the India e-Visa" as one thing.</li>
+<li><strong>Canada eTA</strong> — valid up to five years or until the passport expires, whichever comes first.</li>
+<li><strong>UK ETA</strong> — GOV.UK: <em>"An ETA lasts for 2 years or until your passport expires, whichever is sooner."</em></li>
+</ul>
+<p>All of these are also tied to the passport you applied with, which is a second way to lose them early — see <a href="/guides/new-passport-old-visa">what a passport renewal does to visas you already hold</a>.</p>`,
+      },
+      {
+        h2: "ETIAS is not yet running",
+        html: `<p>Because planners ask: the official EU site states that ETIAS <em>"is currently not in operation and no applications for travel authorisations are collected at this point"</em>, and that the EU will announce the start date several months before launch.</p>
+<p>When it does launch, the published validity is three years or until the travel document used in the application expires, whichever comes first — so it will belong firmly in the clock-two group above. Until then, do not plan around an application window that does not exist, and treat any specific launch date you see elsewhere as unconfirmed.</p>`,
+      },
+      {
+        h2: "Why we publish no processing times",
+        html: `<p>You will find averages everywhere. They are close to useless, and the official sources show why: a single scheme's own published guidance can range from minutes to weeks depending on what the authority decides to ask you for, and authorities hedge their own numbers. Australia's Department of Home Affairs notes that its processing-time tool <em>"is a guide only and not specific to your application"</em>.</p>
+<p>What actually determines your timing is three things, none of which is an average:</p>
+<ol>
+<li><strong>Whether the scheme has an earliest-lodgement date at all</strong> — that sets the front edge of your window.</li>
+<li><strong>Whether an in-person appointment is required, and when the nearest post has one</strong> — this, not adjudication, is usually the long pole for embassy visas.</li>
+<li><strong>Whether the authority comes back asking for more</strong> — a request for documents or an interview is what turns a same-day decision into a multi-week one.</li>
+</ol>
+<p>The single best piece of official advice on timing is Australia's, and it applies everywhere: <em>"We suggest you do not make travel arrangements until we grant your ETA."</em></p>`,
+      },
+      {
+        h2: "Work backwards, in this order",
+        html: `<ol>
+<li><strong>Find out which kind of authorisation you need</strong> for your exact pairing with the <a href="/">visa checker</a>.</li>
+<li><strong>Ask when its clock starts.</strong> If validity runs from grant, work back from your <em>return</em> date, not your departure date.</li>
+<li><strong>Find the earliest lodgement date</strong> and treat it as the front edge — six months for Schengen, three for a UK Standard Visitor, 120 days for an India e-Visa.</li>
+<li><strong>If an appointment is needed, book that first.</strong> It is the constraint you cannot influence.</li>
+<li><strong>Do not book non-refundable travel until it is granted.</strong></li>
+</ol>
+<p>One last check worth doing at the same time: confirm your passport clears the destination's validity rule, since a renewal mid-process can invalidate an electronic authorisation you have just paid for.</p>`,
+      },
+    ],
+    faqs: [
+      { q: "Can you apply for a visa too early?", a: "Yes. Many electronic authorisations start counting from approval rather than arrival — ESTA is valid two years from the date of authorisation, and India's one-year and five-year e-Tourist visas run from the date of grant. Approving one far in advance burns the far end of the window." },
+      { q: "How early can I apply for a Schengen visa?", a: "Article 9(1) of the Visa Code allows applications to be lodged no more than six months before the start of the intended visit, and as a rule no later than 15 calendar days before. Seafarers on duty may lodge up to nine months ahead. The widely quoted three-month figure is superseded pre-2020 wording." },
+      { q: "How early can I apply for a UK Standard Visitor visa?", a: "GOV.UK states the earliest you can apply is three months before you travel. Note this is the Standard Visitor visa; the UK ETA is a separate scheme with no published earliest-apply limit." },
+      { q: "Is there a limit on how early I can apply for a US visitor visa?", a: "No maximum lead time is published for a B1/B2 application. US Mission guidance is to apply as soon as you know you will travel. In practice the constraint is interview appointment availability, which varies by post." },
+      { q: "How long does a visa take to process?", a: "There is no reliable general answer, and we publish no averages. Each authority publishes guidance only for its own scheme and hedges it — Australia notes its processing-time tool is a guide only and not specific to your application. Timing is driven by lodgement windows, appointment availability, and whether more documents are requested." },
+      { q: "Can I apply for ETIAS yet?", a: "No. The official EU site states ETIAS is currently not in operation and no applications are being collected, and that the start date will be announced several months in advance." },
+    ],
+  },
+  {
+    kind: "article",
+    slug: "visa-refused-what-happens-next",
+    title: "Your Visa Was Refused. What Actually Happens Next",
+    description: "No government sets a six-month waiting period before you can reapply. What a refusal actually is, how it differs from a ban, what each system lets you do, and what you must disclose later.",
+    h1: "Your visa was refused. What actually happens next",
+    intro:
+      "The most repeated advice about visa refusals is that you must wait six months before trying again. No government sets that rule. Understanding what a refusal actually is — and what it is not — changes what you should do next, and it is usually not \"wait\".",
+    sections: [
+      {
+        h2: "There is no mandatory waiting period",
+        html: `<p>In the three systems people ask about most, the position is documented and consistent:</p>
+<ul>
+<li><strong>United States</strong> — the refusal notice text published by the US Mission to Türkiye states: <em>"Today's decision cannot be appealed. However, you may reapply at any time."</em> The US Embassy in Vietnam says the same, adding that new applications are adjudicated by a different consular officer.</li>
+<li><strong>Schengen</strong> — Article 21(9) of the EU Visa Code provides that <em>"A previous visa refusal shall not lead to an automatic refusal of a new application. A new application shall be assessed on the basis of all available information."</em> The Visa Code sets no waiting period.</li>
+<li><strong>United Kingdom</strong> — nothing on GOV.UK imposes a waiting period after a visitor visa refusal.</li>
+</ul>
+<p><strong>So where does "six months" come from?</strong> From advice, not law — and specifically from individual US consular posts. The US Embassy in Uzbekistan writes that you can reapply at any time provided your circumstances have changed, and then recommends waiting at least six months. Vietnam advises applicants with more than one recent refusal not to reapply unless circumstances have changed significantly.</p>
+<p>Read those together and the real message appears: the same page that recommends waiting confirms your right to apply immediately. It is post-level guidance about your <em>odds</em>, not a rule about your <em>eligibility</em>.</p>`,
+      },
+      {
+        h2: "A refusal is not a ban — keep three things apart",
+        html: `<p>These get blurred constantly, and the differences are enormous:</p>
+<ol>
+<li><strong>A refusal</strong> closes one application. In the US, the ordinary nonimmigrant refusal is made under INA section 214(b); the US Embassy in Vietnam states such an application <em>"will not be reviewed or reconsidered; there is no appeal process. However, applicants are free to reapply at any time."</em></li>
+<li><strong>An inadmissibility or misrepresentation finding</strong> is about the <em>person</em>, not the application. INA 212(a)(6)(C)(i) provides that anyone who <em>"by fraud or willfully misrepresenting a material fact"</em> seeks to procure a visa or admission is inadmissible. The US Embassy in Vietnam warns that an applicant caught concealing or misrepresenting facts may in certain cases be ruled permanently ineligible.</li>
+<li><strong>An entry ban</strong> is a separate finding under a separate provision. It does not follow from an ordinary refusal.</li>
+</ol>
+<p>If you take one thing from this article: <strong>a refusal closes one application; it does not bar you from the country.</strong> We deliberately publish no ban durations — they arise under unrelated provisions with different triggers in every system, and none is triggered by a plain refusal.</p>`,
+      },
+      {
+        h2: "What each system actually gives you",
+        html: `<p><strong>Schengen — a written refusal and a real appeal right.</strong> Article 32(2) of the Visa Code requires the decision and its reasons to be notified using the standard form in Annex VI. Article 32(3) then provides that applicants <em>"shall have the right to appeal"</em>, conducted against the member state that took the final decision and under that state's national law.</p>
+<p>The Annex VI form is headed "Standard form for notifying reasons for refusal, annulment or revocation of a visa", with the grounds as numbered tick-boxes. At its foot the consulate must fill in the competent appeal authority and the time limit. <strong>Read those boxes on your own form</strong> — the deadline, the fee and the procedure are set by national law and printed per applicant. There is no EU-wide deadline to quote, and the state that hears the appeal is the one that took the final decision, which is not always the one whose consulate you visited.</p>
+<p><strong>United Kingdom — neither an appeal nor an administrative review.</strong> This is worth stating sharply, because getting it wrong costs money. Administrative review is only available on the routes listed at paragraph AR 1.1 of Appendix Administrative Review, and Appendix V: Visitor is not among them; AR 2.2 requires the decision to be on a listed route. Home Office guidance states that where no human rights claim has been made, the application is refused with no right of appeal and no right to seek administrative review. <strong>The remedy for a refused visitor is a fresh application.</strong></p>
+<p><strong>United States — reapply, with something different.</strong> The Türkiye post sets out what that involves: a new application form and photo, the fee again, and a new interview.</p>`,
+      },
+      {
+        h2: "Reapplying: the only question that matters",
+        html: `<p>An identical file produces an identical outcome. A different officer looking at the same evidence usually reaches the same conclusion, which is why "just try again next month" is poor advice on its own.</p>
+<p>The useful question is not <em>when</em> but <em>what has changed</em>. Concretely: has your employment, income, property, family situation or travel history changed in a way you can evidence? Has the trip itself changed — shorter, better documented, differently funded? Did the refusal identify a specific gap you can now close?</p>
+<p>If nothing has changed, waiting six months changes nothing either. If something substantial has changed, there is no rule requiring you to wait for it to age.</p>`,
+      },
+      {
+        h2: "What you have to disclose afterwards",
+        html: `<p>Here the common wisdom is also wrong. There is no universal duty to declare every refusal to every country — the forms differ, and we verified three of them:</p>
+<ul>
+<li><strong>Canada asks about other countries.</strong> IRCC's Guide 5256 for the visitor visa asks the applicant to indicate whether they have ever been <em>"refused a visa or permit, denied entry or ordered to leave Canada or any other country or territory"</em>. This is the clearest case.</li>
+<li><strong>The harmonised Schengen form does not ask at all.</strong> The application form in Annex I to the Visa Code runs to 29 numbered questions, none of which asks about a previous refusal. Individual member states run national portals that may ask more.</li>
+<li><strong>ETIAS asks about removal, not refusal.</strong> Article 17(4) of Regulation (EU) 2018/1240 lists its additional questions exhaustively — certain criminal convictions, stays in war or conflict zones, and whether the applicant has been the subject of a decision requiring them to leave a member state. A refused visa is not on that list.</li>
+</ul>
+<p>The practical rule: <strong>answer the question actually printed on the form in front of you, exactly as worded, and answer it honestly.</strong> The risk of a wrong answer is not the refusal you are declaring — it is the misrepresentation finding in the section above, which is far more serious than the thing you were tempted to omit.</p>`,
+      },
+      {
+        h2: "Will you get your fee back?",
+        html: `<p>Generally no, but the wording differs by system in ways worth knowing. Australia's Home Affairs says it does <em>"not usually refund the visa application charge, even if your visa application is refused or withdrawn"</em> — note "usually", as it maintains an exceptions process. GOV.UK states flatly that you will not get a refund if your application is refused. On the Schengen form you sign a declaration acknowledging the fee is not refunded if the visa is refused.</p>
+<p>We publish no fee amounts here; they change often. Check the issuing authority's own page for the current figure and its current refund policy before you apply again.</p>`,
+      },
+      {
+        h2: "What to do this week",
+        html: `<ol>
+<li><strong>Read the refusal document itself</strong>, not a summary of it. If it is a Schengen Annex VI form, the tick-boxes tell you the ground and the foot of the form tells you your appeal route and deadline.</li>
+<li><strong>Work out which of the three things happened</strong> — a refusal, an inadmissibility finding, or a ban. They need completely different responses.</li>
+<li><strong>Identify what evidence was missing or unconvincing</strong>, and whether you can now change it.</li>
+<li><strong>Check whether your route has a review path at all</strong> before paying for one.</li>
+<li><strong>Reapply when your file is genuinely different</strong> — not on a calendar date someone invented.</li>
+</ol>
+<p>If your plans are flexible, it is also worth checking where your passport takes you without an application at all — try the <a href="/">visa checker</a>, or browse <a href="/countries">destinations by entry requirement</a>.</p>`,
+      },
+    ],
+    faqs: [
+      { q: "Do I have to wait six months to reapply after a visa refusal?", a: "No government sets that rule. US refusal notices state you may reapply at any time, the EU Visa Code says a previous refusal shall not lead to automatic refusal of a new application, and nothing on GOV.UK imposes a wait. The six-month figure comes from advice published by individual US consular posts, not from law." },
+      { q: "Can I appeal a visa refusal?", a: "It depends entirely on the system. Schengen gives a documented right of appeal under Article 32(3) of the Visa Code, against the member state that took the final decision and under its national law. A US 214(b) refusal carries no appeal. A UK standard visitor refusal carries neither an appeal nor an administrative review." },
+      { q: "Does a visa refusal mean I am banned from the country?", a: "No. A refusal closes one application. A ban is a separate finding under a separate provision and does not follow from an ordinary refusal. A misrepresentation finding is different again — under INA 212(a)(6)(C)(i) it attaches to the person rather than the application." },
+      { q: "Do I have to declare a visa refusal on future applications?", a: "Only where the form asks, and they differ. Canada's visitor guide asks whether you have been refused a visa or denied entry by Canada or any other country. The harmonised Schengen form does not ask at all. ETIAS asks about removal decisions, not refusals. Answer the question as worded, and answer honestly." },
+      { q: "Should I use administrative review after a UK visitor visa refusal?", a: "You cannot. Administrative review is only available on the routes listed at paragraph AR 1.1 of Appendix Administrative Review, and Appendix V: Visitor is not one of them. The remedy is to make a fresh application." },
+      { q: "Will I get my visa fee back if I am refused?", a: "Generally not. Australia says it does not usually refund the charge even if the application is refused or withdrawn; GOV.UK says flatly that you will not get a refund; and the Schengen form has you sign a declaration acknowledging it. Check the current policy on the issuing authority's own page." },
+    ],
+  },
+  {
+    kind: "article",
     slug: "why-airlines-deny-boarding",
     title: "Why Airlines Refuse to Board You (And Why It Isn't the Border's Call)",
     description: "An airline can refuse to board you even when the destination would have let you in. Why check-in and immigration are two different decisions, what the agent is reading, and what to do at the desk.",
@@ -410,9 +650,9 @@ export const GUIDES: Guide[] = [
 <ul>
 <li><strong>Valid for at least three months beyond your intended departure</strong> from the Schengen Area — not six, and measured from when you leave rather than when you arrive;</li>
 <li><strong>Issued within the previous ten years</strong> — a genuine trap for anyone whose passport was issued with extra months carried over from an old one, because it can be in date yet still older than ten years and be rejected;</li>
-<li>Carrying <strong>at least two blank pages</strong>.</li>
 </ul>
-<p>These three conditions come from EU visa law (Regulation 810/2009) and are applied at both airline check-in and the border. If you are heading to Europe, check the <em>issue</em> date as carefully as the expiry date.</p>`,
+<p>Both come from the Schengen Borders Code (Regulation (EU) 2016/399, Article 6), which sets the entry conditions for everyone crossing a Schengen border, and both are applied at airline check-in as well as at the border itself. If you are heading to Europe, check the <em>issue</em> date as carefully as the expiry date.</p>
+<p>A third requirement is often quoted alongside these: that your passport must contain <strong>at least two blank pages</strong>. That one sits in a different instrument. It is Article 12 of the Visa Code (Regulation (EC) No 810/2009), and it governs the document you present when <em>applying for a Schengen visa</em> — not the document you present at the border. If you are visa-exempt and simply arriving, it is not an entry condition. Carry blank pages anyway for stamps, but do not confuse the two rules.</p>`,
       },
       {
         h2: "Where the rule is shorter or does not apply",
