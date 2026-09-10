@@ -15,14 +15,16 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.isvisarequired.app"
+      "bundleIdentifier": "com.isvisarequired.app",
+      "buildNumber": "1"
     },
     "android": {
       "package": "com.isvisarequired.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#0A2FA1"
-      }
+      },
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/images/icon.png"
@@ -40,6 +42,8 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "description": "Check visa requirements for any passport and destination, covering 195 countries and 37,830 passport-destination combinations. Free, no account needed.",
+    "primaryColor": "#0A2FA1"
   }
 }

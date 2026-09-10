@@ -48,16 +48,23 @@ const statStyles = StyleSheet.create({
   label: { fontSize: 10, fontFamily: "Inter_500Medium", textAlign: "center" },
 });
 
+// Must stay in step with the website's tier list
+// (artifacts/visa-checker/src/pages/tier-list.tsx). Both score a passport by
+// the countries reachable without applying to an embassy in advance - visa
+// free + visa on arrival + eVisa - NOT by the strict visa-free count. Scoring
+// the app on visaFree alone put the United States in "B" while the website
+// showed the very same passport as "A".
 const TIER_CONFIG = [
-  { key: "S", minScore: 150, label: "S — Elite", description: "Visa-free to nearly everywhere" },
-  { key: "A", minScore: 120, label: "A — Strong", description: "Easy access to most countries" },
-  { key: "B", minScore: 90, label: "B — Good", description: "Good international mobility" },
-  { key: "C", minScore: 60, label: "C — Average", description: "Standard travel options" },
-  { key: "D", minScore: 0, label: "D — Restricted", description: "Many visa requirements apply" },
+  { key: "S", minScore: 178, label: "S — World Elite", description: "Near-universal access" },
+  { key: "A", minScore: 165, label: "A — Highly Powerful", description: "Excellent global mobility" },
+  { key: "B", minScore: 130, label: "B — Strong", description: "Strong global access" },
+  { key: "C", minScore: 105, label: "C — Average", description: "Moderate travel freedom" },
+  { key: "D", minScore: 85, label: "D — Below Average", description: "Limited access" },
+  { key: "E", minScore: 0, label: "E — Restricted", description: "Significant travel restrictions" },
 ];
 
-function getPassportTier(visaFree: number): typeof TIER_CONFIG[0] {
-  return TIER_CONFIG.find((t) => visaFree >= t.minScore) ?? TIER_CONFIG[TIER_CONFIG.length - 1];
+function getPassportTier(accessScore: number): typeof TIER_CONFIG[0] {
+  return TIER_CONFIG.find((t) => accessScore >= t.minScore) ?? TIER_CONFIG[TIER_CONFIG.length - 1];
 }
 
 export default function PassportScreen() {
@@ -79,7 +86,7 @@ export default function PassportScreen() {
 
   const tier = useMemo(() => {
     if (!stats) return null;
-    return getPassportTier(stats.visaFree);
+    return getPassportTier(stats.visaFree + stats.visaOnArrival + stats.eVisa);
   }, [stats]);
 
   const topPadding = Platform.OS === "web" ? 67 : insets.top;

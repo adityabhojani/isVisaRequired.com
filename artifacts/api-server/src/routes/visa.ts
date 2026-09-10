@@ -40,12 +40,26 @@ function buildPowerRankings(): Map<string, number> {
   }, STATIC);
 }
 
-// Sorted rankings list (for rank lookup)
+// Sorted rankings list (for rank lookup). Ties are ordered by country name so
+// the Tier List is stable between requests instead of depending on Map order.
 function getSortedRankings(): [string, number][] {
   return cache.getOrSet("sorted_rankings", () => {
     const scores = buildPowerRankings();
-    return [...scores.entries()].sort((a, b) => b[1] - a[1]);
+    return [...scores.entries()].sort(
+      (a, b) => b[1] - a[1] || (countryMap.get(a[0])?.name ?? a[0]).localeCompare(countryMap.get(b[0])?.name ?? b[0]),
+    );
   }, STATIC);
+}
+
+// Standard competition ranking: every passport with the same access score gets
+// the same rank. Position in the sorted array is NOT the rank - Cyprus, Malta
+// and the United States all score 175, so reading off the index would report
+// them as #39, #40 and #41 and imply a difference in access that is not there.
+function rankOf(passport: string): number {
+  const sorted = getSortedRankings();
+  const score = sorted.find(([code]) => code === passport)?.[1];
+  if (score === undefined) return sorted.length;
+  return sorted.filter(([, s]) => s > score).length + 1;
 }
 
 // All passport rankings in one shot — used by the Tier List page
@@ -211,8 +225,6 @@ router.get("/visa/stats", async (req: Request, res: Response): Promise<void> => 
       counts[entry.requirement]++;
     }
     const total = countries.length - 1;
-    const sorted = getSortedRankings();
-    const rank = sorted.findIndex(([code]) => code === passport) + 1;
 
     return {
       passportCountry,
@@ -222,7 +234,7 @@ router.get("/visa/stats", async (req: Request, res: Response): Promise<void> => 
       visaRequired: counts.visa_required,
       noAdmission: counts.no_admission,
       total,
-      powerRank: rank || sorted.length,
+      powerRank: rankOf(passport),
     };
   }, STATIC);
 

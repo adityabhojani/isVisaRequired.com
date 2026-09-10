@@ -37,7 +37,14 @@ export default function CheckScreen() {
   const [hasChecked, setHasChecked] = useState(false);
 
   const { data: countries = [], isLoading: countriesLoading } = useListCountries({});
-  const { data: popularDests = [] } = useGetPopularDestinations({});
+  const { data: allPopularDests = [] } = useGetPopularDestinations({});
+
+  // Your own country is not a destination you need a visa for, so drop it from
+  // the shortcuts - the popular list is the same for everyone, server-side.
+  const popularDests = useMemo(
+    () => allPopularDests.filter((d) => d.code !== selectedPassport),
+    [allPopularDests, selectedPassport],
+  );
 
   const passportCountry = useMemo(() => countries.find((c) => c.code === selectedPassport), [countries, selectedPassport]);
 

@@ -17,10 +17,17 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PassportProvider } from "@/context/PassportContext";
 
-// Set API base URL so Expo app can reach the server
-if (process.env.EXPO_PUBLIC_DOMAIN) {
-  setBaseUrl(`https://${process.env.EXPO_PUBLIC_DOMAIN}`);
-}
+// API base URL. This MUST always be set in a native build: the shared client
+// falls back to a RELATIVE url when no base is configured, which resolves fine
+// in a browser but has no origin inside a React Native app - every request
+// would fail. EXPO_PUBLIC_DOMAIN stays available for pointing a dev build at a
+// tunnel, a preview deployment or a local server; production falls back to the
+// live site. Local hosts get http because nothing is serving TLS there.
+const API_DOMAIN = process.env.EXPO_PUBLIC_DOMAIN ?? "www.isvisarequired.com";
+const API_SCHEME = /^(localhost|127\.0\.0\.1|\d+\.\d+\.\d+\.\d+)(:|$)/.test(API_DOMAIN)
+  ? "http"
+  : "https";
+setBaseUrl(`${API_SCHEME}://${API_DOMAIN}`);
 
 SplashScreen.preventAutoHideAsync();
 

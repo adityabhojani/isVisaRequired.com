@@ -336,17 +336,24 @@ export default function DestinationScreen() {
                 <Text style={styles.rowLabel}>Processing</Text>
                 <Text style={styles.rowValue}>{data.visaDetail.processingDays}</Text>
               </View>
-              <View style={styles.divider} />
-              <View style={styles.row}>
-                <Text style={styles.rowLabel}>Max Stay</Text>
-                <Text style={styles.rowValue}>{data.visaDetail.maxStay}</Text>
-              </View>
+              {/* Only the generic per-requirement fallback. When the pair has a
+                  real max stay it is already shown above, and printing both
+                  gave two conflicting "Max Stay" rows on the same card. */}
+              {!data.maxStay && (
+                <>
+                  <View style={styles.divider} />
+                  <View style={styles.row}>
+                    <Text style={styles.rowLabel}>Max Stay</Text>
+                    <Text style={styles.rowValue}>{data.visaDetail.maxStay}</Text>
+                  </View>
+                </>
+              )}
             </View>
           </View>
 
           {data.visaDetail.documents.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Required Documents</Text>
+              <Text style={styles.sectionTitle}>Documents to have ready</Text>
               <View style={styles.card}>
                 {data.visaDetail.documents.map((doc, i) => (
                   <View key={i} style={styles.docItem}>

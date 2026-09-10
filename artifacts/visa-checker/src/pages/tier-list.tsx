@@ -7,12 +7,18 @@ import { useListCountries } from "@workspace/api-client-react";
 
 interface PassportScore { code: string; name: string; flag: string; score: number; }
 
+// Thresholds are calibrated against the real score range (71-180 across the
+// 195 passports), not a 0-199 ideal. The old S>=185 and E<60 bands could never
+// match anything, so the tier list always rendered two permanently empty tiers.
+// A passport is scored against every OTHER country, so 194 is the ceiling.
+const MAX_ACCESSIBLE = 194;
+
 const TIER_CONFIG = [
-  { label: "S", min: 185, bg: "bg-amber-50", border: "border-amber-300", badge: "bg-amber-400 text-white", title: "World Elite", subtitle: "Near-universal access" },
+  { label: "S", min: 178, bg: "bg-amber-50", border: "border-amber-300", badge: "bg-amber-400 text-white", title: "World Elite", subtitle: "Near-universal access" },
   { label: "A", min: 165, bg: "bg-green-50", border: "border-green-300", badge: "bg-green-500 text-white", title: "Highly Powerful", subtitle: "Excellent global mobility" },
-  { label: "B", min: 145, bg: "bg-blue-50", border: "border-blue-300", badge: "bg-blue-500 text-white", title: "Strong", subtitle: "Strong global access" },
-  { label: "C", min: 125, bg: "bg-violet-50", border: "border-violet-300", badge: "bg-violet-500 text-white", title: "Average", subtitle: "Moderate travel freedom" },
-  { label: "D", min: 100, bg: "bg-orange-50", border: "border-orange-300", badge: "bg-orange-500 text-white", title: "Below Average", subtitle: "Limited access" },
+  { label: "B", min: 130, bg: "bg-blue-50", border: "border-blue-300", badge: "bg-blue-500 text-white", title: "Strong", subtitle: "Strong global access" },
+  { label: "C", min: 105, bg: "bg-violet-50", border: "border-violet-300", badge: "bg-violet-500 text-white", title: "Average", subtitle: "Moderate travel freedom" },
+  { label: "D", min: 85, bg: "bg-orange-50", border: "border-orange-300", badge: "bg-orange-500 text-white", title: "Below Average", subtitle: "Limited access" },
   { label: "E", min: 0, bg: "bg-red-50", border: "border-red-300", badge: "bg-red-500 text-white", title: "Restricted", subtitle: "Significant travel restrictions" },
 ];
 
@@ -104,7 +110,7 @@ export default function TierListPage() {
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">{tier.title}</p>
-                  <p className="text-xs text-muted-foreground">{tier.subtitle} · {TIER_CONFIG[ti].min}{ti === TIER_CONFIG.length - 1 ? "–99" : `–${(TIER_CONFIG[ti-1]?.min ?? 200) - 1}`} countries accessible · {filteredPassports.length} passport{filteredPassports.length !== 1 ? "s" : ""}</p>
+                  <p className="text-xs text-muted-foreground">{tier.subtitle} · {tier.min}–{ti === 0 ? MAX_ACCESSIBLE : TIER_CONFIG[ti - 1].min - 1} countries accessible · {filteredPassports.length} passport{filteredPassports.length !== 1 ? "s" : ""}</p>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">

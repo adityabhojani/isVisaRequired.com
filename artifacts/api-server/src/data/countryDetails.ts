@@ -26,13 +26,17 @@ export interface VisaDetail {
   notes?: string;
 }
 
+// Generic per-requirement templates, used when we have no country-specific
+// detail. They must not state a rule as universal when it is not: the flat
+// "6 months validity" line that used to sit here is contradicted by our own
+// /guides/six-month-passport-rule, and is wrong for the whole Schengen area.
 const defaultVisaDetails: Record<string, VisaDetail> = {
   visa_free: {
     feeUSD: 0,
     processingDays: "No processing required",
     maxStay: "Varies — check entry stamp",
     documents: [
-      "Valid passport (minimum 6 months validity beyond travel dates)",
+      "Passport meeting the destination's validity rule — commonly six months beyond arrival, but the Schengen area requires three months beyond departure and some countries only require it to cover your stay",
       "Return or onward ticket",
       "Proof of sufficient funds",
       "Travel itinerary",
@@ -48,7 +52,7 @@ const defaultVisaDetails: Record<string, VisaDetail> = {
     processingDays: "Issued on arrival (typically 15–60 minutes)",
     maxStay: "Varies by destination — check destination rules",
     documents: [
-      "Valid passport (minimum 6 months validity)",
+      "Passport meeting the destination's validity rule (commonly six months beyond arrival)",
       "Completed arrival/VOA form (available on plane or at airport)",
       "Return or onward ticket",
       "Proof of accommodation",
@@ -88,7 +92,7 @@ const defaultVisaDetails: Record<string, VisaDetail> = {
     maxStay: "Varies by destination and visa category",
     documents: [
       "Completed visa application form",
-      "Valid passport (6+ months validity, minimum 2 blank pages)",
+      "Passport meeting the destination's validity and blank-page rules (commonly six months beyond arrival and two blank pages)",
       "2 recent passport-sized photos",
       "Round-trip flight tickets",
       "Proof of accommodation (hotel booking)",
