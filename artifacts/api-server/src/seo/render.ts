@@ -7,6 +7,7 @@
 // on-demand is cheap.
 
 import { guideLinksForPair } from "./guideLinks";
+import { exemptionsFor, DOCUMENT_LABEL } from "../data/conditionalExemptions";
 import { FONT_LINKS, BASE_STYLE, renderHeader, renderFooter, renderKeepGoing } from "./shell";
 import { countries, type CountryData } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
@@ -116,6 +117,21 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
   const processing = detail.processingDays || "Varies";
   const [keepGuide, keepGuide2] = guideLinksForPair(requirement, `${from.code}${to.code}`);
   const answer = answerSentence(requirement, from.name, to.name);
+
+  // Conditional exemptions. Presented as an ADDITIONAL sourced path, never as a
+  // silent rewrite of the headline verdict: we cannot see the reader's other
+  // documents, and telling someone they are exempt when they are not is the one
+  // error that gets them denied boarding.
+  const exemptions = requirement === "visa_free" || requirement === "no_admission" ? [] : exemptionsFor(from.code, to.code);
+  const exemptionBlock = exemptions.map((e) => `
+<section class="card" style="border-left:3px solid #0A2FA1">
+  <h2>You may not need this visa</h2>
+  <p>${esc(to.name)} waives its visa requirement for travellers who already hold a second document. If you hold ${e.documents.map((d) => `<strong>${esc(DOCUMENT_LABEL[d])}</strong>`).join(", or ")}, this rule may apply to you.</p>
+  <p><strong>What it grants:</strong> ${esc(e.grants)}<br><strong>Covers:</strong> ${esc(e.purposes)}</p>
+  <p style="margin-bottom:6px"><strong>You must also satisfy:</strong></p>
+  <ul>${e.conditions.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>
+  <p style="font-size:14px;color:#475569;margin-bottom:0">Verified against <a href="${esc(e.source)}" target="_blank" rel="noopener noreferrer">${esc(e.sourceName)}</a> on ${esc(e.verifiedOn)}. Rules change without notice and border officers decide admission — confirm on that official page before you book. See also our guide to <a href="/residence-permit-visa-benefits">travelling on a residence permit or second visa</a>.</p>
+</section>`).join("");
 
   const canonical = `${SITE_ORIGIN}${pairPath(from, to)}`;
   // Answer-in-title: for question queries, the SERP result that already
@@ -342,6 +358,7 @@ ${detail.documents.length ? `<section class="card"><h2>Documents you'll typicall
 ${detail.process.length ? `<section class="card"><h2>How to apply / enter</h2><ol>${processList}</ol></section>` : ""}
 ${entryBlock}
 ${officialBlock}
+${exemptionBlock}
 ${touristBlock}
 
 <section class="card"><h2>Frequently asked questions</h2>${faqHtml}</section>

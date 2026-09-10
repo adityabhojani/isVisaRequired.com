@@ -4,6 +4,8 @@
 // the country's entry requirements (passport validity, funds, insurance,
 // pre-authorisation). Real data only; links to the per-pair pages.
 import { guideLinksForHub } from "./guideLinks";
+import { exemptionsForDestination, DOCUMENT_LABEL } from "../data/conditionalExemptions";
+import { countryMap } from "../data/countries";
 import type { CountryData } from "../data/countries";
 import { countries } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
@@ -93,6 +95,15 @@ export function renderDestinationHub(to: CountryData): string {
 <p class="lead">Do you need a visa for ${esc(to.name)}? It depends on your nationality. ${vf} passports can enter ${esc(to.name)} visa-free, ${voa} get a visa on arrival, ${ev} need an eVisa or travel authorisation, and ${vr} must apply for a visa in advance. Find your passport below, or review ${esc(to.name)}'s general entry requirements.</p>
 <div class="stats">${statCards}</div>
 <p><a class="cta" href="/?destinations=${to.code}">Check ${esc(to.name)} for your passport →</a></p>
+${(() => {
+  const ex = exemptionsForDestination(to.code);
+  if (!ex.length) return "";
+  return ex.map((e) => `<section class="card" style="border-left:3px solid #0A2FA1">
+  <h2>Second-document exemption${e.appliesTo.length ? ` — ${esc(e.appliesTo.map((c) => countryMap.get(c)?.name ?? c).join(", "))} passports` : ""}</h2>
+  <p>${esc(to.name)} waives its visa requirement for ${e.appliesTo.length ? "these nationalities" : "travellers of any nationality"} holding ${e.documents.map((d) => `<strong>${esc(DOCUMENT_LABEL[d])}</strong>`).join(", or ")}. <strong>${esc(e.grants)}</strong> — ${esc(e.purposes.toLowerCase())}.</p>
+  <p style="font-size:14px;color:#475569;margin-bottom:0">Verified against <a href="${esc(e.source)}" target="_blank" rel="noopener noreferrer">${esc(e.sourceName)}</a> on ${esc(e.verifiedOn)}. Confirm on that page before booking.</p>
+</section>`).join("");
+})()}
 ${(() => { const gs = guideLinksForHub(to.code); return `<section class="keep"><h2>Before you travel</h2><div class="tiles">${gs.map((g) => `<a href="${g.href}">${g.label}${g.sub ? `<small>${g.sub}</small>` : ""}</a>`).join("")}<a href="/guides">All visa &amp; travel guides<small>Twelve explainers</small></a></div></section>`; })()}
 
 <h2>${esc(to.name)} entry requirements (all travellers)</h2>
