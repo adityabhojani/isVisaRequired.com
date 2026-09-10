@@ -4,7 +4,7 @@
     "slug": "visa-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon-square.png",
     "scheme": "visa-app",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -21,19 +21,19 @@
     "android": {
       "package": "com.isvisarequired.app",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#0A2FA1"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#1C365F"
       },
       "versionCode": 1
     },
     "web": {
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/images/icon-square.png"
     },
     "plugins": [
       [
         "expo-router",
         {
-          "origin": "https://replit.com/"
+          "origin": "https://www.isvisarequired.com"
         }
       ],
       "expo-font",

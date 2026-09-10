@@ -46,6 +46,8 @@ onlyBuiltDependencies:
   - unrs-resolver
 
 overrides:
+  # expo-asset pulls an older expo-constants; pin it so the app resolves one copy
+  expo-constants: ~18.0.14
   '@esbuild-kit/esm-loader': npm:tsx@^4.21.0
   '@expo/ngrok-bin>@expo/ngrok-bin-darwin-arm64': '-'
   '@expo/ngrok-bin>@expo/ngrok-bin-darwin-x64': '-'
