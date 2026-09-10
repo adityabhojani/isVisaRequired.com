@@ -12,6 +12,7 @@ import { computeReport } from "./report";
 import { DATA_LAST_UPDATED } from "./hubLayout";
 import { slugify } from "./render";
 import { digitalNomadVisas } from "@workspace/travel-data";
+import { PASSPORT_TIERS, tierUpperBound } from "../data/passportTiers";
 
 export const SITE = "https://www.isvisarequired.com";
 
@@ -220,15 +221,6 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
 // that powers the checker — no second copy of the data, no drift.
 // ---------------------------------------------------------------------------
 
-const TIERS = [
-  { label: "S", min: 185, title: "World Elite", note: "Near-universal access" },
-  { label: "A", min: 165, title: "Highly Powerful", note: "Excellent global mobility" },
-  { label: "B", min: 145, title: "Strong", note: "Strong global access" },
-  { label: "C", min: 125, title: "Average", note: "Moderate travel freedom" },
-  { label: "D", min: 100, title: "Below Average", note: "Limited access" },
-  { label: "E", min: 0, title: "Restricted", note: "Significant travel restrictions" },
-];
-
 function table(head: string[], rows: string[][]): string {
   const th = head.map((h) => `<th style="text-align:left;padding:6px 10px;border-bottom:2px solid #e2e8f0">${esc(h)}</th>`).join("");
   const tr = rows.map((r) =>
@@ -238,15 +230,14 @@ function table(head: string[], rows: string[][]): string {
 
 function tierListBody(): string {
   const d = computeReport();
-  const counts = TIERS.map((t, i) => {
-    const upper = i === 0 ? Infinity : TIERS[i - 1].min;
-    const inTier = d.rows.filter((r) => r.mobility >= t.min && r.mobility < upper);
+  const counts = PASSPORT_TIERS.map((t, i) => {
+    const upper = tierUpperBound(i);
+    const inTier = d.rows.filter((r) => r.mobility >= t.min && r.mobility <= upper);
     return { t, inTier };
   });
-  // Only render bands that actually contain passports. The client's TIER_CONFIG
-  // sets S at 185+, but the highest mobility score in the dataset is 180, so S
-  // is currently unreachable — publishing "S — World Elite: 0" as crawlable,
-  // citable text would be worse than omitting it.
+  // Kept as a guard, not as a workaround: the bands are calibrated so none of
+  // them is empty, but publishing "S — World Elite: 0" as crawlable, citable
+  // text would be worse than omitting the row if the data ever shifts.
   const tierRows = counts.filter(({ inTier }) => inTier.length > 0).map(({ t, inTier }) => [
     `<strong>${t.label}</strong> — ${esc(t.title)}`,
     `${t.min}+`,

@@ -5,6 +5,7 @@ import { getDefaultEntry } from "../data/visaData";
 import { getVisaDetail, getCountryTouristInfo } from "../data/countryDetails";
 import { officialLinks } from "../data/officialLinks";
 import { cache, TTL } from "../lib/cache";
+import { PASSPORT_TIERS, tierUpperBound } from "../data/passportTiers";
 
 const router: IRouter = Router();
 
@@ -65,10 +66,13 @@ function rankOf(passport: string): number {
 // All passport rankings in one shot — used by the Tier List page
 router.get("/visa/all-rankings", (_req: Request, res: Response): void => {
   const sorted = getSortedRankings();
-  // Map to [{code, score}] — client enriches with name/flag from /api/countries
+  // Map to [{code, score}] — client enriches with name/flag from /api/countries.
+  // The tier bands ride along so the interactive tier list and the crawlable
+  // one are banded by the same numbers instead of each keeping a copy.
   const rankings = sorted.map(([code, score]) => ({ code, score }));
+  const tiers = PASSPORT_TIERS.map((t, i) => ({ ...t, max: tierUpperBound(i) }));
   res.setHeader("Cache-Control", CACHE_CONTROL_STATIC);
-  res.json({ rankings });
+  res.json({ rankings, tiers });
 });
 
 router.get("/visa/check", async (req: Request, res: Response): Promise<void> => {
