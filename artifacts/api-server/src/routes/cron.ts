@@ -1,7 +1,9 @@
 // Scheduled job (Vercel Cron → GET /api/cron/check-alerts): for every active
 // visa alert, recompute the current requirement and email the subscriber when it
 // has changed since last check. First time an alert is seen, we just record a
-// baseline (no email). Protected by CRON_SECRET when set.
+// baseline (no email). Requires CRON_SECRET, which Vercel Cron sends as a Bearer
+// token; with it unset the job refuses to run.
+import crypto from "crypto";
 import { Router, type IRouter, type Request, type Response } from "express";
 import { getAuth } from "@clerk/express";
 import { db, isDatabaseConfigured } from "@workspace/db";
@@ -15,6 +17,25 @@ import { ensureAlertsSchema } from "./alerts";
 import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
+
+// Fail CLOSED. The old check skipped authentication entirely whenever
+// CRON_SECRET was unset, so anyone could run this job: a scan of the alerts
+// table with writes, and emails once Resend is configured.
+type CronAuth = "ok" | "unauthorized" | "not_configured";
+
+// Hash both sides so timingSafeEqual always gets equal-length input and the
+// comparison leaks neither the secret's length nor a matching prefix.
+function safeEqual(a: string, b: string): boolean {
+  const ha = crypto.createHash("sha256").update(a, "utf8").digest();
+  const hb = crypto.createHash("sha256").update(b, "utf8").digest();
+  return crypto.timingSafeEqual(ha, hb);
+}
+
+function cronAuth(req: Request): CronAuth {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) return "not_configured";
+  return safeEqual(req.headers.authorization ?? "", `Bearer ${secret}`) ? "ok" : "unauthorized";
+}
 
 const SITE_ORIGIN = "https://www.isvisarequired.com";
 const LABELS: Record<string, string> = {
@@ -51,15 +72,16 @@ function changeEmailHtml(a: AlertRow, oldReq: string, newReq: string): string {
 }
 
 router.get("/cron/check-alerts", async (req: Request, res: Response): Promise<void> => {
-  const cronSecret = process.env.CRON_SECRET;
+  const cron = cronAuth(req);
 
   // Admin-only test send: /api/cron/check-alerts?test=you@email.com sends one
   // sample alert email so you can confirm the Resend pipeline works.
   const testTo = typeof req.query["test"] === "string" ? (req.query["test"] as string) : null;
   if (testTo) {
-    const auth = getAuth(req);
-    const okAdmin = Boolean(auth?.userId && isAdminUser(auth.userId));
-    const okSecret = Boolean(cronSecret && req.headers.authorization === `Bearer ${cronSecret}`);
+    // getAuth() throws when Clerk isn't mounted, so only ask when it is.
+    const userId = process.env.CLERK_SECRET_KEY ? getAuth(req)?.userId : null;
+    const okAdmin = Boolean(userId && isAdminUser(userId));
+    const okSecret = cron === "ok";
     if (!okAdmin && !okSecret) {
       res.status(401).json({ error: "Sign in as admin to send a test email." });
       return;
@@ -78,7 +100,14 @@ router.get("/cron/check-alerts", async (req: Request, res: Response): Promise<vo
     return;
   }
 
-  if (cronSecret && req.headers.authorization !== `Bearer ${cronSecret}`) {
+  if (cron === "not_configured") {
+    // 503, not 401, so a missing secret can be told apart from a wrong one from
+    // outside — without running anything.
+    logger.error("CRON_SECRET is not set on this deployment; refusing to run the alert check.");
+    res.status(503).json({ error: "Cron is not configured on this deployment." });
+    return;
+  }
+  if (cron !== "ok") {
     res.status(401).json({ error: "Unauthorized." });
     return;
   }
