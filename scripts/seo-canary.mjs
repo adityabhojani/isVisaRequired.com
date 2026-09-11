@@ -23,6 +23,13 @@ const GOOGLEBOT =
 const CHROME =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36";
 
+// What crawlers and browsers actually send when they request a page. Node's
+// fetch defaults to "Accept: */*", and middleware can treat that differently:
+// from May to September 2026 Clerk answered "Accept: text/html" page requests
+// with a 307 to clerk.accounts.dev, while this canary — sending */* — got a
+// clean 200 and passed. Always ask for pages the way Googlebot does.
+const PAGE_ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
+
 // One representative URL per page type. If a whole page type regresses, at
 // least one of these catches it.
 const INDEXABLE = [
@@ -48,12 +55,20 @@ const INDEXABLE = [
 const failures = [];
 const fail = (url, msg) => failures.push(`${url}\n    -> ${msg}`);
 
-async function head(url) {
-  const res = await fetch(url, {
-    headers: { "User-Agent": GOOGLEBOT },
-    redirect: "manual",
-  });
-  return res;
+// Network errors must become canary failures, never crashes: an uncaught
+// "fetch failed" exits without saying which URL broke or why. redirect:"manual"
+// so a redirect is reported as a status instead of followed — following one is
+// how a redirect LOOP turns into an unexplained crash.
+async function get(url) {
+  try {
+    return await fetch(url, {
+      headers: { "User-Agent": GOOGLEBOT, Accept: PAGE_ACCEPT },
+      redirect: "manual",
+    });
+  } catch (e) {
+    fail(url, `request failed: ${e.cause?.message ?? e.message}`);
+    return null;
+  }
 }
 
 async function checkIndexable(path) {
@@ -64,7 +79,7 @@ async function checkIndexable(path) {
     // response; following a redirect first would inspect some other page's
     // headers and miss it entirely.
     res = await fetch(url, {
-      headers: { "User-Agent": GOOGLEBOT },
+      headers: { "User-Agent": GOOGLEBOT, Accept: PAGE_ACCEPT },
       redirect: "manual",
     });
   } catch (e) {
@@ -80,11 +95,32 @@ async function checkIndexable(path) {
     fail(url, `X-Robots-Tag says "${xr}" — THIS IS THE JUNE-JULY 2026 OUTAGE MODE`);
   }
 
+  // A page must never bounce a crawler to another host. Checked on the first
+  // response, for the same reason as the header above.
+  if (res.status >= 300 && res.status < 400) {
+    const location = res.headers.get("location") ?? "";
+    const clerkStatus = res.headers.get("x-clerk-auth-status");
+    let host = "";
+    try {
+      host = new URL(location, url).host;
+    } catch {
+      // unparseable Location: the status check below still reports it
+    }
+    if (clerkStatus || (host && host !== new URL(ORIGIN).host)) {
+      fail(
+        url,
+        `redirects crawlers off-site: ${res.status} to ${host || location}` +
+          (clerkStatus ? ` (x-clerk-auth-status: ${clerkStatus} — Clerk middleware is running on pages)` : ""),
+      );
+      return;
+    }
+  }
+
   // Any UA-conditional difference is itself the alarm: it means something is
   // branching on user-agent, which is how crawlers get served a worse response
   // than humans without anyone noticing.
   const asChrome = await fetch(url, {
-    headers: { "User-Agent": CHROME },
+    headers: { "User-Agent": CHROME, Accept: PAGE_ACCEPT, "Sec-Fetch-Dest": "document" },
     redirect: "manual",
   }).catch(() => null);
   if (asChrome) {
@@ -129,7 +165,8 @@ async function checkIndexable(path) {
 
 async function checkApexRedirects() {
   for (const path of ["/", "/guides"]) {
-    const res = await head(`${APEX}${path}`);
+    const res = await get(`${APEX}${path}`);
+    if (!res) continue;
     if (res.status !== 308 && res.status !== 301) {
       fail(`${APEX}${path}`, `apex should redirect, got ${res.status}`);
     }
@@ -138,7 +175,8 @@ async function checkApexRedirects() {
 
 async function checkUnknownIs404() {
   const url = `${ORIGIN}/this-url-should-not-exist-seo-canary-zzz`;
-  const res = await fetch(url, { headers: { "User-Agent": GOOGLEBOT } });
+  const res = await get(url);
+  if (!res) return;
   if (res.status !== 404) {
     fail(url, `unknown paths must 404 (soft-404 guard), got ${res.status}`);
   }
@@ -147,7 +185,8 @@ async function checkUnknownIs404() {
 
 async function checkRobotsTxt() {
   const url = `${ORIGIN}/robots.txt`;
-  const res = await fetch(url, { headers: { "User-Agent": GOOGLEBOT } });
+  const res = await get(url);
+  if (!res) return;
   // A 5xx on robots.txt makes Google treat the ENTIRE host as disallowed.
   if (res.status !== 200) return fail(url, `robots.txt must be 200, got ${res.status}`);
   const ct = res.headers.get("content-type") ?? "";
@@ -169,9 +208,8 @@ async function checkRobotsTxt() {
 // site's 38,000 pages live. Sampling fresh each run eventually covers
 // everything and cannot be gamed by the pages happening to be on the list.
 async function sitemapSample(n) {
-  const idx = await fetch(`${ORIGIN}/sitemap.xml`, {
-    headers: { "User-Agent": GOOGLEBOT },
-  });
+  const idx = await get(`${ORIGIN}/sitemap.xml`);
+  if (!idx) return [];
   if (idx.status !== 200) {
     fail(`${ORIGIN}/sitemap.xml`, `sitemap index returned ${idx.status}`);
     return [];
@@ -185,7 +223,8 @@ async function sitemapSample(n) {
   const pool = [];
   // Sample a few child sitemaps rather than downloading all of them.
   for (const c of children.sort(() => Math.random() - 0.5).slice(0, 4)) {
-    const r = await fetch(c, { headers: { "User-Agent": GOOGLEBOT } });
+    const r = await get(c);
+    if (!r) continue;
     if (r.status !== 200) { fail(c, `child sitemap returned ${r.status}`); continue; }
     const b = await r.text();
     if (/<!DOCTYPE html|<html/i.test(b)) { fail(c, "child sitemap served HTML"); continue; }
@@ -207,7 +246,7 @@ async function checkSample(urls) {
   const canonicals = [];
   for (const url of urls) {
     const res = await fetch(url, {
-      headers: { "User-Agent": GOOGLEBOT },
+      headers: { "User-Agent": GOOGLEBOT, Accept: PAGE_ACCEPT },
       redirect: "manual",
     }).catch(() => null);
     if (!res) { fail(url, "request failed"); continue; }
@@ -250,11 +289,22 @@ const checked = INDEXABLE.length + 4 + sample.length;
 if (failures.length) {
   console.error(`\n✗ ${failures.length} FAILURE(S) of ${checked} checks:\n`);
   for (const f of failures) console.error(`  ${f}\n`);
-  console.error(
-    "If X-Robots-Tag noindex appears: the live domain is almost certainly being\n" +
-      "served by a PREVIEW deployment. In Vercel, promote a deployment whose\n" +
-      "target is 'production' (Deployments -> the main-branch build -> Promote).\n",
-  );
+  // Point at the likely cause of whichever failure class actually occurred, so
+  // a redirect failure doesn't send someone off chasing a noindex outage.
+  if (failures.some((f) => /X-Robots-Tag|noindex/i.test(f))) {
+    console.error(
+      "If X-Robots-Tag noindex appears: the live domain is almost certainly being\n" +
+        "served by a PREVIEW deployment. In Vercel, promote a deployment whose\n" +
+        "target is 'production' (Deployments -> the main-branch build -> Promote).\n",
+    );
+  }
+  if (failures.some((f) => f.includes("redirects crawlers off-site"))) {
+    console.error(
+      "If pages redirect crawlers off-site: middleware is answering page requests\n" +
+        "with a redirect. In September 2026 it was Clerk's auth middleware mounted on\n" +
+        "every route with a development instance; it must only run on /api.\n",
+    );
+  }
   process.exit(1);
 }
 console.log(`✓ all ${checked} checks passed — site is indexable`);

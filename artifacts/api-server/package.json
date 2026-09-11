@@ -27,7 +27,6 @@
     "express": "^5",
     "express-rate-limit": "^8.4.1",
     "helmet": "^8.1.0",
-    "http-proxy-middleware": "^3.0.5",
     "marked": "^18.0.3",
     "pino": "^9",
     "pino-http": "^10",

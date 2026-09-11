@@ -31,6 +31,9 @@ function safeEqual(a: string, b: string): boolean {
   return crypto.timingSafeEqual(ha, hb);
 }
 
+// Generate the secret as hex (`openssl rand -hex 32`). A value with exactly two
+// dots looks like a JWT, and Clerk's middleware on /api would try to read Vercel's
+// Bearer header as a session token before this route ever runs.
 function cronAuth(req: Request): CronAuth {
   const secret = process.env.CRON_SECRET;
   if (!secret) return "not_configured";
