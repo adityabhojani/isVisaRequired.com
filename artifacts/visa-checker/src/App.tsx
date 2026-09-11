@@ -63,17 +63,15 @@ const queryClient = new QueryClient({
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-// Use env var directly — the publishableKeyFromHost internal API is production-only.
-// Falls back to the project's Clerk key (publishable keys are public, safe to embed)
-// so the app always has a ClerkProvider — Header and other components call useUser()
-// unconditionally and crash without one. Override with VITE_CLERK_PUBLISHABLE_KEY in
-// the deploy environment to point at a production Clerk instance.
+// The Clerk key is baked in at build time. The fallback only exists so local and
+// preview builds without the variable still get a ClerkProvider — Header and
+// other components call useUser() unconditionally and crash without one. It is
+// the development instance production has been running on, not the old
+// Replit-provisioned one the founder can't open. Production builds are refused
+// when the variable is missing (scripts/check-clerk-env.mjs), so it never ships.
 const clerkPubKey =
   (import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined) ||
-  "pk_test_ZGFybGluZy1wZWdhc3VzLTQxLmNsZXJrLmFjY291bnRzLmRldiQ";
-
-// Only set proxy URL in production (it's auto-set by the platform, undefined in dev)
-const clerkProxyUrl = (import.meta.env.VITE_CLERK_PROXY_URL as string | undefined) || undefined;
+  "pk_test_Zmx1ZW50LXdhbGxhYnktNzYuY2xlcmsuYWNjb3VudHMuZGV2JA";
 
 function stripBase(path: string): string {
   return basePath && path.startsWith(basePath) ? path.slice(basePath.length) || "/" : path;
@@ -235,7 +233,6 @@ function ClerkProviderWithRoutes() {
   return (
     <ClerkProvider
       publishableKey={clerkPubKey}
-      proxyUrl={clerkProxyUrl}
       appearance={clerkAppearance}
       signInUrl={`${basePath}/sign-in`}
       signUpUrl={`${basePath}/sign-up`}
