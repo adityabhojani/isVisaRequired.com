@@ -14,6 +14,6 @@ export const COVERAGE = {
   countries: 195,
   pairs: 37830,
   pairsLabel: "37,830",
-  lastReviewed: "2026-08-25",
-  lastReviewedLabel: "25 Aug 2026",
+  lastReviewed: "2026-09-12",
+  lastReviewedLabel: "12 Sep 2026",
 } as const;

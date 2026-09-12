@@ -62,6 +62,93 @@ const NAMIBIA_VISA_NOW_REQUIRED = [
   "CH", "TJ", "TM", "UA", "UZ", "GB", "US",
 ];
 
+
+// --- Ghana: online authorisation for everyone outside ECOWAS/AES ------------
+// Ghana's e-Visa portal (Ghana Immigration Service) launched 25 May 2026. Its
+// eligibility engine returns only two outcomes: ECOWAS/AES nationals enter
+// visa-free, and every other nationality must obtain an ETA or e-Visa online
+// before travelling. Checked for all 194 nationalities against the portal's own
+// eligibility endpoint; the base snapshot still had Ghana open to everyone.
+const GHANA_ONLINE_AUTH = [
+  "AF", "AL", "DZ", "AD", "AO", "AG", "AR", "AM", "AU", "AT", "AZ", "BS",
+  "BH", "BD", "BB", "BY", "BE", "BZ", "BT", "BO", "BA", "BW", "BR", "BN",
+  "BG", "BI", "KH", "CM", "CA", "CF", "TD", "CL", "CN", "CO", "KM", "CG",
+  "CD", "CR", "HR", "CU", "CY", "CZ", "DK", "DJ", "DM", "DO", "EC", "EG",
+  "SV", "GQ", "ER", "EE", "SZ", "ET", "FJ", "FI", "FR", "GA", "GE", "DE",
+  "GR", "GD", "GT", "GY", "HT", "HN", "HU", "IS", "IN", "ID", "IR", "IQ",
+  "IE", "IL", "IT", "JM", "JP", "JO", "KZ", "KE", "KI", "KW", "KG", "LA",
+  "LV", "LB", "LS", "LY", "LI", "LT", "LU", "MG", "MW", "MY", "MV", "MT",
+  "MH", "MR", "MU", "MX", "FM", "MD", "MC", "MN", "ME", "MA", "MZ", "MM",
+  "NA", "NR", "NP", "NL", "NZ", "NI", "KP", "MK", "NO", "OM", "PK", "PW",
+  "PS", "PA", "PG", "PY", "PE", "PH", "PL", "PT", "QA", "RO", "RU", "RW",
+  "KN", "LC", "VC", "WS", "SM", "ST", "SA", "RS", "SC", "SG", "KR", "SK",
+  "SI", "SB", "SO", "ZA", "SS", "ES", "LK", "SD", "SR", "SE", "CH", "SY",
+  "TW", "TJ", "TZ", "TH", "TL", "TO", "TT", "TN", "TR", "TM", "TV", "UG",
+  "UA", "AE", "GB", "US", "UY", "UZ", "VU", "VE", "VN", "YE", "ZM", "ZW",
+];
+
+// --- Cabo Verde: 91-country advance-visa list, in force 1 January 2026 -------
+// Despacho n.o 244/GMAI/2026 (Boletim Oficial, 23 Jan 2026) requires nationals of
+// the listed countries to hold a visa before arrival, including for transit.
+// 89 of the 91 are countries in this dataset.
+const CABO_VERDE_VISA_REQUIRED = [
+  "AF", "AM", "AZ", "BD", "BH", "BI", "BN", "BO", "BT", "BW", "BY", "CD",
+  "CF", "CG", "CL", "CO", "CR", "DJ", "DM", "DO", "DZ", "EC", "EG", "ER",
+  "ET", "GA", "GT", "GY", "HN", "HT", "ID", "IQ", "IR", "JM", "JO", "KG",
+  "KH", "KI", "KM", "KP", "KZ", "LA", "LB", "LK", "LS", "LY", "MG", "MM",
+  "MN", "MR", "MW", "MX", "NA", "NI", "NP", "NR", "OM", "PA", "PE", "PG",
+  "PH", "PK", "PS", "PW", "PY", "SD", "SO", "SR", "SS", "SV", "SY", "SZ",
+  "TD", "TJ", "TM", "TN", "TO", "TT", "TV", "TZ", "UG", "UZ", "VE", "VN",
+  "VU", "WS", "YE", "ZM", "ZW",
+];
+
+// --- Guinea-Bissau: prior authorisation outside ECOWAS ------------------------
+// Entry on arrival needs an authorisation letter approved in advance by the
+// Migration Office, so it is not a walk-up visa on arrival. Sourced to foreign
+// ministries rather than Bissau's own portal, whose officialness we could not
+// establish; ECOWAS free movement is unaffected.
+const GUINEA_BISSAU_VISA_REQUIRED = [
+  "AD", "AE", "AF", "AG", "AL", "AM", "AO", "AR", "AT", "AU", "AZ", "BA",
+  "BB", "BD", "BE", "BG", "BH", "BI", "BN", "BO", "BR", "BS", "BT", "BW",
+  "BY", "BZ", "CA", "CD", "CF", "CG", "CH", "CL", "CM", "CN", "CO", "CR",
+  "CU", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG",
+  "ER", "ES", "ET", "FI", "FJ", "FM", "FR", "GA", "GB", "GD", "GE", "GQ",
+  "GR", "GT", "GY", "HN", "HR", "HT", "HU", "ID", "IE", "IL", "IN", "IQ",
+  "IR", "IS", "IT", "JM", "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN",
+  "KP", "KR", "KW", "KZ", "LA", "LB", "LC", "LI", "LK", "LS", "LT", "LU",
+  "LV", "LY", "MA", "MC", "MD", "ME", "MG", "MH", "MK", "MM", "MN", "MR",
+  "MT", "MU", "MV", "MW", "MX", "MY", "MZ", "NA", "NI", "NL", "NO", "NP",
+  "NR", "NZ", "OM", "PA", "PE", "PG", "PH", "PK", "PL", "PS", "PT", "PW",
+  "PY", "QA", "RO", "RS", "RU", "RW", "SA", "SB", "SC", "SD", "SE", "SG",
+  "SI", "SK", "SM", "SO", "SR", "SS", "ST", "SV", "SY", "SZ", "TD", "TH",
+  "TJ", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ", "UA", "UG",
+  "US", "UY", "UZ", "VC", "VE", "VN", "VU", "WS", "YE", "ZA", "ZM", "ZW",
+];
+
+// --- Seychelles: Travel Authorisation required of every visitor ---------------
+// No visa, but Seychelles Immigration requires every visitor to hold an approved
+// electronic Travel Authorisation before departure (fee-based, seychelles.govtas.com).
+// An approval obtained before travel is an eVisa/ETA in this dataset's vocabulary.
+const SEYCHELLES_TA = [
+  "AD", "AE", "AF", "AG", "AL", "AM", "AO", "AR", "AT", "AU", "AZ", "BA",
+  "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BN", "BO", "BR", "BS",
+  "BT", "BW", "BY", "BZ", "CA", "CD", "CF", "CG", "CH", "CI", "CL", "CM",
+  "CN", "CO", "CR", "CU", "CV", "CY", "CZ", "DE", "DJ", "DK", "DM", "DO",
+  "DZ", "EC", "EE", "EG", "ER", "ES", "ET", "FI", "FJ", "FM", "FR", "GA",
+  "GB", "GD", "GE", "GH", "GM", "GN", "GQ", "GR", "GT", "GW", "GY", "HN",
+  "HR", "HT", "HU", "ID", "IE", "IL", "IN", "IQ", "IR", "IS", "IT", "JM",
+  "JO", "JP", "KE", "KG", "KH", "KI", "KM", "KN", "KP", "KR", "KW", "KZ",
+  "LA", "LB", "LC", "LI", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA",
+  "MC", "MD", "ME", "MG", "MH", "MK", "ML", "MM", "MN", "MR", "MT", "MU",
+  "MV", "MW", "MX", "MY", "MZ", "NA", "NE", "NG", "NI", "NL", "NO", "NP",
+  "NR", "NZ", "OM", "PA", "PE", "PG", "PH", "PK", "PL", "PS", "PT", "PW",
+  "PY", "QA", "RO", "RS", "RU", "RW", "SA", "SB", "SD", "SE", "SG", "SI",
+  "SK", "SL", "SM", "SN", "SO", "SR", "SS", "ST", "SV", "SY", "SZ", "TD",
+  "TG", "TH", "TJ", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ",
+  "UA", "UG", "US", "UY", "UZ", "VC", "VE", "VN", "VU", "WS", "YE", "ZA",
+  "ZM", "ZW",
+];
+
 export const VISA_OVERRIDES: VisaOverride[] = [
   ...UK_ETA_EUROPE.map((passport): VisaOverride => ({
     passport,
@@ -295,5 +382,47 @@ export const VISA_OVERRIDES: VisaOverride[] = [
     value: "14",
     source: "Oman Ministry of Foreign Affairs entry-visa list (fm.gov.om)",
     verifiedOn: "2026-08-25",
+  },
+  ...GHANA_ONLINE_AUTH.map((passport): VisaOverride => ({
+    passport,
+    destination: "GH",
+    value: "e-visa",
+    source: "Ghana Immigration Service e-Visa portal (evisa.immigration.gov.gh) — per-nationality eligibility check",
+    verifiedOn: "2026-09-12",
+  })),
+
+  ...CABO_VERDE_VISA_REQUIRED.map((passport): VisaOverride => ({
+    passport,
+    destination: "CV",
+    value: "visa required",
+    source: "Despacho n.o 244/GMAI/2026 (Boletim Oficial, 23 Jan 2026), published on the official EASE portal ease.gov.cv",
+    verifiedOn: "2026-09-12",
+  })),
+
+  ...GUINEA_BISSAU_VISA_REQUIRED.map((passport): VisaOverride => ({
+    passport,
+    destination: "GW",
+    value: "visa required",
+    source: "UK FCDO, France Diplomatie (20 Jul 2026) and Global Affairs Canada travel advice for Guinea-Bissau: visa required in advance",
+    verifiedOn: "2026-09-12",
+  })),
+
+  ...SEYCHELLES_TA.map((passport): VisaOverride => ({
+    passport,
+    destination: "SC",
+    value: "eta",
+    source: "Seychelles Immigration (ics.gov.sc/permits/visitors-permit) and Ministry of Foreign Affairs (mfa.gov.sc): Travel Authorisation required before departure",
+    verifiedOn: "2026-09-12",
+  })),
+
+  // Maldives: entry is not granted on Israeli passports (Third Amendment to the
+  // Immigration Act, ratified 15 April 2025). Everyone else still gets a free
+  // visa on arrival.
+  {
+    passport: "IL",
+    destination: "MV",
+    value: "no admission",
+    source: "Maldives Immigration tourist-visa page (immigration.gov.mv) and President's Office press release on the Third Amendment",
+    verifiedOn: "2026-09-12",
   },
 ];
