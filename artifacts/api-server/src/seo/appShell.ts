@@ -72,6 +72,7 @@ function linkBlock(): string {
       <li><a href="/guides">Visa &amp; travel guides</a></li>
       <li><a href="/reports/passport-power-2026">Global Passport Power Report 2026</a></li>
       <li><a href="/reports/most-welcoming-countries-2026">Most Welcoming Countries Index 2026</a></li>
+      <li><a href="/visa-changes">Verified visa rule changes</a></li>
       <li><a href="/dual-citizenship">Dual citizenship visa checker</a></li>
     </ul>
     <p style="font-weight:600;margin-top:12px">Guides</p>

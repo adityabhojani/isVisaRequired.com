@@ -250,7 +250,24 @@ function parseValue(raw: string): VisaEntry {
 
 type VisaLookup = Map<string, Map<string, VisaEntry>>;
 
+/** One verified correction: what the base dataset said, and what replaced it. */
+export interface VerifiedChange {
+  passport: string;
+  destination: string;
+  before: VisaEntry | null;
+  after: VisaEntry;
+  source: string;
+  verifiedOn: string;
+}
+
 let _lookup: VisaLookup | null = null;
+let _changes: VerifiedChange[] | null = null;
+
+/** Every correction in visa-overrides.ts, with the value it replaced. */
+export function getVerifiedChanges(): VerifiedChange[] {
+  getPassportIndexLookup(); // builds the base layer and records the changes
+  return _changes ?? [];
+}
 
 export function getPassportIndexLookup(): VisaLookup {
   if (_lookup) return _lookup;
@@ -315,6 +332,7 @@ export function getPassportIndexLookup(): VisaLookup {
       console.warn(`[visa-overrides] INVALID value "${o.value}" for ${key} — parseValue will treat it as "visa required". Use: ${[...OVERRIDE_VOCAB].join(" | ")} | <days>.`);
     }
   }
+  _changes = [];
   for (const o of VISA_OVERRIDES) {
     let destMap = _lookup.get(o.passport);
     if (!destMap) {
@@ -323,7 +341,12 @@ export function getPassportIndexLookup(): VisaLookup {
     }
     // Keep the provenance so pages can show "verified against <source> on <date>"
     // for manually corrected cells, instead of only the dataset-wide date.
-    destMap.set(o.destination, { ...parseValue(o.value), verifiedSource: o.source, verifiedOn: o.verifiedOn });
+    const before = destMap.get(o.destination) ?? null;
+    const after: VisaEntry = { ...parseValue(o.value), verifiedSource: o.source, verifiedOn: o.verifiedOn };
+    destMap.set(o.destination, after);
+    // Remember what each correction replaced, so the site can publish its own
+    // trail of what changed and when it was verified.
+    _changes.push({ passport: o.passport, destination: o.destination, before, after, source: o.source, verifiedOn: o.verifiedOn });
   }
 
   return _lookup;

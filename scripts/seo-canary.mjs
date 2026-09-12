@@ -43,6 +43,7 @@ const INDEXABLE = [
   "/travel-authorization/etias",
   "/reports/passport-power-2026",
   "/reports/most-welcoming-countries-2026",
+  "/visa-changes",
   "/dual-citizenship",
   "/tier-list",
   "/stats",

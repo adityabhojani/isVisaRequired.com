@@ -122,6 +122,7 @@ export function Footer() {
                   { href: "/stats", label: "Passport Power Index" },
                   { href: "/reports/passport-power-2026", label: "Passport Power Report 2026" },
                   { href: "/reports/most-welcoming-countries-2026", label: "Most Welcoming Countries 2026" },
+                  { href: "/visa-changes", label: "Verified Visa Rule Changes" },
                   { href: "/popular", label: "Popular Destinations" },
                   { href: "/transit-visa", label: "Transit Visa Guides" },
                   { href: "/travel-authorization", label: "ETIAS, ESTA & ETA" },

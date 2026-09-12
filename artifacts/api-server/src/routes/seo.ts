@@ -30,6 +30,7 @@ import { ROUTE_SEO, renderAppRoute, loadShell } from "../seo/appShell";
 import { renderBlogPostShell, type BlogPostRow } from "../seo/blogSeo";
 import { renderPassportPowerReport, renderReportCsv, REPORT_PATH, WELCOMING_PATH } from "../seo/report";
 import { renderWelcomingIndex, renderWelcomingCsv } from "../seo/welcoming";
+import { renderVisaChanges, renderVisaChangesRss, CHANGES_PATH } from "../seo/visaChanges";
 import { db, isDatabaseConfigured } from "@workspace/db";
 import { sql } from "drizzle-orm";
 
@@ -163,6 +164,7 @@ router.get("/llms.txt", (_req: Request, res: Response): void => {
 - Global Passport Power Report (rankings + open CSV data, CC BY 4.0): ${SITE_ORIGIN}/reports/passport-power-2026
 - Most Welcoming Countries Index (countries ranked by nationalities admitted, CSV, CC BY 4.0): ${SITE_ORIGIN}${WELCOMING_PATH}
 - Dual citizenship visa checker (combine two or three passports): ${SITE_ORIGIN}/dual-citizenship
+- Verified visa rule changes (what changed, when it was checked, against which source; RSS at /visa-changes.xml): ${SITE_ORIGIN}${CHANGES_PATH}
 - Transit visa guides: ${SITE_ORIGIN}/transit-visa
 - ETIAS / ESTA / ETA / eTA explainers: ${SITE_ORIGIN}/travel-authorization
 - Residence-permit & second-document rules: ${SITE_ORIGIN}/residence-permit-visa-benefits
@@ -267,6 +269,7 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   for (const a of TRAVEL_AUTHS) urls.push(`${SITE_ORIGIN}/travel-authorization/${a.slug}`);
   urls.push(`${SITE_ORIGIN}${REPORT_PATH}`);
   urls.push(`${SITE_ORIGIN}${WELCOMING_PATH}`);
+  urls.push(`${SITE_ORIGIN}${CHANGES_PATH}`);
   urls.push(`${SITE_ORIGIN}/guides`);
   for (const g of GUIDES) urls.push(`${SITE_ORIGIN}/guides/${g.slug}`);
   // Canonical passport & destination hubs (server-rendered). The SPA
@@ -333,6 +336,17 @@ router.get(`${WELCOMING_PATH}.csv`, (_req: Request, res: Response): void => {
   res.setHeader("Cache-Control", XML_CACHE);
   res.setHeader("Content-Disposition", "attachment; filename=most-welcoming-countries-2026.csv");
   res.type("text/csv").send(renderWelcomingCsv());
+});
+
+// ── Verified changes log + feed ───────────────────────────────────────────────
+router.get(CHANGES_PATH, (_req: Request, res: Response): void => {
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderVisaChanges());
+});
+
+router.get(`${CHANGES_PATH}.xml`, (_req: Request, res: Response): void => {
+  res.setHeader("Cache-Control", XML_CACHE);
+  res.type("application/rss+xml").send(renderVisaChangesRss());
 });
 
 // ── blog posts: server-rendered into the SPA shell (crawlable editorial) ─────
