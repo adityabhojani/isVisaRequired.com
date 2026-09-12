@@ -42,6 +42,8 @@ const INDEXABLE = [
   "/transit-visa/united-states",
   "/travel-authorization/etias",
   "/reports/passport-power-2026",
+  "/reports/most-welcoming-countries-2026",
+  "/dual-citizenship",
   "/tier-list",
   "/stats",
   "/reciprocity",

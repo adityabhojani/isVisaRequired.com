@@ -12,6 +12,8 @@ import { getDefaultEntry } from "../data/visaData";
 import { getEntryRules } from "../data/entryRequirements";
 import { slugify, pairPath } from "./render";
 import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED, REQ_COLOR } from "./hubLayout";
+import { WELCOMING_PATH } from "./report";
+import { opennessRankOf } from "./welcoming";
 
 const YEAR = "2026";
 const LEVEL_LABEL: Record<string, string> = { required: "Required", recommended: "Recommended", none: "Not required" };
@@ -28,6 +30,7 @@ export function renderDestinationHub(to: CountryData): string {
   const n = (k: string) => groups[k]?.length ?? 0;
   const vf = n("visa_free"), voa = n("visa_on_arrival"), ev = n("e_visa"), vr = n("visa_required");
   const rules = getEntryRules(to.code);
+  const openness = opennessRankOf(to.code);
 
   const canonical = `${SITE_ORIGIN}/countries/${slugify(to.name)}`;
   const title = `${to.name} Visa Requirements (${YEAR}) — Who Needs a Visa?`;
@@ -94,6 +97,7 @@ export function renderDestinationHub(to: CountryData): string {
 <div class="updated">Requirements by nationality · Last reviewed ${esc(DATA_LAST_UPDATED)}</div>
 <p class="lead">Do you need a visa for ${esc(to.name)}? It depends on your nationality. ${vf} passports can enter ${esc(to.name)} visa-free, ${voa} get a visa on arrival, ${ev} need an eVisa or travel authorisation, and ${vr} must apply for a visa in advance. Find your passport below, or review ${esc(to.name)}'s general entry requirements.</p>
 <div class="stats">${statCards}</div>
+${openness ? `<p style="color:#334155;margin:0 0 8px">${esc(to.name)} ranks <strong>#${openness.rank} of ${openness.of}</strong> in our <a href="${WELCOMING_PATH}">Most Welcoming Countries Index</a>, admitting ${openness.open} of the other ${openness.of - 1} nationalities visa-free or on arrival.</p>` : ""}
 <p><a class="cta" href="/?destinations=${to.code}">Check ${esc(to.name)} for your passport →</a></p>
 ${(() => {
   const ex = exemptionsForDestination(to.code);

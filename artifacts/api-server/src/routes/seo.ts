@@ -28,7 +28,8 @@ import { GUIDES, getGuide } from "../data/guidesData";
 import { renderGuidesHub, renderGuide } from "../seo/guides";
 import { ROUTE_SEO, renderAppRoute, loadShell } from "../seo/appShell";
 import { renderBlogPostShell, type BlogPostRow } from "../seo/blogSeo";
-import { renderPassportPowerReport, renderReportCsv, REPORT_PATH } from "../seo/report";
+import { renderPassportPowerReport, renderReportCsv, REPORT_PATH, WELCOMING_PATH } from "../seo/report";
+import { renderWelcomingIndex, renderWelcomingCsv } from "../seo/welcoming";
 import { db, isDatabaseConfigured } from "@workspace/db";
 import { sql } from "drizzle-orm";
 
@@ -141,13 +142,13 @@ router.get("/transit-visa/:slug", (req: Request, res: Response): void => {
 router.get("/llms.txt", (_req: Request, res: Response): void => {
   const body = `# isvisarequired.com
 
-> Free visa-requirement checker covering 199 countries and ~38,000 passport-to-destination
+> Free visa-requirement checker covering 195 countries and 37,830 passport-to-destination
 > combinations. Tells travellers whether they need a visa, visa on arrival, eVisa, electronic
 > travel authorisation, or can travel visa-free — plus airport transit rules and entry
 > requirements. General guidance only; always confirm with the official government source.
 
 ## Key facts
-- Covers 199 countries / ~38,000 passport-destination pairs.
+- Covers 195 countries / 37,830 passport-destination pairs.
 - Requirement types: visa-free, visa on arrival, eVisa, visa required, entry not permitted.
 - Data is sourced from official government immigration portals plus an open base dataset, with
   source-verified manual corrections. Each page shows a "last reviewed" date.
@@ -160,6 +161,8 @@ router.get("/llms.txt", (_req: Request, res: Response): void => {
 - Visa requirements by destination country: ${SITE_ORIGIN}/countries
 - Editorial guides (visa-free lists, visa types): ${SITE_ORIGIN}/guides
 - Global Passport Power Report (rankings + open CSV data, CC BY 4.0): ${SITE_ORIGIN}/reports/passport-power-2026
+- Most Welcoming Countries Index (countries ranked by nationalities admitted, CSV, CC BY 4.0): ${SITE_ORIGIN}${WELCOMING_PATH}
+- Dual citizenship visa checker (combine two or three passports): ${SITE_ORIGIN}/dual-citizenship
 - Transit visa guides: ${SITE_ORIGIN}/transit-visa
 - ETIAS / ESTA / ETA / eTA explainers: ${SITE_ORIGIN}/travel-authorization
 - Residence-permit & second-document rules: ${SITE_ORIGIN}/residence-permit-visa-benefits
@@ -252,7 +255,7 @@ router.get("/sitemap.xml", (_req: Request, res: Response): void => {
 
 router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   const staticPaths = [
-    "/", "/compare", "/discover", "/stats", "/popular", "/map", "/trip-planner",
+    "/", "/compare", "/dual-citizenship", "/discover", "/stats", "/popular", "/map", "/trip-planner",
     "/schengen", "/tier-list", "/digital-nomad", "/reciprocity", "/blog", "/alerts",
     "/visa-requirements", "/countries", "/methodology", "/residence-permit-visa-benefits", "/privacy", "/terms",
   ];
@@ -263,6 +266,7 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
   urls.push(`${SITE_ORIGIN}/travel-authorization`);
   for (const a of TRAVEL_AUTHS) urls.push(`${SITE_ORIGIN}/travel-authorization/${a.slug}`);
   urls.push(`${SITE_ORIGIN}${REPORT_PATH}`);
+  urls.push(`${SITE_ORIGIN}${WELCOMING_PATH}`);
   urls.push(`${SITE_ORIGIN}/guides`);
   for (const g of GUIDES) urls.push(`${SITE_ORIGIN}/guides/${g.slug}`);
   // Canonical passport & destination hubs (server-rendered). The SPA
@@ -317,6 +321,18 @@ router.get(`${REPORT_PATH}.csv`, (_req: Request, res: Response): void => {
   res.setHeader("Cache-Control", XML_CACHE);
   res.setHeader("Content-Disposition", "attachment; filename=passport-power-2026.csv");
   res.type("text/csv").send(renderReportCsv());
+});
+
+// ── Most Welcoming Countries Index (the destination side of the report) ──────
+router.get(WELCOMING_PATH, (_req: Request, res: Response): void => {
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.type("html").send(renderWelcomingIndex());
+});
+
+router.get(`${WELCOMING_PATH}.csv`, (_req: Request, res: Response): void => {
+  res.setHeader("Cache-Control", XML_CACHE);
+  res.setHeader("Content-Disposition", "attachment; filename=most-welcoming-countries-2026.csv");
+  res.type("text/csv").send(renderWelcomingCsv());
 });
 
 // ── blog posts: server-rendered into the SPA shell (crawlable editorial) ─────

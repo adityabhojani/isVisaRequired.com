@@ -8,7 +8,7 @@
 // app. If the shell can't be read we fall back to the raw shell (never break the page).
 import fs from "fs";
 import path from "path";
-import { computeReport } from "./report";
+import { computeReport, competitionRanks } from "./report";
 import { DATA_LAST_UPDATED } from "./hubLayout";
 import { slugify } from "./render";
 import { digitalNomadVisas } from "@workspace/travel-data";
@@ -71,6 +71,8 @@ function linkBlock(): string {
       <li><a href="/countries">Visa requirements by country</a></li>
       <li><a href="/guides">Visa &amp; travel guides</a></li>
       <li><a href="/reports/passport-power-2026">Global Passport Power Report 2026</a></li>
+      <li><a href="/reports/most-welcoming-countries-2026">Most Welcoming Countries Index 2026</a></li>
+      <li><a href="/dual-citizenship">Dual citizenship visa checker</a></li>
     </ul>
     <p style="font-weight:600;margin-top:12px">Guides</p>
     <ul>
@@ -111,6 +113,13 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     description: "Compare two passports side by side: how many countries each can enter visa-free, where their access differs, and which is stronger for travel.",
     h1: "Compare two passports",
     body: `<p>See two passports side by side — total visa-free destinations, where their access differs, and which opens more of the world. A quick way to understand passport power and plan around the stronger document.</p>`,
+  },
+  "/dual-citizenship": {
+    title: "Dual Citizenship Visa Checker — Combine Your Passports | isvisarequired.com",
+    description: "Hold two or three passports? See the easiest entry any of them gets for every country, which passport to travel on, and where your second passport adds access.",
+    h1: "Dual citizenship visa checker",
+    body: `<p>Most visa tools ask for one nationality. If you hold two or three passports, enter them all: for every country we show the easiest entry any of your passports gets, which passport to travel on, and where your second passport opens a door the first one doesn't.</p>
+<p><strong>The working rule:</strong> use your own country's passport when entering that country, and whichever passport gives you the easiest entry everywhere else. Some countries require their citizens to use their own passport — the United States, Australia and, for flights, Canada (Canadian-American dual citizens excepted). Read <a href="/guides/which-passport-to-use-dual-citizenship">which passport to use as a dual national</a> for the details and sources.</p>`,
   },
   "/discover": {
     title: "Where Can I Go Visa-Free? Discover Destinations by Passport | isvisarequired.com",
@@ -244,8 +253,9 @@ function tierListBody(): string {
     String(inTier.length),
     inTier.slice(0, 6).map((r) => esc(r.c.name)).join(", ") || "—",
   ]);
+  const ranks = competitionRanks(d.rows, (r) => r.mobility);
   const top = d.rows.slice(0, 10).map((r, i) => [
-    String(i + 1),
+    String(ranks[i]),
     `<a href="/visa-requirements/${slugify(r.c.name)}">${esc(r.c.name)}</a>`,
     String(r.mobility),
   ]);
@@ -262,8 +272,9 @@ function statsBody(): string {
   const avg = Math.round(d.rows.reduce((a, r) => a + r.mobility, 0) / d.rows.length);
   const top = d.rows[0], bottom = d.rows[d.rows.length - 1];
   const regionRows = d.regions.map((r) => [esc(r.name), String(r.count), String(r.avg)]);
+  const openRanks = competitionRanks(d.byOpenness, (r) => r.open);
   const openRows = d.byOpenness.slice(0, 10).map((r, i) => [
-    String(i + 1), `<a href="/countries/${slugify(r.c.name)}">${esc(r.c.name)}</a>`, String(r.open),
+    String(openRanks[i]), `<a href="/countries/${slugify(r.c.name)}">${esc(r.c.name)}</a>`, String(r.open),
   ]);
   return `<p>Aggregate figures computed from all ${d.totalPairs.toLocaleString()} passport–destination pairs in our dataset, last reviewed ${esc(DATA_LAST_UPDATED)}. <strong>Mobility score</strong> counts destinations reachable without a prior visa; <strong>openness</strong> counts how many nationalities a country admits without one.</p>
   <h2>Headline numbers</h2>

@@ -11,8 +11,21 @@ import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED } from "./hubLayout";
 
 const YEAR = "2026";
 export const REPORT_PATH = `/reports/passport-power-${YEAR}`;
+export const WELCOMING_PATH = `/reports/most-welcoming-countries-${YEAR}`;
 
-interface Row {
+// Standard competition ranking ("1224"): equal scores share a rank and the next
+// rank skips. Reading a rank off the array index gave tied countries different
+// numbers — Denmark, Spain, Sweden and the UAE all score 180 but were listed as
+// #1, #2, #3 and #4. `sorted` must already be ordered best first.
+export function competitionRanks<T>(sorted: T[], score: (x: T) => number): number[] {
+  const ranks: number[] = [];
+  sorted.forEach((x, i) => {
+    ranks.push(i > 0 && score(x) === score(sorted[i - 1]) ? ranks[i - 1] : i + 1);
+  });
+  return ranks;
+}
+
+export interface Row {
   c: CountryData;
   vf: number;
   voa: number;
@@ -21,6 +34,12 @@ interface Row {
   na: number;
   mobility: number; // vf + voa + ev — reachable without an embassy visa
   open: number; // destination-side: how many nationalities this country admits visa-free or VoA
+  // Destination-side breakdown: how this country treats each other nationality.
+  inVf: number;
+  inVoa: number;
+  inEv: number;
+  inVr: number;
+  inNa: number;
 }
 
 interface ReportData {
@@ -35,7 +54,10 @@ interface ReportData {
 let _data: ReportData | null = null;
 export function computeReport(): ReportData {
   if (_data) return _data;
-  const rows: Row[] = countries.map((c) => ({ c, vf: 0, voa: 0, ev: 0, vr: 0, na: 0, mobility: 0, open: 0 }));
+  const rows: Row[] = countries.map((c) => ({
+    c, vf: 0, voa: 0, ev: 0, vr: 0, na: 0, mobility: 0, open: 0,
+    inVf: 0, inVoa: 0, inEv: 0, inVr: 0, inNa: 0,
+  }));
   const idx = new Map(rows.map((r) => [r.c.code, r]));
   const vfMatrix = new Map<string, boolean>(); // "A>B" → A enters B visa-free
   let totalPairs = 0;
@@ -45,15 +67,13 @@ export function computeReport(): ReportData {
       if (from.c.code === to.c.code) continue;
       totalPairs++;
       const req = getDefaultEntry(from.c.code, to.c.code).requirement;
-      if (req === "visa_free") { from.vf++; vfMatrix.set(`${from.c.code}>${to.c.code}`, true); }
-      else if (req === "visa_on_arrival") from.voa++;
-      else if (req === "e_visa") from.ev++;
-      else if (req === "visa_required") from.vr++;
-      else from.na++;
-      if (req === "visa_free" || req === "visa_on_arrival") {
-        const dest = idx.get(to.c.code);
-        if (dest) dest.open++;
-      }
+      const dest = idx.get(to.c.code)!;
+      if (req === "visa_free") { from.vf++; dest.inVf++; vfMatrix.set(`${from.c.code}>${to.c.code}`, true); }
+      else if (req === "visa_on_arrival") { from.voa++; dest.inVoa++; }
+      else if (req === "e_visa") { from.ev++; dest.inEv++; }
+      else if (req === "visa_required") { from.vr++; dest.inVr++; }
+      else { from.na++; dest.inNa++; }
+      if (req === "visa_free" || req === "visa_on_arrival") dest.open++;
     }
     from.mobility = from.vf + from.voa + from.ev;
   }
@@ -98,8 +118,9 @@ export function computeReport(): ReportData {
 export function renderReportCsv(): string {
   const d = computeReport();
   const lines = ["rank,code,name,region,visa_free,visa_on_arrival,evisa_or_eta,visa_required,no_admission,mobility_score,admits_without_advance_visa"];
+  const ranks = competitionRanks(d.rows, (r) => r.mobility);
   d.rows.forEach((r, i) => {
-    lines.push(`${i + 1},${r.c.code},"${r.c.name}",${r.c.region},${r.vf},${r.voa},${r.ev},${r.vr},${r.na},${r.mobility},${r.open}`);
+    lines.push(`${ranks[i]},${r.c.code},"${r.c.name}",${r.c.region},${r.vf},${r.voa},${r.ev},${r.vr},${r.na},${r.mobility},${r.open}`);
   });
   return lines.join("\n") + "\n";
 }
@@ -111,6 +132,14 @@ export function renderPassportPowerReport(): string {
   const bottomRows = d.rows.slice(-10);
   const top10avg = Math.round(d.rows.slice(0, 10).reduce((s, r) => s + r.mobility, 0) / 10);
   const bottom10avg = Math.round(bottomRows.reduce((s, r) => s + r.mobility, 0) / 10);
+  // Name every country that ties, rather than whichever one sorted first.
+  const tiedNames = (rs: Row[]) => {
+    const n = rs.map((r) => `<strong>${esc(r.c.name)}</strong>`);
+    return n.length <= 1 ? (n[0] ?? "") : `${n.slice(0, -1).join(", ")} and ${n[n.length - 1]}`;
+  };
+  const topOpen = d.byOpenness.filter((r) => r.open === d.byOpenness[0].open);
+  const bottomOpen = d.byOpenness.filter((r) => r.open === d.byOpenness[d.byOpenness.length - 1].open);
+  const topMobility = d.rows.filter((r) => r.mobility === d.rows[0].mobility);
   const mostOpen = d.byOpenness[0];
   const leastOpen = d.byOpenness[d.byOpenness.length - 1];
   const asymPct = Math.round((d.totalAsymmetric / (d.totalPairs / 2)) * 100);
@@ -119,13 +148,15 @@ export function renderPassportPowerReport(): string {
   const description = `Full ${YEAR} ranking of ${d.rows.length} passports by travel freedom, computed from ${d.totalPairs.toLocaleString()} passport–destination rules: mobility scores, regional gaps, destination openness and visa reciprocity. Free to cite with attribution; CSV download included.`;
 
   const hubLink = (c: CountryData) => `/visa-requirements/${slugify(c.name)}`;
-  const rankRow = (r: Row, i: number) =>
-    `<tr><td>${i + 1}</td><td><a href="${hubLink(r.c)}">${esc(r.c.flag)} ${esc(r.c.name)}</a></td><td>${r.vf}</td><td>${r.voa}</td><td>${r.ev}</td><td><strong>${r.mobility}</strong></td></tr>`;
+  const rankRow = (r: Row, rank: number) =>
+    `<tr><td>${rank}</td><td><a href="${hubLink(r.c)}">${esc(r.c.flag)} ${esc(r.c.name)}</a></td><td>${r.vf}</td><td>${r.voa}</td><td>${r.ev}</td><td><strong>${r.mobility}</strong></td></tr>`;
 
-  const fullTable = d.rows.map((r, i) => rankRow(r, i)).join("");
+  const mobilityRanks = competitionRanks(d.rows, (r) => r.mobility);
+  const fullTable = d.rows.map((r, i) => rankRow(r, mobilityRanks[i])).join("");
   const regionRows = d.regions.map((rg) => `<tr><td>${esc(rg.name)}</td><td>${rg.count}</td><td><strong>${rg.avg}</strong></td></tr>`).join("");
+  const openRanks = competitionRanks(d.byOpenness, (r) => r.open);
   const openRows = d.byOpenness.slice(0, 10).map((r, i) =>
-    `<tr><td>${i + 1}</td><td><a href="/countries/${slugify(r.c.name)}">${esc(r.c.flag)} ${esc(r.c.name)}</a></td><td><strong>${r.open}</strong></td></tr>`).join("");
+    `<tr><td>${openRanks[i]}</td><td><a href="/countries/${slugify(r.c.name)}">${esc(r.c.flag)} ${esc(r.c.name)}</a></td><td><strong>${r.open}</strong></td></tr>`).join("");
   const asymExamples = d.asymmetric
     .filter((p) => ["US", "GB", "DE", "JP", "AU", "CA", "AE", "TR", "BR", "CN"].includes(p.a.code))
     .slice(0, 8)
@@ -172,7 +203,7 @@ export function renderPassportPowerReport(): string {
 <p class="lead">How far does each passport take you? This report ranks all ${d.rows.length} passports in our dataset by <strong>mobility score</strong> — the number of destinations reachable without visiting an embassy (visa-free + visa on arrival + eVisa/ETA) — and looks at the other side of the desk: which destinations admit the most nationalities without an advance visa. Every figure is computed live from the same dataset that powers our <a href="/">visa checker</a>.</p>
 
 <div class="stats">
-  <div class="stat"><div class="n">${top.mobility}</div><div class="k">Top score — ${esc(top.c.name)}</div></div>
+  <div class="stat"><div class="n">${top.mobility}</div><div class="k">Top score — ${topMobility.length === 1 ? esc(top.c.name) : `${topMobility.length} passports tied`}</div></div>
   <div class="stat"><div class="n">${top10avg}</div><div class="k">Top-10 average</div></div>
   <div class="stat"><div class="n">${bottom10avg}</div><div class="k">Bottom-10 average</div></div>
   <div class="stat"><div class="n">${asymPct}%</div><div class="k">Of country pairs are one-way visa-free</div></div>
@@ -182,7 +213,7 @@ export function renderPassportPowerReport(): string {
 <ul style="color:#334155;padding-left:20px">
   <li style="margin:6px 0">The <strong>mobility gap</strong> is stark: the top-10 passports average <strong>${top10avg}</strong> accessible destinations; the bottom 10 average just <strong>${bottom10avg}</strong> — a ${(top10avg / Math.max(1, bottom10avg)).toFixed(1)}× difference determined entirely by birthplace.</li>
   <li style="margin:6px 0"><strong>${esc(d.regions[0].name)}</strong> passports have the highest average mobility (${d.regions[0].avg}); <strong>${esc(d.regions[d.regions.length - 1].name)}</strong> the lowest (${d.regions[d.regions.length - 1].avg}).</li>
-  <li style="margin:6px 0">The most open destination is <strong>${esc(mostOpen.c.name)}</strong>, admitting <strong>${mostOpen.open}</strong> nationalities visa-free or on arrival; the most restrictive, <strong>${esc(leastOpen.c.name)}</strong>, admits ${leastOpen.open}.</li>
+  <li style="margin:6px 0">${tiedNames(topOpen)} ${topOpen.length === 1 ? "is the most open destination, admitting" : "are the most open destinations, each admitting"} <strong>${mostOpen.open}</strong> nationalities visa-free or on arrival; ${tiedNames(bottomOpen)} ${bottomOpen.length === 1 ? "admits" : "each admit"} ${leastOpen.open}.</li>
   <li style="margin:6px 0">Visa policy is strikingly unequal between partners: <strong>${d.totalAsymmetric.toLocaleString()}</strong> country pairs (${asymPct}% of all pairs) are "one-way doors" — one side enters visa-free while the other queues at an embassy.</li>
 </ul>
 
@@ -192,6 +223,7 @@ export function renderPassportPowerReport(): string {
 <h2>The most open destinations</h2>
 <p style="color:#334155">Countries admitting the most nationalities without an advance visa (visa-free or on arrival):</p>
 <div class="card" style="padding:0;overflow-x:auto"><table><thead><tr><th>#</th><th>Destination</th><th>Nationalities admitted</th></tr></thead><tbody>${openRows}</tbody></table></div>
+<p style="margin-top:8px"><a href="${WELCOMING_PATH}">See all ${d.rows.length} destinations in the Most Welcoming Countries Index ${YEAR} →</a></p>
 
 <h2>One-way doors: reciprocity asymmetries</h2>
 <p style="color:#334155">Visa-free access is often not mutual. Notable examples from the ${d.totalAsymmetric.toLocaleString()} asymmetric pairs:</p>
