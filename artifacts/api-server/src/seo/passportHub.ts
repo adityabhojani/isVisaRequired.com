@@ -42,6 +42,19 @@ export function renderPassportHub(from: CountryData): string {
   const title = `${from.name} Passport Visa Requirements (${YEAR}) — Visa-Free, VoA & eVisa`;
   const description = `${from.name} passport holders can travel visa-free to ${vf} countries, get visa on arrival in ${voa} and an eVisa for ${ev}; ${vr} require a visa in advance. Full country-by-country list with fees, stay limits and official links.`;
 
+  // Longest visa-free stays: the question behind "where can I go" for anyone
+  // planning a long trip. Same per-pair data as the table below, ranked.
+  const stays = groups.visa_free
+    .map(({ c, maxStay }) => ({ c, days: Number(/^(\d+)\s*days?$/.exec(maxStay ?? "")?.[1] ?? 0) }))
+    .filter((x) => x.days > 0)
+    .sort((a, b) => b.days - a.days || a.c.name.localeCompare(b.c.name))
+    .slice(0, 8);
+  const staysBlock = stays.length >= 5
+    ? `<h2>Longest visa-free stays</h2>
+<p style="color:#334155;margin:0 0 8px">Where a ${esc(from.name)} passport buys the most time without a visa. Open a destination for how its limit is counted — the Schengen countries share one 90-day allowance between them.</p>
+<div class="card cols">${stays.map((x) => `<a href="${pairPath(from, x.c)}">${esc(x.c.flag)} ${esc(x.c.name)} — ${x.days} days</a>`).join("")}</div>`
+    : "";
+
   const statCards = [
     { n: vf, k: "Visa-free" },
     { n: voa, k: "Visa on arrival" },
@@ -102,6 +115,7 @@ export function renderPassportHub(from: CountryData): string {
 <p class="lead">Where can ${esc(from.name)} passport holders travel in ${YEAR}? This page lists the visa requirement for every country — ${vf} visa-free, ${voa} visa on arrival, ${ev} eVisa and ${vr} requiring a visa in advance. Select any destination for full details: visa type, permitted stay, fees, required documents and the official application link.</p>
 <div class="stats">${statCards}</div>
 <p><a class="cta" href="/?passport=${from.code}">Check a specific destination in the visa tool →</a></p>
+${staysBlock}
 ${(() => { const gs = guideLinksForHub(from.code); return `<section class="keep"><h2>Before you travel</h2><div class="tiles">${gs.map((g) => `<a href="${g.href}">${g.label}${g.sub ? `<small>${g.sub}</small>` : ""}</a>`).join("")}<a href="/guides">All visa &amp; travel guides<small>Twelve explainers</small></a></div></section>`; })()}
 ${guideCta}
 ${sections}
