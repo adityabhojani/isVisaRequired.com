@@ -4,13 +4,9 @@ import { useSEO } from "@/hooks/useSEO";
 import { Footer } from "@/components/Footer";
 import { Header, PageHero } from "@/components/Header";
 import { useListCountries, useCheckVisaAll, getCheckVisaAllQueryKey } from "@workspace/api-client-react";
-import type { Country, VisaResult, VisaRequirement } from "@workspace/api-client-react";
-import {
-  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
-} from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import type { VisaResult, VisaRequirement } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
+import { PassportPicker } from "@/components/PassportPicker";
 import { trackEvent } from "@/lib/analytics";
 
 const reqOrder: VisaRequirement[] = ["visa_free", "visa_on_arrival", "e_visa", "visa_required", "no_admission"];
@@ -29,53 +25,6 @@ function compare(a: VisaRequirement, b: VisaRequirement): "A" | "B" | "tie" {
   if (ia < ib) return "A";
   if (ib < ia) return "B";
   return "tie";
-}
-
-function PassportPicker({ value, onChange, countries, exclude, label }: {
-  value: string; onChange: (c: string) => void; countries: Country[];
-  exclude?: string; label: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const filtered = countries.filter((c) => c.code !== exclude);
-  const selected = countries.find((c) => c.code === value);
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</label>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="outline" role="combobox" className="w-full justify-between h-12 font-normal text-base border-border bg-card">
-            {selected ? (
-              <span className="flex items-center gap-2">
-                <span className="text-xl">{selected.flag}</span>
-                <span className="font-medium">{selected.name}</span>
-              </span>
-            ) : (
-              <span className="text-muted-foreground">Select passport…</span>
-            )}
-            <ChevronDown className="h-4 w-4 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[350px] p-0" align="start">
-          <Command>
-            <CommandInput placeholder="Search countries…" className="h-10" />
-            <CommandList>
-              <CommandEmpty>No country found.</CommandEmpty>
-              <CommandGroup>
-                {filtered.map((c) => (
-                  <CommandItem key={c.code} value={`${c.name} ${c.code}`}
-                    onSelect={() => { onChange(c.code); setOpen(false); }} className="cursor-pointer">
-                    <span className="mr-2 text-lg">{c.flag}</span>
-                    <span>{c.name}</span>
-                    <span className="ml-auto text-xs text-muted-foreground">{c.code}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
-  );
 }
 
 function StatBox({ label, value, winner }: { label: string; value: number; winner: "A" | "B" | "tie" | "none" }) {
@@ -177,13 +126,13 @@ export default function ComparePage() {
         <div className="bg-card rounded-2xl border border-border/70 shadow-sm ring-1 ring-[rgb(15_23_41/0.06)] overflow-hidden mb-8">
           <div className="p-6">
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-end gap-4">
-            <PassportPicker value={passportA} onChange={setPassportA} countries={countries} exclude={passportB} label="First Passport" />
+            <PassportPicker value={passportA} onChange={setPassportA} countries={countries} exclude={[passportB]} label="First Passport" />
             <div className="flex items-center justify-center pb-2">
               <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
                 <ArrowLeftRight className="h-4 w-4 text-muted-foreground" />
               </div>
             </div>
-            <PassportPicker value={passportB} onChange={setPassportB} countries={countries} exclude={passportA} label="Second Passport" />
+            <PassportPicker value={passportB} onChange={setPassportB} countries={countries} exclude={[passportA]} label="Second Passport" />
           </div>
           <Button
             onClick={handleCompare}
@@ -194,6 +143,13 @@ export default function ComparePage() {
           </Button>
           </div>
         </div>
+
+        <p className="-mt-4 mb-8 text-center text-sm text-muted-foreground">
+          Hold both passports?{" "}
+          <a href={`/dual-citizenship${passportA && passportB ? `?p=${passportA},${passportB}` : ""}`} className="font-medium text-primary hover:underline">
+            See everywhere you can go with them combined →
+          </a>
+        </p>
 
         {/* Loading */}
         {(loadingA || loadingB) && passportA && passportB && (

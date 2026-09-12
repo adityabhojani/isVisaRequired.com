@@ -699,12 +699,12 @@ export const GUIDES: Guide[] = [
     description: "Holding two passports means choosing one at booking, one at check-in and one at the border — and they can legitimately differ. The rules that are real, and the ones the internet invented.",
     h1: "Dual nationality: which passport do you actually travel on?",
     intro:
-      "If you hold two passports, almost every visa tool — including ours — asks you for one nationality. That is the one question a requirements matrix cannot answer for you. The good news is that the decision follows a short rule, and several of the constraints people worry about turn out not to exist.",
+      "If you hold two passports, almost every visa tool asks you for one nationality. Ours now takes all of them, but deciding which passport to actually travel on still follows a short rule, and several of the constraints people worry about turn out not to exist.",
     sections: [
       {
         h2: "The working rule",
         html: `<p><strong>Use your own country's passport when entering that country. Use whichever passport gives you the easiest entry everywhere else.</strong></p>
-<p>The second half is where the value is: if one of your passports needs a visa for your destination and the other does not, you travel on the one that does not. Run both pairings through the <a href="/">visa checker</a> and compare — that is a two-minute check that can save an entire application.</p>`,
+<p>The second half is where the value is: if one of your passports needs a visa for your destination and the other does not, you travel on the one that does not. Enter both passports in the <a href="/dual-citizenship">dual citizenship checker</a> and it compares every country at once — a two-minute check that can save an entire application.</p>`,
       },
       {
         h2: "Countries that require their own passport",
@@ -741,7 +741,7 @@ export const GUIDES: Guide[] = [
         h2: "How to decide, in order",
         html: `<ol>
 <li><strong>Are you entering a country you are a citizen of?</strong> Use that country's passport, and check whether it is legally required.</li>
-<li><strong>Otherwise, compare.</strong> Check each of your nationalities against the destination in the <a href="/">visa checker</a>.</li>
+<li><strong>Otherwise, compare.</strong> Check all of your nationalities at once in the <a href="/dual-citizenship">dual citizenship checker</a>, or one destination at a time in the <a href="/">visa checker</a>.</li>
 <li><strong>Pick the easier one</strong> — visa-free beats eVisa beats embassy visa. Then check <a href="/guides/six-month-passport-rule">validity</a> on that specific book.</li>
 <li><strong>Use it consistently for that leg</strong> — booking, check-in and border — so your entry record matches your documents.</li>
 <li><strong>Check the exit rule of your own country</strong> if you are departing one you are a citizen of.</li>

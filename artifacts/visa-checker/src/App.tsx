@@ -21,6 +21,7 @@ const PrivacyPage    = lazy(() => import("@/pages/privacy"));
 const TermsPage      = lazy(() => import("@/pages/terms"));
 const ContactPage    = lazy(() => import("@/pages/contact"));
 const ComparePage    = lazy(() => import("@/pages/compare"));
+const DualCitizenshipPage = lazy(() => import("@/pages/dual-citizenship"));
 const DiscoverPage   = lazy(() => import("@/pages/discover"));
 const PassportPage   = lazy(() => import("@/pages/passport"));
 const WidgetPage     = lazy(() => import("@/pages/widget"));
@@ -180,6 +181,7 @@ function AppRoutes() {
           <Route path="/passports"         component={PassportsRedirect} />
           <Route path="/popular"           component={wrap(PopularPage)} />
           <Route path="/compare"           component={wrap(ComparePage)} />
+          <Route path="/dual-citizenship"  component={wrap(DualCitizenshipPage)} />
           <Route path="/discover"          component={wrap(DiscoverPage)} />
           <Route path="/passport/:code"    component={wrap(PassportPage)} />
           <Route path="/destination/:code" component={wrap(DestinationPage)} />

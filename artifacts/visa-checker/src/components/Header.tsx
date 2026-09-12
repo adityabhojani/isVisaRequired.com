@@ -25,6 +25,7 @@ const DEFAULT_ITEMS: NavItem[] = [
 ];
 
 const MORE_ITEMS: NavItem[] = [
+  { href: "/dual-citizenship", label: "Dual Citizenship" },
   { href: "/schengen", label: "Schengen Calculator" },
   { href: "/tier-list", label: "Passport Tier List" },
   { href: "/map", label: "World Visa Map" },
