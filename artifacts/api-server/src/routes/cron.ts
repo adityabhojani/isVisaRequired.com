@@ -15,6 +15,10 @@ import { alertUnsubUrl } from "../lib/alertToken";
 import { isAdminUser } from "../middleware/requireAdmin";
 import { ensureAlertsSchema } from "./alerts";
 import { logger } from "../lib/logger";
+import { coreUrls, staticBlogUrls, pairUrls } from "../seo/urlList";
+import {
+  bingConfigured, getBingQuota, indexNowKey, submitToBing, submitToIndexNow,
+} from "../lib/urlSubmission";
 
 const router: IRouter = Router();
 
@@ -161,6 +165,160 @@ router.get("/cron/check-alerts", async (req: Request, res: Response): Promise<vo
     logger.error({ err }, "Alert check failed");
     res.status(500).json({ error: "Alert check failed." });
   }
+});
+
+// ─── Daily URL submission to Bing / IndexNow ─────────────────────────────────
+// Bing shows most of a large site as never crawled for months. This walks the
+// whole inventory — landing pages and hubs first, then all ~38,000 pair pages —
+// submitting exactly as many URLs a day as Bing says we are allowed, and never
+// the same URL twice until everything else has had a turn.
+//
+// Both back ends are optional: with neither key set the job reports what it
+// would have done and changes nothing.
+
+const SUBMISSION_TABLE_READY = { done: false };
+
+async function ensureSubmissionSchema(): Promise<void> {
+  if (SUBMISSION_TABLE_READY.done) return;
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS url_submissions (
+      url TEXT PRIMARY KEY,
+      last_submitted TIMESTAMPTZ NOT NULL DEFAULT now(),
+      submit_count INTEGER NOT NULL DEFAULT 1
+    )
+  `);
+  SUBMISSION_TABLE_READY.done = true;
+}
+
+/** Landing pages and hubs first, then blog posts, then every pair page. */
+function submissionInventory(): string[] {
+  return [...coreUrls(), ...staticBlogUrls(), ...pairUrls()];
+}
+
+/**
+ * Bing's own answer for today, capped at what one SubmitUrlbatch call takes.
+ * Null means we could not ask, and the caller then submits nothing to Bing.
+ */
+async function bingBudget(): Promise<{ budget: number; daily: number | null; monthly: number | null }> {
+  if (!bingConfigured()) return { budget: 0, daily: null, monthly: null };
+  const quota = await getBingQuota();
+  if (!quota) return { budget: 0, daily: null, monthly: null };
+  return { budget: Math.min(quota.daily, 500), daily: quota.daily, monthly: quota.monthly };
+}
+
+router.get("/cron/submit-urls", async (req: Request, res: Response): Promise<void> => {
+  const cron = cronAuth(req);
+  const userId = process.env.CLERK_SECRET_KEY ? getAuth(req)?.userId : null;
+  const okAdmin = Boolean(userId && isAdminUser(userId));
+  if (cron === "not_configured" && !okAdmin) {
+    res.status(503).json({ error: "Cron is not configured on this deployment." });
+    return;
+  }
+  if (cron !== "ok" && !okAdmin) {
+    res.status(401).json({ error: "Unauthorized." });
+    return;
+  }
+
+  // ?dry=1 shows what today's run would submit without submitting anything.
+  const dryRun = req.query["dry"] === "1";
+  const inventory = submissionInventory();
+  const { budget, daily, monthly } = await bingBudget();
+  const keySet = Boolean(indexNowKey());
+
+  // IndexNow publishes no daily cap, so it carries the bulk of the work: 1,000
+  // a day while the site is still being covered for the first time (about five
+  // weeks for the whole inventory), then 200 a day to keep it fresh. Bing's own
+  // API is used strictly within the allowance it reports.
+  const FIRST_PASS_PER_DAY = 1000;
+  const REFRESH_PER_DAY = 200;
+  if (budget === 0 && !keySet) {
+    res.json({
+      ok: true, submitted: 0, inventory: inventory.length,
+      note: "Neither BING_API_KEY nor INDEXNOW_KEY is set on this deployment.",
+    });
+    return;
+  }
+
+  let batch: string[];
+  let cycled = false;
+  let remaining: number | null = inventory.length;
+  if (isDatabaseConfigured()) {
+    try {
+      await ensureSubmissionSchema();
+      const done = await db.execute(sql`SELECT url FROM url_submissions`);
+      const seen = new Set((done.rows as { url: string }[]).map((r) => r.url));
+      const fresh = inventory.filter((u) => !seen.has(u));
+      remaining = fresh.length;
+      cycled = fresh.length === 0;
+      const perRun = Math.max(budget, keySet ? (cycled ? REFRESH_PER_DAY : FIRST_PASS_PER_DAY) : 0);
+      batch = fresh.slice(0, perRun);
+      if (batch.length < perRun) {
+        // Everything has had a turn: top the batch up with whatever was
+        // submitted longest ago, so the whole site keeps being refreshed.
+        const top = perRun - batch.length;
+        const old = await db.execute(sql`
+          SELECT url FROM url_submissions ORDER BY last_submitted ASC LIMIT ${top}
+        `);
+        const inBatch = new Set(batch);
+        batch = [...batch, ...(old.rows as { url: string }[]).map((r) => r.url).filter((u) => !inBatch.has(u))];
+      }
+    } catch (err) {
+      logger.error({ err }, "URL submission bookkeeping failed");
+      res.status(500).json({ error: "Submission bookkeeping failed." });
+      return;
+    }
+  } else {
+    // No database, so nothing is remembered between runs: rotate through the
+    // inventory by day so consecutive runs still cover new ground instead of
+    // resubmitting the same first page for ever.
+    remaining = null;
+    const perRun = Math.max(budget, keySet ? FIRST_PASS_PER_DAY : 0);
+    const day = Math.floor(Date.now() / 86_400_000);
+    const start = (day * perRun) % Math.max(1, inventory.length);
+    batch = inventory.slice(start, start + perRun);
+    if (batch.length < perRun) batch = [...batch, ...inventory.slice(0, perRun - batch.length)];
+  }
+
+  if (dryRun) {
+    res.json({
+      ok: true, dryRun: true, wouldSubmit: batch.length, cycled,
+      bing: { configured: bingConfigured(), dailyQuota: daily, monthlyQuota: monthly, budget },
+      indexNow: { configured: keySet },
+      inventory: inventory.length, neverSubmitted: remaining, sample: batch.slice(0, 10),
+    });
+    return;
+  }
+
+  const bing = budget > 0 ? await submitToBing(batch.slice(0, budget)) : { attempted: 0, accepted: 0, status: null };
+  const indexNow = keySet ? await submitToIndexNow(batch) : { attempted: 0, accepted: 0, status: null };
+
+  // Record only what at least one back end actually took, so a failed run is
+  // retried tomorrow rather than being silently skipped.
+  const recorded = Math.max(bing.accepted, indexNow.accepted);
+  if (recorded > 0 && isDatabaseConfigured()) {
+    try {
+      // One statement per 500 URLs. A row per round trip would take longer than
+      // the function is allowed to run.
+      const todo = batch.slice(0, recorded);
+      for (let i = 0; i < todo.length; i += 500) {
+        const values = sql.join(todo.slice(i, i + 500).map((u) => sql`(${u})`), sql`, `);
+        await db.execute(sql`
+          INSERT INTO url_submissions (url) VALUES ${values}
+          ON CONFLICT (url) DO UPDATE SET last_submitted = now(), submit_count = url_submissions.submit_count + 1
+        `);
+      }
+    } catch (err) {
+      logger.error({ err }, "Failed to record URL submissions");
+    }
+  }
+
+  logger.info({ bing, indexNow, cycled }, "URL submission run complete");
+  res.json({
+    ok: true, submitted: recorded, cycled, inventory: inventory.length,
+    neverSubmitted: remaining === null ? null : Math.max(0, remaining - recorded),
+    bing: { ...bing, dailyQuota: daily, monthlyQuota: monthly },
+    indexNow,
+  });
 });
 
 export default router;

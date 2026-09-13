@@ -140,6 +140,20 @@ router.get("/transit-visa/:slug", (req: Request, res: Response): void => {
   res.type("html").send(renderTransitGuide(guide));
 });
 
+// ── IndexNow key file ────────────────────────────────────────────────────────
+// IndexNow proves you own the host by asking for the key back from a text file
+// on it. The route is registered only when INDEXNOW_KEY is set, and only at the
+// exact filename the key implies, so nothing is exposed without the variable.
+{
+  const key = (process.env.INDEXNOW_KEY ?? "").trim();
+  if (/^[A-Za-z0-9-]{8,128}$/.test(key)) {
+    router.get(`/${key}.txt`, (_req: Request, res: Response): void => {
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      res.type("text/plain").send(key);
+    });
+  }
+}
+
 // ── llms.txt (AI-assistant / generative-search visibility) ───────────────────
 router.get("/llms.txt", (_req: Request, res: Response): void => {
   const body = `# isvisarequired.com
