@@ -31,7 +31,7 @@ See `vercel.json`:
 | `NODE_ENV=production` | both | Vercel sets this automatically; keeps pino logging worker-free for serverless. |
 | `CRON_SECRET` | api-server | Authorises the scheduled jobs. Generate with `openssl rand -hex 32` — hex, never anything with two dots, which Clerk would read as a session token. Without it the cron endpoints return 503 and run nothing. |
 | `RESEND_API_KEY` | api-server | Sends visa-alert emails. Optional: alerts are recorded either way, but nothing is emailed without it. |
-| `INDEXNOW_KEY` | api-server | Optional override. A default key ships in the code and the ownership file is served at `/{key}.txt` automatically, so IndexNow works with nothing set — an IndexNow key is public by design. Set this only to rotate it. |
+| `INDEXNOW_KEY` | api-server | Optional override. The site's existing key ships in the code, so IndexNow works with nothing set — an IndexNow key is public by design. Set this only to rotate it, and mint a new key only if you must: a fresh key starts from zero trust and a smaller quota. |
 | `BING_API_KEY` | api-server | Optional. From Bing Webmaster Tools → Settings → API access. Lets the same job use Bing's direct URL Submission API within the allowance Bing reports. |
 
 `PORT` / `BASE_PATH` are Replit dev-server vars and are **not** needed on Vercel (the build defaults `BASE_PATH=/`).
@@ -47,11 +47,14 @@ has had a turn. What has been sent is recorded in the `url_submissions` table.
 Two back ends, both optional and independent:
 
 * **IndexNow** — the open protocol behind Bing, Yandex, Naver and Seznam. No
-  account, no published quota, and nothing to configure: the key ships in the
-  code and is served at `/{key}.txt`, which is exactly how the protocol proves
-  host ownership. It carries the bulk of the work:
-  1,000 URLs a day until the site has been covered once, about five weeks, then
-  200 a day to keep it fresh.
+  account and nothing to configure: the key ships in the code and is served at
+  `/{key}.txt`, which is exactly how the protocol proves host ownership. It
+  carries the bulk of the work — up to 1,000 URLs a day until the site has been
+  covered once, then 200 a day to keep it fresh. Bing publishes no daily figure,
+  so the job submits in chunks of 100 (larger batches are refused with 403),
+  stops after five refused chunks in a row, and records only what was accepted.
+  A refused chunk is simply retried the next day, which means the job discovers
+  the real quota rather than assuming one.
 * **Bing URL Submission API** (`BING_API_KEY`) — direct, but rate-limited per site.
   The job asks Bing what today's allowance is (`GetUrlSubmissionQuota`) and never
   exceeds it. A new site typically gets ten a day; the allowance rises as Bing

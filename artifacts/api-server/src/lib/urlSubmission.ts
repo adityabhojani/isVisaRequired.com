@@ -27,8 +27,12 @@ export const SITE_URL = "https://www.isvisarequired.com";
 
 /** Bing accepts at most 500 URLs in one SubmitUrlBatch call. */
 const BING_BATCH_MAX = 500;
-/** IndexNow accepts up to 10,000, but we stay well under to look like a good citizen. */
+/** Most a single run will try, across chunks. */
 const INDEXNOW_BATCH_MAX = 1000;
+/** Bing rejects larger batches from this key with 403 — 100 is what it accepts. */
+const INDEXNOW_CHUNK = 100;
+/** Bing's own IndexNow endpoint, already proven against this site's key. */
+const INDEXNOW_ENDPOINT = "https://www.bing.com/indexnow";
 const TIMEOUT_MS = 20_000;
 
 export function bingConfigured(): boolean {
@@ -40,7 +44,11 @@ export function bingConfigured(): boolean {
 // the host; the key itself is meant to be readable by anyone. So we ship a
 // default rather than leaving the whole mechanism switched off until someone
 // sets an environment variable. INDEXNOW_KEY overrides it, for rotation.
-const DEFAULT_INDEXNOW_KEY = "9f2c7a41d6b84e03ac15d7e8b0364f9a";
+//
+// This is the site's existing key, already known to Bing and already served as a
+// static file from artifacts/visa-checker/public. Do not mint a new one: a fresh
+// key starts from zero trust and a smaller quota.
+const DEFAULT_INDEXNOW_KEY = "0f8264930bf723c4519dfd306237a820";
 
 export function indexNowKey(): string | null {
   const key = (process.env.INDEXNOW_KEY ?? "").trim() || DEFAULT_INDEXNOW_KEY;
@@ -127,23 +135,58 @@ export async function submitToBing(urls: string[]): Promise<SubmitResult> {
   }
 }
 
-/** Ping IndexNow (Bing, Yandex, Naver, Seznam) with the same batch. */
+/**
+ * Ping IndexNow (Bing, Yandex, Naver, Seznam) in chunks of 100.
+ *
+ * The chunk size is not arbitrary: submitting this site's key in larger batches
+ * is rejected with 403, which scripts/indexnow-submit.mjs found the hard way.
+ * Bing publishes no daily figure either, so rather than guess one we keep going
+ * until five chunks in a row fail — the shape a spent quota takes — and report
+ * only what was actually accepted. The caller records exactly that many URLs as
+ * submitted, so a refused chunk is simply retried tomorrow.
+ */
 export async function submitToIndexNow(urls: string[]): Promise<SubmitResult> {
   const key = indexNowKey();
-  if (!key) return { attempted: 0, accepted: 0, status: null, error: "INDEXNOW_KEY not set" };
+  if (!key) return { attempted: 0, accepted: 0, status: null, error: "no IndexNow key" };
   const batch = urls.slice(0, INDEXNOW_BATCH_MAX);
   if (!batch.length) return { attempted: 0, accepted: 0, status: null };
-  try {
-    const { status, text } = await postJson("https://api.indexnow.org/IndexNow", {
-      host: new URL(SITE_URL).host,
-      key,
-      keyLocation: `${SITE_URL}/${key}.txt`,
-      urlList: batch,
-    });
-    // 200 = accepted, 202 = accepted but the key file has not been read yet.
-    const ok = status === 200 || status === 202;
-    return { attempted: batch.length, accepted: ok ? batch.length : 0, status, ...(ok ? {} : { error: text }) };
-  } catch (err) {
-    return { attempted: batch.length, accepted: 0, status: null, error: String(err) };
+
+  let accepted = 0;
+  let lastStatus: number | null = null;
+  let lastError: string | undefined;
+  let failStreak = 0;
+
+  for (let i = 0; i < batch.length; i += INDEXNOW_CHUNK) {
+    const chunk = batch.slice(i, i + INDEXNOW_CHUNK);
+    try {
+      const { status, text } = await postJson(INDEXNOW_ENDPOINT, {
+        host: new URL(SITE_URL).host,
+        key,
+        keyLocation: `${SITE_URL}/${key}.txt`,
+        urlList: chunk,
+      });
+      lastStatus = status;
+      // 200 = accepted; 202 = accepted, key file not read yet.
+      if (status === 200 || status === 202) {
+        accepted += chunk.length;
+        failStreak = 0;
+      } else {
+        lastError = text;
+        failStreak++;
+      }
+    } catch (err) {
+      lastError = String(err);
+      failStreak++;
+    }
+    if (failStreak >= 5) break;
+    // Ease off between chunks; the whole run has to fit in one function call.
+    if (i + INDEXNOW_CHUNK < batch.length) await new Promise((r) => setTimeout(r, 200));
   }
+
+  return {
+    attempted: batch.length,
+    accepted,
+    status: lastStatus,
+    ...(accepted < batch.length && lastError ? { error: lastError } : {}),
+  };
 }

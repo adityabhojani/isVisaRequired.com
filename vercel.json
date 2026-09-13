@@ -30,7 +30,8 @@
   ],
   "functions": {
     "api/index.ts": {
-      "includeFiles": "artifacts/{api-server/src/data/passport-index.csv,visa-checker/dist/public/shell.html}"
+      "includeFiles": "artifacts/{api-server/src/data/passport-index.csv,visa-checker/dist/public/shell.html}",
+      "maxDuration": 60
     }
   },
   "crons": [
