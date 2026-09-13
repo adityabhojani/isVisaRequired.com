@@ -23,6 +23,14 @@ const safeMarked = new Marked({
     html({ text }) {
       return escapeHtml(text);
     },
+    // The page already renders the post title as its <h1>, so a post's own
+    // headings must start at <h2> — a second <h1> muddies the document outline
+    // for search engines. miniMarkdown on the server clamps the same way, so
+    // the crawled and hydrated versions of a post agree heading for heading.
+    heading({ tokens, depth }) {
+      const level = Math.max(2, Math.min(6, depth));
+      return `<h${level}>${this.parser.parseInline(tokens)}</h${level}>\n`;
+    },
     link({ href, title, tokens }) {
       const url = safeUrl(href);
       const text = this.parser.parseInline(tokens);

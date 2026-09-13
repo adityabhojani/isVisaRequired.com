@@ -28,6 +28,15 @@ export interface StaticPost {
   created_at: string;
   /** ISO date. Bump this when you materially revise a post. */
   updated_at: string;
+  /**
+   * Questions the post answers, emitted as FAQPage structured data.
+   *
+   * These must MIRROR a visible FAQ section in `content`, not add to it. Google
+   * treats structured data that isn't on the page as a manual-action offence,
+   * and the rich result is not worth the risk. Write the section first, then
+   * copy the questions and a one-or-two-sentence answer here.
+   */
+  faq?: { q: string; a: string }[];
 }
 
 export const STATIC_POSTS: StaticPost[] = [
