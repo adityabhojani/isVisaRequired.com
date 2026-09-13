@@ -141,8 +141,8 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     body: tierListBody,
   },
   "/digital-nomad": {
-    title: "Digital Nomad Visas — Countries, Requirements & Income Rules | isvisarequired.com",
-    description: "Browse countries offering digital nomad and remote-work visas, with income requirements, length of stay and how to apply.",
+    title: "Digital Nomad Visas — Requirements Checked Against Official Sources | isvisarequired.com",
+    description: "Every digital nomad and remote-work visa we track, with income requirements, length of stay and fees read off each government's own page — plus the programmes that have quietly closed.",
     h1: "Digital nomad visas",
     body: digitalNomadBody,
   },
@@ -308,14 +308,23 @@ function reciprocityBody(): string {
 }
 
 
+const NOMAD_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function nomadVerified(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return iso;
+  return `${d} ${NOMAD_MONTHS[m - 1]} ${y}`;
+}
+
 function digitalNomadBody(): string {
-  const v = digitalNomadVisas;
+  const open = digitalNomadVisas.filter((x) => x.status !== "ended");
+  const ended = digitalNomadVisas.filter((x) => x.status === "ended");
   const byRegion = new Map<string, number>();
-  for (const x of v) byRegion.set(x.region, (byRegion.get(x.region) ?? 0) + 1);
+  for (const x of open) byRegion.set(x.region, (byRegion.get(x.region) ?? 0) + 1);
   const regions = [...byRegion].sort((a, b) => b[1] - a[1]);
-  const withTax = v.filter((x) => x.taxBenefits).length;
-  const freeToApply = v.filter((x) => x.govFee === "Free").length;
-  const rows = [...v]
+  const withTax = open.filter((x) => x.taxBenefits).length;
+  const verified = open.filter((x) => x.verifiedOn);
+  const rows = [...open]
     .sort((a, b) => a.region.localeCompare(b.region) || a.country.localeCompare(b.country))
     .map((x) => [
       `${esc(x.flag)} <strong>${esc(x.country)}</strong>`,
@@ -323,14 +332,28 @@ function digitalNomadBody(): string {
       esc(x.minMonthlyIncome ? `${x.minMonthlyIncome}/mo` : x.minAnnualIncome ? `${x.minAnnualIncome}/yr` : "Not stated"),
       esc(x.duration),
       esc(x.govFee ?? "Not stated"),
+      x.source && x.verifiedOn
+        ? `<a href="${esc(x.source)}" rel="nofollow noopener">${esc(nomadVerified(x.verifiedOn))}</a>`
+        : "Not yet re-checked",
+    ]);
+  const endedRows = [...ended]
+    .sort((a, b) => a.country.localeCompare(b.country))
+    .map((x) => [
+      `${esc(x.flag)} <strong>${esc(x.country)}</strong>`,
+      esc(x.visaName),
+      esc(x.endedNote ?? "No longer offered"),
     ]);
   const regionList = regions.map(([r, n]) => `${esc(r)} (${n})`).join(" · ");
-  return `<p><strong>${v.length} countries</strong> currently run a digital nomad or remote-work visa. Below is every programme we track, with the income you must show, how long the permit lasts and the government fee. ${withTax} offer some form of tax benefit and ${freeToApply} charge no government fee. Coverage: ${regionList}.</p>
-  <p style="color:#475569;font-size:14px">Income thresholds and fees are set by each government and change without notice — always confirm on the official application site linked from the interactive table before you apply.</p>
-  <h2>All ${v.length} digital nomad visa programmes</h2>
-  ${table(["Country", "Visa", "Income requirement", "Duration", "Government fee"], rows)}
+  return `<p><strong>${open.length} countries</strong> currently run a digital nomad or remote-work visa. Below is every programme we track, with the income you must show, how long the permit lasts and the government fee. ${verified.length} of them have had every figure read off the government's own page — the date of that check links to the source. ${withTax} offer some form of tax benefit. Coverage: ${regionList}.</p>
+  <p style="color:#475569;font-size:14px">Where a government states only a monthly or only an annual threshold we publish that one and leave the other blank, rather than multiplying it out and presenting the result as official. Thresholds pegged to a minimum wage or to GNI per capita move every year.</p>
+  <h2>All ${open.length} open digital nomad visa programmes</h2>
+  ${table(["Country", "Visa", "Income requirement", "Duration", "Government fee", "Checked"], rows)}
+  ${ended.length ? `<h2>${ended.length} programmes that have closed</h2>
+  <p>These nomad visas are still widely listed as available on other comparison sites. They are not open, and applying for them is a waste of time.</p>
+  ${table(["Country", "Visa", "What happened"], endedRows)}` : ""}
   <p style="margin-top:12px">A nomad visa is a residence permit, not a tourist entry — check the plain tourist rule for your passport with the <a href="/">visa checker</a>, and read <a href="/guides/visa-validity-vs-duration-of-stay">visa validity vs duration of stay</a> before you plan a long stay.</p>`;
 }
+
 
 export function renderAppRoute(routePath: string, seo: RouteSeo): string | null {
   const shell = loadShell();

@@ -7,6 +7,7 @@ import { getAuth } from "@clerk/express";
 import { logger } from "../lib/logger";
 import { requireAdmin, isAdminUser } from "../middleware/requireAdmin";
 import { writeLimiter } from "../middleware/rateLimiter";
+import { staticPostBySlug, staticPostsNewestFirst } from "../content/posts";
 
 const router: IRouter = Router();
 
@@ -230,33 +231,66 @@ router.put("/admin/settings", writeLimiter, requireAdmin, async (req: Request, r
 
 // ─── Public Blog endpoints ────────────────────────────────────────────────────
 
+// Repo-authored posts (src/content/posts.ts) are merged with database posts.
+// A database row always wins on a slug collision so /admin/blog can override one.
+function staticListRows(): Record<string, unknown>[] {
+  return staticPostsNewestFirst().map((p) => ({
+    id: p.slug, title: p.title, slug: p.slug, excerpt: p.excerpt,
+    cover_url: null, tags: p.tags, author: p.author,
+    created_at: p.created_at, updated_at: p.updated_at,
+  }));
+}
+
+function mergeBySlug(dbRows: Record<string, unknown>[], staticRows: Record<string, unknown>[]) {
+  const seen = new Set(dbRows.map((r) => String(r.slug)));
+  return [...dbRows, ...staticRows.filter((r) => !seen.has(String(r.slug)))].sort((a, b) =>
+    String(b.created_at ?? "").localeCompare(String(a.created_at ?? "")),
+  );
+}
+
 router.get("/blog/posts", async (_req: Request, res: Response): Promise<void> => {
-  if (!isDatabaseConfigured()) { res.json({ posts: [] }); return; }
+  res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+  if (!isDatabaseConfigured()) { res.json({ posts: staticListRows() }); return; }
   try {
     const result = await db.execute(sql`
       SELECT id, title, slug, excerpt, cover_url, tags, author, created_at, updated_at
       FROM blog_posts WHERE published = true ORDER BY created_at DESC
     `);
-    res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
-    res.json({ posts: result.rows });
+    res.json({ posts: mergeBySlug(result.rows as Record<string, unknown>[], staticListRows()) });
   } catch (err) {
     logger.error({ err }, "Failed to fetch public blog posts");
-    res.status(500).json({ error: "Failed to fetch posts." });
+    // Repo posts don't need the database, so still serve them.
+    res.json({ posts: staticListRows() });
   }
 });
 
 router.get("/blog/posts/:slug", async (req: Request, res: Response): Promise<void> => {
   const slug = String(req.params.slug ?? "").toLowerCase().trim();
   if (!slug) { res.status(400).json({ error: "Invalid slug." }); return; }
+  const fallback = staticPostBySlug(slug);
+  const sendStatic = () => {
+    res.setHeader("Cache-Control", "public, max-age=120, stale-while-revalidate=600");
+    res.json({ post: { ...fallback, id: fallback!.slug, cover_url: null, published: true } });
+  };
+  if (!isDatabaseConfigured()) {
+    if (fallback) { sendStatic(); return; }
+    res.status(404).json({ error: "Post not found." });
+    return;
+  }
   try {
     const result = await db.execute(sql`
       SELECT * FROM blog_posts WHERE slug = ${slug} AND published = true
     `);
-    if (result.rows.length === 0) { res.status(404).json({ error: "Post not found." }); return; }
+    if (result.rows.length === 0) {
+      if (fallback) { sendStatic(); return; }
+      res.status(404).json({ error: "Post not found." });
+      return;
+    }
     res.setHeader("Cache-Control", "public, max-age=120, stale-while-revalidate=600");
     res.json({ post: result.rows[0] });
   } catch (err) {
     logger.error({ err, slug }, "Failed to fetch blog post by slug");
+    if (fallback) { sendStatic(); return; }
     res.status(500).json({ error: "Failed to fetch post." });
   }
 });
