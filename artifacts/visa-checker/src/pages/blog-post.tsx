@@ -7,7 +7,8 @@ import { renderMarkdown } from "@/lib/markdown";
 import { Calendar, User, Tag, ArrowLeft, Share2 } from "lucide-react";
 
 interface BlogPost {
-  id: number;
+  /** Database rows use a numeric id; repo-authored posts use their slug. */
+  id: number | string;
   title: string;
   slug: string;
   excerpt: string;

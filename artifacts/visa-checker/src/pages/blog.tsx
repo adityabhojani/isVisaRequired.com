@@ -5,7 +5,8 @@ import { useSEO } from "@/hooks/useSEO";
 import { Calendar, Tag, User, ArrowRight } from "lucide-react";
 
 interface BlogPost {
-  id: number;
+  /** Database rows use a numeric id; repo-authored posts use their slug. */
+  id: number | string;
   title: string;
   slug: string;
   excerpt: string;
