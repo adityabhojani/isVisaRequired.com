@@ -35,8 +35,15 @@ export function bingConfigured(): boolean {
   return Boolean(process.env.BING_API_KEY);
 }
 
+// An IndexNow key is not a secret. The protocol works by asking you to serve the
+// key back from a public file on your own host, which is what proves you control
+// the host; the key itself is meant to be readable by anyone. So we ship a
+// default rather than leaving the whole mechanism switched off until someone
+// sets an environment variable. INDEXNOW_KEY overrides it, for rotation.
+const DEFAULT_INDEXNOW_KEY = "9f2c7a41d6b84e03ac15d7e8b0364f9a";
+
 export function indexNowKey(): string | null {
-  const key = (process.env.INDEXNOW_KEY ?? "").trim();
+  const key = (process.env.INDEXNOW_KEY ?? "").trim() || DEFAULT_INDEXNOW_KEY;
   return /^[A-Za-z0-9-]{8,128}$/.test(key) ? key : null;
 }
 

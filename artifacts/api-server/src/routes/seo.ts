@@ -29,6 +29,7 @@ import { renderGuidesHub, renderGuide } from "../seo/guides";
 import { ROUTE_SEO, renderAppRoute, loadShell } from "../seo/appShell";
 import { renderBlogPostShell, type BlogPostRow } from "../seo/blogSeo";
 import { staticPostBySlug, staticPostsNewestFirst } from "../content/posts";
+import { indexNowKey } from "../lib/urlSubmission";
 import { renderPassportPowerReport, renderReportCsv, REPORT_PATH, WELCOMING_PATH } from "../seo/report";
 import { renderWelcomingIndex, renderWelcomingCsv } from "../seo/welcoming";
 import { renderVisaChanges, renderVisaChangesRss, CHANGES_PATH } from "../seo/visaChanges";
@@ -142,11 +143,10 @@ router.get("/transit-visa/:slug", (req: Request, res: Response): void => {
 
 // ── IndexNow key file ────────────────────────────────────────────────────────
 // IndexNow proves you own the host by asking for the key back from a text file
-// on it. The route is registered only when INDEXNOW_KEY is set, and only at the
-// exact filename the key implies, so nothing is exposed without the variable.
+// on it. Registered at exactly the filename the key implies, and nowhere else.
 {
-  const key = (process.env.INDEXNOW_KEY ?? "").trim();
-  if (/^[A-Za-z0-9-]{8,128}$/.test(key)) {
+  const key = indexNowKey();
+  if (key) {
     router.get(`/${key}.txt`, (_req: Request, res: Response): void => {
       res.setHeader("Cache-Control", "public, max-age=86400");
       res.type("text/plain").send(key);

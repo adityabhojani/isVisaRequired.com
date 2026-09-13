@@ -31,7 +31,7 @@ See `vercel.json`:
 | `NODE_ENV=production` | both | Vercel sets this automatically; keeps pino logging worker-free for serverless. |
 | `CRON_SECRET` | api-server | Authorises the scheduled jobs. Generate with `openssl rand -hex 32` — hex, never anything with two dots, which Clerk would read as a session token. Without it the cron endpoints return 503 and run nothing. |
 | `RESEND_API_KEY` | api-server | Sends visa-alert emails. Optional: alerts are recorded either way, but nothing is emailed without it. |
-| `INDEXNOW_KEY` | api-server | Optional. Any 8–128 character hex string (`openssl rand -hex 16`). Turns on the daily push to Bing/Yandex/Naver/Seznam and serves the ownership file at `/{key}.txt`. |
+| `INDEXNOW_KEY` | api-server | Optional override. A default key ships in the code and the ownership file is served at `/{key}.txt` automatically, so IndexNow works with nothing set — an IndexNow key is public by design. Set this only to rotate it. |
 | `BING_API_KEY` | api-server | Optional. From Bing Webmaster Tools → Settings → API access. Lets the same job use Bing's direct URL Submission API within the allowance Bing reports. |
 
 `PORT` / `BASE_PATH` are Replit dev-server vars and are **not** needed on Vercel (the build defaults `BASE_PATH=/`).
@@ -46,8 +46,10 @@ has had a turn. What has been sent is recorded in the `url_submissions` table.
 
 Two back ends, both optional and independent:
 
-* **IndexNow** (`INDEXNOW_KEY`) — the open protocol behind Bing, Yandex, Naver and
-  Seznam. No account and no published quota. It carries the bulk of the work:
+* **IndexNow** — the open protocol behind Bing, Yandex, Naver and Seznam. No
+  account, no published quota, and nothing to configure: the key ships in the
+  code and is served at `/{key}.txt`, which is exactly how the protocol proves
+  host ownership. It carries the bulk of the work:
   1,000 URLs a day until the site has been covered once, about five weeks, then
   200 a day to keep it fresh.
 * **Bing URL Submission API** (`BING_API_KEY`) — direct, but rate-limited per site.
@@ -55,7 +57,7 @@ Two back ends, both optional and independent:
   exceeds it. A new site typically gets ten a day; the allowance rises as Bing
   comes to trust the site, and the job picks that up automatically.
 
-With neither variable set the job runs, changes nothing, and says so.
+IndexNow runs out of the box; `BING_API_KEY` only adds the direct Bing channel on top.
 
 To see what tomorrow would do without sending anything, sign in as an admin and
 open `/api/cron/submit-urls?dry=1`.
