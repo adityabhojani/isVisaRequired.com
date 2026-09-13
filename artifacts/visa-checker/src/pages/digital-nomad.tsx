@@ -379,6 +379,24 @@ export default function DigitalNomadPage() {
           </section>
         )}
 
+        <div className="mt-10 bg-card rounded-2xl border border-border/70 shadow-sm p-5">
+          <h2 className="font-semibold text-foreground mb-1.5">What the check turned up</h2>
+          <ul className="text-sm text-muted-foreground space-y-1.5 leading-relaxed">
+            <li>
+              <a href="/blog/what-we-found-checking-every-digital-nomad-visa" className="text-primary hover:underline">
+                What we found checking every digital nomad visa against its own government's page
+              </a>{" "}
+              — 218 values changed; Japan's income requirement was out by a factor of ten.
+            </li>
+            <li>
+              <a href="/blog/digital-nomad-visas-that-have-closed" className="text-primary hover:underline">
+                Five digital nomad visas that no longer exist
+              </a>{" "}
+              — and what replaced them.
+            </li>
+          </ul>
+        </div>
+
         <div className="mt-8 bg-amber-50 border border-amber-200 rounded-2xl p-5">
           <p className="text-xs text-amber-800 leading-relaxed">
             <strong>How to read this:</strong> a programme marked “Verified” had every figure above read off the linked

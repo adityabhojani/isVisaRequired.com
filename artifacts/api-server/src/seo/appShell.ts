@@ -351,6 +351,7 @@ function digitalNomadBody(): string {
   ${ended.length ? `<h2>${ended.length} programmes that have closed</h2>
   <p>These nomad visas are still widely listed as available on other comparison sites. They are not open, and applying for them is a waste of time.</p>
   ${table(["Country", "Visa", "What happened"], endedRows)}` : ""}
+  <p style="margin-top:12px">Read what the check turned up: <a href="/blog/what-we-found-checking-every-digital-nomad-visa">what we found checking every digital nomad visa</a>, and <a href="/blog/digital-nomad-visas-that-have-closed">five programmes that no longer exist</a>.</p>
   <p style="margin-top:12px">A nomad visa is a residence permit, not a tourist entry — check the plain tourist rule for your passport with the <a href="/">visa checker</a>, and read <a href="/guides/visa-validity-vs-duration-of-stay">visa validity vs duration of stay</a> before you plan a long stay.</p>`;
 }
 
