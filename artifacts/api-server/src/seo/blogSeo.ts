@@ -118,6 +118,8 @@ export interface BlogPostRow {
   title: string;
   slug: string;
   excerpt?: string | null;
+  /** Preferred source for the meta description; `excerpt` is the fallback. */
+  metaDescription?: string | null;
   content: string;
   cover_url?: string | null;
   author?: string | null;
@@ -154,7 +156,7 @@ export function renderBlogPostShell(post: BlogPostRow): string | null {
   const canonical = `${SITE}/blog/${post.slug}`;
   const title = `${post.title} | isvisarequired.com`;
   const plain = post.content.replace(/[#*`\[\]()>_]/g, " ").replace(/\s+/g, " ").trim();
-  const description = clip(post.excerpt || plain, 158);
+  const description = clip(post.metaDescription || post.excerpt || plain, 158);
   const published = isoDate(post.created_at);
   const modified = isoDate(post.updated_at) ?? published;
   const cover = post.cover_url && /^https?:\/\//.test(post.cover_url) ? post.cover_url : null;
@@ -203,6 +205,16 @@ export function renderBlogPostShell(post: BlogPostRow): string | null {
   </article>`;
 
   let html = shell;
+  // The shell carries the site-wide FAQ schema, which is right for the homepage
+  // and wrong here: two FAQPage blocks on one URL is not two chances at a rich
+  // result, it is a reason for Google to trust neither. When the post brings its
+  // own — always more relevant to the query that found it — the shell's goes.
+  if (faqLd) {
+    html = html.replace(
+      /<script type="application\/ld\+json">([\s\S]*?)<\/script>\s*/gi,
+      (match, body: string) => (/"@type"\s*:\s*"FAQPage"/.test(body) ? "" : match),
+    );
+  }
   html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(title)}</title>`);
   html = html.replace(/<meta\s+name="description"\s+content="[\s\S]*?"\s*\/?>/i, `<meta name="description" content="${esc(description)}" />`);
   html = html.replace(/<link\s+rel="canonical"\s+href="[\s\S]*?"\s*\/?>/i, `<link rel="canonical" href="${esc(canonical)}" />`);
