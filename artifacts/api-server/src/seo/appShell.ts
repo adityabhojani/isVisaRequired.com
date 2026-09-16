@@ -174,16 +174,17 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
   },
   "/privacy": {
     title: "Privacy Policy | Is Visa Required?",
-    description: "Privacy policy for isvisarequired.com — how we collect, use, and protect your information.",
+    description: "What isvisarequired.com collects, which services receive it, the cookies we use, how long we keep information and how to ask us to delete it.",
     h1: "Privacy Policy",
-    body: `<p>This policy explains what isvisarequired.com collects, why, and what control you have over it. We collect limited, anonymised analytics data to improve the site; we do not sell personal data.</p>
+    body: `<p>You can use the visa checker, guides and tools without an account and without giving us your name or email address. We only store an email address if you give us one — for a visa alert, for email updates, or on the contact form — and we don't sell personal information or use advertising cookies.</p>
     <h2>What this policy covers</h2>
     <ol>
-      <li>Overview</li><li>Information we collect</li><li>How we use your information</li>
-      <li>Cookies</li><li>Third-party services</li><li>Your rights (GDPR &amp; CCPA)</li>
-      <li>Data retention</li><li>Children's privacy</li><li>Changes to this policy</li><li>Contact</li>
+      <li>Who we are</li><li>Information you give us</li><li>Information collected automatically</li>
+      <li>Cookies and browser storage</li><li>Services that receive information</li><li>How we use information</li>
+      <li>How long we keep it</li><li>Your choices and rights</li><li>Security</li><li>Children</li>
+      <li>Changes to this policy</li><li>Contact</li>
     </ol>
-    <p>The full text of each section is shown below once the page loads.</p>`,
+    <p>The full text of each section is shown below once the page loads. To ask a question or use your rights, use our <a href="/contact">contact form</a>.</p>`,
   },
 
   "/terms": {

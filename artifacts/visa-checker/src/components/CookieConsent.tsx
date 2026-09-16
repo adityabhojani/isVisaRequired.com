@@ -11,9 +11,10 @@ const CONSENT_KEY = "cookie_consent";
 // deriving the list from the flags means it can't describe a service that isn't
 // running, and it reappears with the right wording when one is switched on.
 //
-// Deliberately not listed, because neither needs consent: Vercel Web Analytics,
-// which is always on and sets no cookies, and the sign-in cookies Clerk sets,
-// which are strictly necessary for an account.
+// Deliberately not listed: Vercel Web Analytics, which is always on and sets no
+// cookies, and Clerk's sign-in cookies. Note that Clerk sets those on every page
+// of the React app, for visitors who never sign in too — they are disclosed on
+// /privacy rather than gated here, because gating them would break sign-in.
 const CONSENT_SERVICES = [
   isAnalyticsEnabled ? "Google Analytics" : null,
   isClarityEnabled ? "Microsoft Clarity" : null,

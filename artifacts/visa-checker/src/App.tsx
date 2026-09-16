@@ -239,6 +239,10 @@ function ClerkProviderWithRoutes() {
   return (
     <ClerkProvider
       publishableKey={clerkPubKey}
+      // Clerk sends SDK usage telemetry to clerk-telemetry.com from every
+      // visitor's browser while the site runs on a development instance. It
+      // helps Clerk, not us, and it was one more third party on every page.
+      telemetry={false}
       appearance={clerkAppearance}
       signInUrl={`${basePath}/sign-in`}
       signUpUrl={`${basePath}/sign-up`}
