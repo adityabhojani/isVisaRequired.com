@@ -120,7 +120,8 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     description: "Hold two or three passports? See the easiest entry any of them gets for every country, which passport to travel on, and where your second passport adds access.",
     h1: "Dual citizenship visa checker",
     body: `<p>Most visa tools ask for one nationality. If you hold two or three passports, enter them all: for every country we show the easiest entry any of your passports gets, which passport to travel on, and where your second passport opens a door the first one doesn't.</p>
-<p><strong>The working rule:</strong> use your own country's passport when entering that country, and whichever passport gives you the easiest entry everywhere else. Some countries require their citizens to use their own passport — the United States, Australia and, for flights, Canada (Canadian-American dual citizens excepted). Read <a href="/guides/which-passport-to-use-dual-citizenship">which passport to use as a dual national</a> for the details and sources.</p>`,
+<p><strong>The working rule:</strong> use your own country's passport when entering that country, and whichever passport gives you the easiest entry everywhere else. Some countries require their citizens to use their own passport — the United States, Australia and, for flights, Canada (Canadian-American dual citizens excepted). Read <a href="/guides/which-passport-to-use-dual-citizenship">which passport to use as a dual national</a> for the details and sources.</p>
+<p>A second passport adds far less than its ranking suggests when your first is already strong: a German passport gains two destinations from an Irish one and fourteen from a Beninese one. We worked out <a href="/blog/which-second-passport-adds-the-most-countries">which second passport adds the most</a> for common nationalities.</p>`,
   },
   "/discover": {
     title: "Where Can I Go Visa-Free? Discover Destinations by Passport | isvisarequired.com",
@@ -132,7 +133,8 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     title: "Schengen 90/180-Day Calculator — Track Your Days | isvisarequired.com",
     description: "Free Schengen 90/180-day calculator. Enter your trips and see exactly how many days you can still stay in the Schengen Area without overstaying.",
     h1: "Schengen 90/180-day calculator",
-    body: `<p>Stay compliant with the Schengen rule: a maximum of 90 days in any rolling 180-day period. Enter your past and planned trips to see how many days you have left and avoid an overstay.</p>`,
+    body: `<p>Stay compliant with the Schengen rule: a maximum of 90 days in any rolling 180-day period. Enter your past and planned trips to see how many days you have left and avoid an overstay.</p>
+<p>Going over is rarely punished with a fine alone. The cost that matters is a re-entry ban, and its length often depends on how you leave rather than how long you stayed — see <a href="/blog/what-happens-if-you-overstay-a-visa">what happens if you overstay a visa</a>, country by country.</p>`,
   },
   "/tier-list": {
     title: "Passport Tier List — S/A/B/C/D Rankings | isvisarequired.com",
