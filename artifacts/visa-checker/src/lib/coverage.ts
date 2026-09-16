@@ -2,8 +2,7 @@
 //
 // MUST stay identical to the server: `countries` is the length of
 // api-server/src/data/countries.ts, `pairs` is countries x (countries - 1) —
-// the same total api-server/src/seo/report.ts computes — and `lastReviewed`
-// is DATA_LAST_UPDATED from api-server/src/seo/render.ts.
+// the same total api-server/src/seo/report.ts computes.
 //
 // Build-time constants rather than values derived from the async countries
 // query, so the hero paints its final text on the first frame with no layout
@@ -14,6 +13,4 @@ export const COVERAGE = {
   countries: 195,
   pairs: 37830,
   pairsLabel: "37,830",
-  lastReviewed: "2026-09-12",
-  lastReviewedLabel: "12 Sep 2026",
 } as const;

@@ -68,7 +68,7 @@ export function renderDestinationHub(to: CountryData): string {
     { q: `Who needs a visa to visit ${to.name}?`, a: `${vr} nationalities must obtain a visa before travelling to ${to.name}, while ${vf} can enter visa-free, ${voa} receive a visa on arrival and ${ev} apply for an eVisa or travel authorisation online. Find your nationality in the lists above for exact details.` },
     { q: `How long must my passport be valid to enter ${to.name}?`, a: rules.passportValidity + "." },
     { q: `Do I need proof of funds or a return ticket for ${to.name}?`, a: `Return/onward ticket: ${(LEVEL_LABEL[rules.returnTicket] ?? rules.returnTicket).toLowerCase()}${rules.returnTicketNote ? ` (${rules.returnTicketNote})` : ""}. Proof of funds: ${(LEVEL_LABEL[rules.proofOfFunds] ?? rules.proofOfFunds).toLowerCase()}${rules.proofOfFundsNote ? ` (${rules.proofOfFundsNote})` : ""}.` },
-    { q: `Is this ${to.name} visa information official?`, a: `No. isvisarequired.com offers general guidance compiled from public government and IATA sources, last reviewed ${DATA_LAST_UPDATED}. Always confirm current requirements with ${to.name}'s official immigration authority or nearest embassy before travel.` },
+    { q: `Is this ${to.name} visa information official?`, a: `No. isvisarequired.com offers general guidance compiled from public government and IATA sources. Always confirm current requirements with ${to.name}'s official immigration authority or nearest embassy before travel.` },
   ];
   const faqHtml = faqs.map((f) => `<div class="faq"><h3>${esc(f.q)}</h3><p>${esc(f.a)}</p></div>`).join("");
 
@@ -94,7 +94,7 @@ export function renderDestinationHub(to: CountryData): string {
   const body = `
 <nav class="crumbs"><a href="/">Home</a> › <a href="/countries">Countries</a> › ${esc(to.name)}</nav>
 <h1>${esc(to.flag)} ${esc(to.name)} visa requirements</h1>
-<div class="updated">Requirements by nationality · Last reviewed ${esc(DATA_LAST_UPDATED)}</div>
+<div class="updated">Requirements by nationality</div>
 <p class="lead">Do you need a visa for ${esc(to.name)}? It depends on your nationality. ${vf} passports can enter ${esc(to.name)} visa-free, ${voa} get a visa on arrival, ${ev} need an eVisa or travel authorisation, and ${vr} must apply for a visa in advance. Find your passport below, or review ${esc(to.name)}'s general entry requirements.</p>
 <div class="stats">${statCards}</div>
 ${openness ? `<p style="color:#334155;margin:0 0 8px">${esc(to.name)} ranks <strong>#${openness.rank} of ${openness.of}</strong> in our <a href="${WELCOMING_PATH}">Most Welcoming Countries Index</a>, admitting ${openness.open} of the other ${openness.of - 1} nationalities visa-free or on arrival.</p>` : ""}

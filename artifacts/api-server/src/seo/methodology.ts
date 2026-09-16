@@ -57,7 +57,6 @@ ${renderHeader()}
 <main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › Methodology</nav>
 <h1>How we source our visa data</h1>
-<div class="updated">Last reviewed: ${esc(DATA_LAST_UPDATED)}</div>
 <p class="lead">Visa rules affect real money and real travel plans, so we're upfront about where our information comes from, how current it is, and where its limits are.</p>
 
 <h2>What we cover</h2>
@@ -74,7 +73,7 @@ ${renderHeader()}
 </div>
 
 <h2>How current it is</h2>
-<p>Every page shows a visible <strong>"last reviewed"</strong> date so you can judge freshness for yourself. Visa policy changes frequently and sometimes with little notice; a date tells you when we last checked, not a guarantee that nothing has changed since.</p>
+<p>Rules we have individually checked are marked on their page with the official source they were checked against. Visa policy changes frequently and sometimes with little notice, so a checked rule tells you what the source said when we read it, not a guarantee that nothing has changed since. Every correction we have made is listed, with its source, on our <a href="/visa-changes">verified changes log</a>.</p>
 
 <h2>Important limitations</h2>
 <div class="note">

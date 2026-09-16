@@ -199,7 +199,7 @@ export function renderPassportPowerReport(): string {
   const body = `
 <nav class="crumbs"><a href="/">Home</a> › Passport Power Report ${YEAR}</nav>
 <h1>Global Passport Power Report ${YEAR}</h1>
-<div class="updated">Computed from ${d.totalPairs.toLocaleString()} passport–destination rules · Data last reviewed ${esc(DATA_LAST_UPDATED)}</div>
+<div class="updated">Computed from ${d.totalPairs.toLocaleString()} passport–destination rules</div>
 <p class="lead">How far does each passport take you? This report ranks all ${d.rows.length} passports in our dataset by <strong>mobility score</strong> — the number of destinations reachable without visiting an embassy (visa-free + visa on arrival + eVisa/ETA) — and looks at the other side of the desk: which destinations admit the most nationalities without an advance visa. Every figure is computed live from the same dataset that powers our <a href="/">visa checker</a>.</p>
 
 <div class="stats">
@@ -235,7 +235,7 @@ export function renderPassportPowerReport(): string {
 <p><a class="cta" href="${REPORT_PATH}.csv">Download the full dataset (CSV) →</a></p>
 
 <h2>Methodology</h2>
-<p style="color:#334155">Scores are computed from isvisarequired.com's visa-requirement dataset: an open base dataset (derived from public government and IATA-style sources) plus our layer of individually verified corrections, each pinned to a primary source and date. "Mobility" counts destinations an ordinary tourist-passport holder can reach without an embassy visa: visa-free entry, visa on arrival, or an eVisa/electronic travel authorisation. Destination "openness" counts nationalities admitted visa-free or on arrival. The dataset covers ${d.rows.length} countries (${d.totalPairs.toLocaleString()} directed pairs); territories and special administrative regions are excluded, so totals differ slightly from indexes that count them. Figures reflect the dataset as of ${esc(DATA_LAST_UPDATED)}. See <a href="/methodology">how we source our data</a>.</p>
+<p style="color:#334155">Scores are computed from isvisarequired.com's visa-requirement dataset: an open base dataset (derived from public government and IATA-style sources) plus our layer of individually verified corrections, each pinned to a primary source and date. "Mobility" counts destinations an ordinary tourist-passport holder can reach without an embassy visa: visa-free entry, visa on arrival, or an eVisa/electronic travel authorisation. Destination "openness" counts nationalities admitted visa-free or on arrival. The dataset covers ${d.rows.length} countries (${d.totalPairs.toLocaleString()} directed pairs); territories and special administrative regions are excluded, so totals differ slightly from indexes that count them. See <a href="/methodology">how we source our data</a>.</p>
 
 <h2>Cite or reuse this report</h2>
 <p style="color:#334155">This report and the CSV are free to reuse under <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener">CC BY 4.0</a> — cite "isvisarequired.com Global Passport Power Report ${YEAR}" and link to <a href="${REPORT_PATH}">this page</a>. Journalists: we're happy to provide custom cuts of the data — <a href="/contact">get in touch</a>.</p>

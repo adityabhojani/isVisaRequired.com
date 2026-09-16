@@ -89,7 +89,7 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     title: "Is Visa Required? | Free Visa Checker for 195 Countries",
     description: "Check visa requirements instantly for any passport and destination. Find out if you need a visa, visa on arrival, e-visa, ETA/ETIAS, or can travel visa-free — free, no sign-up.",
     h1: "Do you need a visa?",
-    body: `<p>Select your passport and destination to instantly see whether you need a visa, visa on arrival, an e-visa, an electronic travel authorisation (ETIAS/ESTA/ETA), or can travel visa-free — across 195 countries and 37,830 passport–destination combinations. Free, no account needed. Data last reviewed ${DATA_LAST_UPDATED}.</p>`,
+    body: `<p>Select your passport and destination to instantly see whether you need a visa, visa on arrival, an e-visa, an electronic travel authorisation (ETIAS/ESTA/ETA), or can travel visa-free — across 195 countries and 37,830 passport–destination combinations. Free, no account needed.</p>`,
     jsonLd: [
       {
         "@context": "https://schema.org",
@@ -262,7 +262,7 @@ function tierListBody(): string {
     `<a href="/visa-requirements/${slugify(r.c.name)}">${esc(r.c.name)}</a>`,
     String(r.mobility),
   ]);
-  return `<p>Every passport in our dataset is scored by <strong>mobility score</strong> — the number of destinations it reaches without arranging a visa in advance (visa-free + visa on arrival + eVisa/ETA) — then banded into tiers. Scores are computed from ${d.totalPairs.toLocaleString()} passport–destination rules, last reviewed ${esc(DATA_LAST_UPDATED)}.</p>
+  return `<p>Every passport in our dataset is scored by <strong>mobility score</strong> — the number of destinations it reaches without arranging a visa in advance (visa-free + visa on arrival + eVisa/ETA) — then banded into tiers. Scores are computed from ${d.totalPairs.toLocaleString()} passport–destination rules.</p>
   <h2>The tiers</h2>
   ${table(["Tier", "Score", "Passports", "Examples"], tierRows)}
   <h2>Top 10 passports</h2>
@@ -279,7 +279,7 @@ function statsBody(): string {
   const openRows = d.byOpenness.slice(0, 10).map((r, i) => [
     String(openRanks[i]), `<a href="/countries/${slugify(r.c.name)}">${esc(r.c.name)}</a>`, String(r.open),
   ]);
-  return `<p>Aggregate figures computed from all ${d.totalPairs.toLocaleString()} passport–destination pairs in our dataset, last reviewed ${esc(DATA_LAST_UPDATED)}. <strong>Mobility score</strong> counts destinations reachable without a prior visa; <strong>openness</strong> counts how many nationalities a country admits without one.</p>
+  return `<p>Aggregate figures computed from all ${d.totalPairs.toLocaleString()} passport–destination pairs in our dataset. <strong>Mobility score</strong> counts destinations reachable without a prior visa; <strong>openness</strong> counts how many nationalities a country admits without one.</p>
   <h2>Headline numbers</h2>
   ${table(["Measure", "Value"], [
     ["Passports ranked", String(d.rows.length)],
@@ -303,7 +303,7 @@ function reciprocityBody(): string {
     `<a href="/visa-requirements/${slugify(p.b.name)}/${slugify(p.a.name)}">${esc(p.b.name)} → ${esc(p.a.name)}</a>`,
     "Visa required",
   ]);
-  return `<p>Visa access is often <strong>not mutual</strong>. Across ${d.totalPairs.toLocaleString()} passport–destination rules we find <strong>${d.totalAsymmetric.toLocaleString()} one-sided relationships</strong> — pairs where one country's citizens enter visa-free while the other's must apply for a visa. Last reviewed ${esc(DATA_LAST_UPDATED)}.</p>
+  return `<p>Visa access is often <strong>not mutual</strong>. Across ${d.totalPairs.toLocaleString()} passport–destination rules we find <strong>${d.totalAsymmetric.toLocaleString()} one-sided relationships</strong> — pairs where one country's citizens enter visa-free while the other's must apply for a visa.</p>
   <h2>Examples of one-sided access</h2>
   ${table(["Direction", "Requirement", "Reverse direction", "Requirement"], sample)}
   <p style="margin-top:12px">Enter any two countries above to see both directions side by side, or read the <a href="/reports/passport-power-2026">full passport power report</a>.</p>`;

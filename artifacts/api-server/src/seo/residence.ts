@@ -60,7 +60,6 @@ ${renderHeader()}
 <main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › Residence permits &amp; visa requirements</nav>
 <h1>Does a residence permit or US/UK/Schengen visa change your visa requirements?</h1>
-<div class="updated">Last reviewed: ${esc(DATA_LAST_UPDATED)}</div>
 <p class="lead">Your passport isn't always the whole story. Holding a residence permit — or a valid visa from a major country — can unlock easier entry to certain third countries. Here's how it works, and the cases that are well established.</p>
 
 <div class="note"><strong>This is general guidance, not a ruling for your case.</strong> Second-document rules are specific to your exact permit/visa and destination, and they change often. Always confirm with the destination's official immigration portal (linked on each destination page) before you book or travel.</div>

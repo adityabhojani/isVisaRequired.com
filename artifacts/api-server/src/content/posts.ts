@@ -56,7 +56,7 @@ export const STATIC_POSTS: StaticPost[] = [
     author: "isvisarequired.com",
     tags: ["visa policy", "ETA", "travel authorisation"],
     created_at: "2026-09-13",
-    updated_at: "2026-09-13",
+    updated_at: "2026-09-16",
     content: `Most visa datasets — ours included, before we started correcting it — record two useful states and one lie. The useful ones are *visa required* and *visa on arrival*. The lie is *visa free*, because in 2025 and 2026 a growing number of countries kept the words “visa free” while adding a mandatory online form you must complete before you travel.
 
 We re-checked our data country by country against each government's own page. That produced **793 corrections across 18 countries**, all listed with sources on our [verified changes log](/visa-changes). Reading them together, one pattern dominates.
@@ -92,7 +92,7 @@ An ETA is not a visa, and that distinction matters less than it sounds. Practica
 - **It is tied to your passport.** Renew the passport and most authorisations die with it, even if they had months left.
 - **"Visa free for 90 days" is a separate question from validity.** See [visa validity vs duration of stay](/guides/visa-validity-vs-duration-of-stay) for why those two numbers are not the same thing.
 
-Check your own combination on the [visa checker](/) — every pair page shows the date we last verified that rule and the official source we read it from. Where a rule has changed since our base dataset was frozen, the [verified changes log](/visa-changes) records what it was, what it is now, and who says so.`,
+Check your own combination on the [visa checker](/). Where we have individually verified a rule, its page names the official source we checked it against. Where a rule has changed since our base dataset was frozen, the [verified changes log](/visa-changes) records what it was, what it is now, and who says so.`,
   },
   {
     title: "Five digital nomad visas that no longer exist",

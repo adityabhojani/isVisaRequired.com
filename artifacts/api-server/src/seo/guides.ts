@@ -115,14 +115,14 @@ function renderRoundup(g: PassportRoundup): string {
     { q: `How many countries can ${g.nationality} visit visa-free?`, a: `${g.adjective} passport holders can enter ${vf} countries and territories visa-free and a further ${voa} on a visa on arrival — ${noVisa} destinations in total with no visa arranged in advance. Another ${ev} are reachable with an online eVisa.` },
     { q: `What is the difference between visa-free and visa on arrival for ${g.adjective} travellers?`, a: `Visa-free means you are admitted on your passport alone. Visa on arrival means a visa is issued to you at the airport or border, usually for a fee — you still get it on the day, but you should carry the fee, a return ticket and a hotel booking.` },
     { q: `Do ${g.nationality} need proof of funds for visa-free travel?`, a: `Often, yes. Even where no visa is required, border officers may ask ${g.adjective} travellers for evidence of onward travel and sufficient funds. Carry a printed itinerary and recent bank statements to be safe.` },
-    { q: `Is this list official?`, a: `No. isvisarequired.com compiles this from public government and IATA sources, last reviewed ${DATA_LAST_UPDATED}. Rules change often — always confirm with the destination's official immigration authority before booking.` },
+    { q: `Is this list official?`, a: `No. isvisarequired.com compiles this from public government and IATA sources. Rules change often — always confirm with the destination's official immigration authority before booking.` },
   ];
   const faqHtml = faqs.map((f) => `<div class="faq"><h3>${esc(f.q)}</h3><p>${esc(f.a)}</p></div>`).join("");
 
   const body = `
 <nav class="crumbs"><a href="/">Home</a> › <a href="/guides">Guides</a> › Visa-free for ${esc(g.adjective)}</nav>
 <h1>${esc(h1)}</h1>
-<div class="updated">Last reviewed ${esc(DATA_LAST_UPDATED)} · ${vf} visa-free · ${voa} visa on arrival · ${ev} eVisa</div>
+<div class="updated">${vf} visa-free · ${voa} visa on arrival · ${ev} eVisa</div>
 <p class="lead">${esc(g.intro)}</p>
 <div class="stats">
   <div class="stat"><div class="n" style="color:${REQ_COLOR.visa_free}">${vf}</div><div class="k">Visa-free</div></div>
@@ -151,7 +151,7 @@ ${ev ? table(groups.e_visa) : "<p>No eVisa destinations are currently listed.</p
 ${tipsHtml}
 
 <h2>How this list is compiled</h2>
-<p style="color:#334155">Requirements are compiled from publicly available government and IATA Timatic-style sources and reviewed periodically (last reviewed ${esc(DATA_LAST_UPDATED)}). We show what is generally applicable to ordinary tourist passports; diplomatic, official and refugee travel documents can differ. Because visa policy changes frequently, treat this as a starting point and confirm with the destination's official immigration authority before booking. See our <a href="/methodology">data methodology</a> for details.</p>
+<p style="color:#334155">Requirements are compiled from publicly available government and IATA Timatic-style sources and reviewed periodically. We show what is generally applicable to ordinary tourist passports; diplomatic, official and refugee travel documents can differ. Because visa policy changes frequently, treat this as a starting point and confirm with the destination's official immigration authority before booking. See our <a href="/methodology">data methodology</a> for details.</p>
 
 <h2>Frequently asked questions</h2>
 ${faqHtml}
@@ -172,7 +172,6 @@ function renderArticle(g: Article): string {
   const body = `
 <nav class="crumbs"><a href="/">Home</a> › <a href="/guides">Guides</a> › ${esc(g.h1)}</nav>
 <h1>${esc(g.h1)}</h1>
-<div class="updated">Last reviewed ${esc(DATA_LAST_UPDATED)}</div>
 <p class="lead">${esc(g.intro)}</p>
 <p><a class="cta" href="/">Check your visa requirement instantly →</a></p>
 ${sections}

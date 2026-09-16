@@ -78,7 +78,7 @@ export function renderPassportHub(from: CountryData): string {
     { q: `How many countries can ${from.name} passport holders visit visa-free?`, a: `${from.name} passport holders can enter ${vf} countries and territories visa-free, and a further ${voa} offer a visa on arrival — ${noVisaNeeded} destinations in total with no advance visa needed. Including eVisa/ETA destinations, ${mobility} countries are reachable without visiting an embassy.` },
     { q: `Which countries can ${from.name} citizens visit without a visa?`, a: vf ? `Visa-free destinations for ${from.name} citizens include ${esc(topFree)}${vf > 12 ? ", and more — see the full list above." : "."}` : `There are currently no fully visa-free destinations for ${from.name} passport holders; check the visa on arrival and eVisa lists above.` },
     { q: `How many countries require a visa for ${from.name} passport holders?`, a: `${vr} countries require ${from.name} passport holders to obtain a visa before travelling${na ? `, and ${na} do not currently permit entry` : ""}. The full list is above, each linking to the requirements, costs and official application link.` },
-    { q: `Is this ${from.name} visa information official?`, a: `No. isvisarequired.com provides general guidance compiled from public government and IATA sources, last reviewed ${DATA_LAST_UPDATED}. Visa rules change often — always confirm with the destination's official immigration authority or embassy before you book or travel.` },
+    { q: `Is this ${from.name} visa information official?`, a: `No. isvisarequired.com provides general guidance compiled from public government and IATA sources. Visa rules change often — always confirm with the destination's official immigration authority or embassy before you book or travel.` },
   ];
   const faqHtml = faqs.map((f) => `<div class="faq"><h3>${esc(f.q)}</h3><p>${f.a}</p></div>`).join("");
 
@@ -111,7 +111,7 @@ export function renderPassportHub(from: CountryData): string {
   const body = `
 <nav class="crumbs"><a href="/">Home</a> › <a href="/visa-requirements">Passports</a> › ${esc(from.name)}</nav>
 <h1>${esc(from.flag)} ${esc(from.name)} passport visa requirements</h1>
-<div class="updated">Covering ${total} destinations · Last reviewed ${esc(DATA_LAST_UPDATED)}</div>
+<div class="updated">Covering ${total} destinations</div>
 <p class="lead">Where can ${esc(from.name)} passport holders travel in ${YEAR}? This page lists the visa requirement for every country — ${vf} visa-free, ${voa} visa on arrival, ${ev} eVisa and ${vr} requiring a visa in advance. Select any destination for full details: visa type, permitted stay, fees, required documents and the official application link.</p>
 <div class="stats">${statCards}</div>
 <p><a class="cta" href="/?passport=${from.code}">Check a specific destination in the visa tool →</a></p>

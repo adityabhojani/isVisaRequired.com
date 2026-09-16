@@ -93,7 +93,7 @@ export function renderFooter(): string {
   return `<footer class="site"><div class="wrap">
 <div class="cols">
 <div><a class="brand" href="/" style="margin-bottom:8px"><span class="mark">${GLOBE}</span><span class="word">isvisarequired</span><span class="tld">.com</span></a>
-<p style="margin:8px 0 0;max-width:38ch;line-height:1.55">Built from an open base dataset, corrected against official government portals, and last reviewed ${DATA_LAST_UPDATED}. Independent — not a visa agency, and we never charge for applications.</p></div>
+<p style="margin:8px 0 0;max-width:38ch;line-height:1.55">Built from an open base dataset and corrected against official government portals. Independent — not a visa agency, and we never charge for applications.</p></div>
 <div><h4>Explore</h4><a href="/">Visa checker</a><a href="/visa-requirements">All 195 passports</a><a href="/countries">All 195 destinations</a><a href="/guides">Visa &amp; travel guides</a><a href="/transit-visa">Transit visa guides</a><a href="/travel-authorization">ETIAS, ESTA &amp; ETA</a><a href="/reports/passport-power-2026">Passport Power Report</a><a href="/reports/most-welcoming-countries-2026">Most Welcoming Countries</a><a href="/visa-changes">Verified rule changes</a></div>
 <div><h4>Tools</h4><a href="/compare">Compare two passports</a><a href="/dual-citizenship">Dual citizenship checker</a><a href="/tier-list">Passport tier list</a><a href="/schengen">Schengen calculator</a><a href="/trip-planner">Trip planner</a><a href="/digital-nomad">Digital nomad visas</a><a href="/methodology">How we source our data</a><a href="/contact">Contact &amp; corrections</a></div>
 </div>

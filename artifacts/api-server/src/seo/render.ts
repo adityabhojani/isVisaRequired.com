@@ -2,7 +2,7 @@
 //
 // These are fully server-rendered HTML documents (not the SPA shell) so they are
 // directly indexable: unique <title>/meta, canonical, FAQPage + BreadcrumbList
-// JSON-LD, a visible "last updated" date, and rich pair-specific content. Each
+// JSON-LD, and rich pair-specific content. Each
 // page is CDN-cached (see Cache-Control in the route), so serving ~38k pages
 // on-demand is cheap.
 
@@ -19,6 +19,13 @@ import { getEntryRules } from "../data/entryRequirements";
 export const SITE_ORIGIN = "https://www.isvisarequired.com";
 
 // Date the visa dataset was last reviewed. Bump when data is refreshed.
+//
+// Machine-readable only: it feeds sitemap <lastmod>, JSON-LD dateModified and
+// the year in page titles. It is deliberately NOT printed on any page. A
+// hand-bumped site-wide date that nobody remembers to bump makes the whole site
+// look abandoned the week after it was set. Where freshness genuinely matters —
+// an individually verified rule — the page names the source and the date that
+// rule was checked instead (see entry.verifiedSource below).
 export const DATA_LAST_UPDATED = "2026-09-12";
 
 // ── slug helpers ─────────────────────────────────────────────────────────────
@@ -144,7 +151,7 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
     no_admission: "Entry Suspended",
   };
   const title = `Do ${from.name} citizens need a visa for ${to.name}? ${TITLE_ANSWER[requirement] ?? ""} (${new Date(DATA_LAST_UPDATED).getFullYear()})`;
-  const metaDesc = `${answer} Visa type: ${reqLabel}. Max stay: ${maxStay}. Fee: ${fee}. Processing: ${processing}. Documents, costs and official links — updated ${DATA_LAST_UPDATED}.`;
+  const metaDesc = `${answer} Visa type: ${reqLabel}. Max stay: ${maxStay}. Fee: ${fee}. Processing: ${processing}. Documents, costs and official links.`;
 
   // FAQ (kept identical between visible content and JSON-LD)
   const rules = getEntryRules(to.code);
@@ -338,7 +345,6 @@ ${renderHeader()}
 <div class="hero"><div class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › <a href="/visa-requirements/${slugify(from.name)}">${esc(from.name)} passport</a> › ${esc(from.name)} → ${esc(to.name)}</nav>
 <h1>Do ${esc(from.name)} citizens need a visa for ${esc(to.name)}?</h1>
-<div class="updated">Last updated: ${esc(entry.verifiedOn || DATA_LAST_UPDATED)}</div>
 </div></div>
 <main class="wrap">
 <div class="answer">

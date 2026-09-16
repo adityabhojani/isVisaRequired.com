@@ -105,7 +105,6 @@ ${FONT_LINKS}<style>${STYLE}${BASE_STYLE}</style></head>
 <body>${HEADER}<main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › <a href="/travel-authorization">Travel authorisations</a> › ${esc(a.name)}</nav>
 <h1>${esc(a.name)} — ${esc(a.scheme)}</h1>
-<div class="updated">Last reviewed: ${esc(a.reviewed)}</div>
 <div class="statusbox ${statusCls}"><strong>${statusLabel}.</strong> ${esc(a.statusNote)}</div>
 <p class="lead">${esc(a.summary)}</p>
 

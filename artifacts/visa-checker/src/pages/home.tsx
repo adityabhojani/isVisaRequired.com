@@ -594,7 +594,7 @@ export default function HomePage() {
             href="/methodology"
             className="inline-flex items-center gap-2 bg-white/10 text-white/90 rounded-full px-3.5 py-1 text-xs font-semibold mb-3 border border-white/20 backdrop-blur-sm hover:bg-white/[0.18] transition-colors">
             <Shield className="h-3 w-3" />
-            Data last reviewed {COVERAGE.lastReviewedLabel}
+            How we source our data
           </a>
           <h1 className="font-serif text-[2.5rem] md:text-[3.25rem] font-semibold text-white mb-3 leading-[1.06] tracking-[-0.022em] text-balance">
             Do you need a visa?
@@ -944,8 +944,8 @@ export default function HomePage() {
           <AdSlot slotId="7432198541" size="responsive" className="mt-8" />
 
           <p className="mt-8 text-sm text-muted-foreground leading-relaxed max-w-[62ch]">
-            Built from an open base dataset, corrected against official government portals, and
-            last reviewed {COVERAGE.lastReviewedLabel}. We're independent — not a visa agency, and
+            Built from an open base dataset and corrected against official government portals.
+            We're independent — not a visa agency, and
             we never charge for applications.{" "}
             <a href="/methodology" className="text-primary hover:underline">How we source this →</a>
           </p>

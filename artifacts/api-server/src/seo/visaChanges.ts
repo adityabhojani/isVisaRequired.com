@@ -147,7 +147,7 @@ export function renderVisaChanges(): string {
   const body = `
 <nav class="crumbs"><a href="/">Home</a> › Visa rule changes</nav>
 <h1>Visa rule changes we've verified</h1>
-<div class="updated">${cells} corrections across ${countries} countries · Most recent ${esc(dates[0] ?? DATA_LAST_UPDATED)}</div>
+<div class="updated">${cells} corrections across ${countries} countries</div>
 <p class="lead">Our base dataset is a snapshot, and snapshots go stale. When a rule changes we check it against the country's own immigration authority, correct the cell, and record what it replaced. This is that trail — every correction, what the data said before, and the source it was checked against. <a href="${CHANGES_PATH}.xml">Subscribe by RSS</a>, or read <a href="/methodology">how we source our data</a>.</p>
 
 <div class="stats">

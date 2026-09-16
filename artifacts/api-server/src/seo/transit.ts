@@ -53,7 +53,7 @@ export function renderTransitHub(): string {
 export function renderTransitGuide(g: TransitGuide): string {
   const canonical = `${SITE_ORIGIN}/transit-visa/${g.slug}`;
   const title = `Do you need a transit visa for ${g.name}? (${new Date(g.reviewed).getFullYear()})`;
-  const desc = `${g.summary} Airside vs leaving the airport, transit schemes, and the official source — reviewed ${g.reviewed}.`;
+  const desc = `${g.summary} Airside vs leaving the airport, transit schemes, and the official source.`;
 
   const faqs = [
     { q: `Do you need a transit visa to connect through ${g.name}?`, a: g.summary },
@@ -90,7 +90,6 @@ ${FONT_LINKS}<style>${STYLE}${BASE_STYLE}</style></head>
 <body>${HEADER}<main class="wrap">
 <nav class="crumbs"><a href="/">Home</a> › <a href="/transit-visa">Transit visas</a> › ${esc(g.name)}</nav>
 <h1>Do you need a transit visa for ${esc(g.name)}?</h1>
-<div class="updated">Last reviewed: ${esc(g.reviewed)}</div>
 <p class="lead">${esc(g.summary)}</p>
 
 <section class="card"><h2>Staying airside (not leaving the airport)</h2><p>${esc(g.airside)}</p></section>

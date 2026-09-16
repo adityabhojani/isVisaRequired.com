@@ -122,7 +122,7 @@ export function renderWelcomingIndex(): string {
   const body = `
 <nav class="crumbs"><a href="/">Home</a> › Most Welcoming Countries Index ${YEAR}</nav>
 <h1>Most Welcoming Countries Index ${YEAR}</h1>
-<div class="updated">Computed from ${d.totalPairs.toLocaleString()} passport–destination rules · Data last reviewed ${esc(DATA_LAST_UPDATED)}</div>
+<div class="updated">Computed from ${d.totalPairs.toLocaleString()} passport–destination rules</div>
 <p class="lead">Which countries let the most of the world in? This index ranks all ${rows.length} countries in our dataset by <strong>openness</strong>: how many of the other ${others} nationalities they admit visa-free or with a visa on arrival — that is, without a visa arranged in advance. It is the other side of the <a href="${REPORT_PATH}">Passport Power Report</a>, which ranks passports by where they can go.</p>
 
 <div class="stats">
@@ -150,7 +150,7 @@ export function renderWelcomingIndex(): string {
 <p style="color:#64748b;font-size:13px">Where a row adds up to less than ${others}, our dataset records no ordinary tourist admission for the remaining nationalities; the CSV lists them separately. <a href="${WELCOMING_PATH}.csv">Download the full data (CSV)</a>.</p>
 
 <h2>Methodology</h2>
-<p style="color:#334155">Computed from isvisarequired.com's visa-requirement dataset: an open base dataset plus our layer of individually verified corrections, each pinned to a primary source and date. For every country we count how the other ${others} nationalities are treated when an ordinary tourist-passport holder arrives: visa-free, visa on arrival, eVisa or electronic travel authorisation, visa required, or no admission. The openness score counts only visa-free and on-arrival entry, because an eVisa or ETA still means applying before you travel. It measures entry policy by nationality alone, so exemptions that depend on holding another country's visa or residence permit are not counted (see <a href="/residence-permit-visa-benefits">second-document rules</a>). Territories and special administrative regions are excluded. Figures reflect the dataset as of ${esc(DATA_LAST_UPDATED)}. See <a href="/methodology">how we source our data</a>.</p>
+<p style="color:#334155">Computed from isvisarequired.com's visa-requirement dataset: an open base dataset plus our layer of individually verified corrections, each pinned to a primary source and date. For every country we count how the other ${others} nationalities are treated when an ordinary tourist-passport holder arrives: visa-free, visa on arrival, eVisa or electronic travel authorisation, visa required, or no admission. The openness score counts only visa-free and on-arrival entry, because an eVisa or ETA still means applying before you travel. It measures entry policy by nationality alone, so exemptions that depend on holding another country's visa or residence permit are not counted (see <a href="/residence-permit-visa-benefits">second-document rules</a>). Territories and special administrative regions are excluded. See <a href="/methodology">how we source our data</a>.</p>
 
 <h2>Cite or reuse this index</h2>
 <p style="color:#334155">This index and its CSV are free to reuse under <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener">CC BY 4.0</a>. Cite "isvisarequired.com Most Welcoming Countries Index ${YEAR}" and link to <a href="${WELCOMING_PATH}">this page</a>. For the passport side of the picture, see the <a href="${REPORT_PATH}">Global Passport Power Report ${YEAR}</a>.</p>

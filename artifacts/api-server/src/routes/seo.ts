@@ -63,7 +63,7 @@ h1{font-size:26px;margin:18px 0 6px}.intro{color:var(--muted);margin-bottom:18px
 footer.site{color:var(--muted);font-size:13px;padding:28px 0;text-align:center}</style></head>
 <body><header class="site"><div class="wrap"><a class="logo" href="/">isvisarequired<span>.com</span></a><a href="/" style="font-size:14px;text-decoration:none">Visa checker →</a></div></header>
 <main class="wrap"><h1>${esc(h1)}</h1><p class="intro">${esc(intro)}</p>${body}</main>
-<footer class="site"><div class="wrap">© isvisarequired.com — always confirm with official government sources. Updated ${esc(DATA_LAST_UPDATED)}.</div></footer></body></html>`;
+<footer class="site"><div class="wrap">© isvisarequired.com — always confirm with official government sources.</div></footer></body></html>`;
 }
 
 // ── hub: all passports ───────────────────────────────────────────────────────
@@ -167,7 +167,7 @@ router.get("/llms.txt", (_req: Request, res: Response): void => {
 - Covers 195 countries / 37,830 passport-destination pairs.
 - Requirement types: visa-free, visa on arrival, eVisa, visa required, entry not permitted.
 - Data is sourced from official government immigration portals plus an open base dataset, with
-  source-verified manual corrections. Each page shows a "last reviewed" date.
+  source-verified manual corrections. Individually verified rules show the official source they were checked against.
 - Free to use; the site never charges for visa applications and links to official portals.
 
 ## Primary pages
