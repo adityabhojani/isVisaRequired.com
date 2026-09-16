@@ -1,14 +1,34 @@
 import { useState, useEffect } from "react";
 import { Cookie, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { initGA } from "@/lib/analytics";
+import { initGA, initClarity, isAnalyticsEnabled, isClarityEnabled } from "@/lib/analytics";
 
 const CONSENT_KEY = "cookie_consent";
+
+// The banner exists to ask permission for tracking that needs it, so what it
+// names comes from the same build-time flags that switch each service on. It
+// said "We use Google Analytics" for months while no GA measurement ID was set;
+// deriving the list from the flags means it can't describe a service that isn't
+// running, and it reappears with the right wording when one is switched on.
+//
+// Deliberately not listed, because neither needs consent: Vercel Web Analytics,
+// which is always on and sets no cookies, and the sign-in cookies Clerk sets,
+// which are strictly necessary for an account.
+const CONSENT_SERVICES = [
+  isAnalyticsEnabled ? "Google Analytics" : null,
+  isClarityEnabled ? "Microsoft Clarity" : null,
+].filter((s): s is string => s !== null);
+
+function joinNames(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (CONSENT_SERVICES.length === 0) return;
     const consent = localStorage.getItem(CONSENT_KEY);
     if (consent) return;
     const timer = setTimeout(() => setVisible(true), 1200);
@@ -19,6 +39,7 @@ export function CookieConsent() {
     localStorage.setItem(CONSENT_KEY, "accepted");
     setVisible(false);
     initGA();
+    initClarity();
   };
 
   const decline = () => {
@@ -26,7 +47,8 @@ export function CookieConsent() {
     setVisible(false);
   };
 
-  if (!visible) return null;
+  // Nothing that needs consent is switched on, so there is nothing to ask.
+  if (!visible || CONSENT_SERVICES.length === 0) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4">
@@ -34,10 +56,10 @@ export function CookieConsent() {
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <Cookie className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-foreground">We use cookies</p>
+            <p className="text-sm font-semibold text-foreground">Analytics cookies</p>
             <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-              We use Google Analytics to understand how visitors use this site and make it better.
-              No personal data is sold or shared.{" "}
+              With your permission, we use {joinNames(CONSENT_SERVICES)} to understand how visitors use
+              this site. They only run if you accept, and we never sell your data.{" "}
               <a href="/privacy" className="underline underline-offset-2 hover:text-foreground transition-colors">
                 Privacy Policy
               </a>
@@ -49,7 +71,7 @@ export function CookieConsent() {
             Decline
           </Button>
           <Button size="sm" onClick={accept} className="flex-1 sm:flex-none text-xs h-8 bg-primary text-primary-foreground">
-            Accept All
+            Accept
           </Button>
           <button
             onClick={decline}

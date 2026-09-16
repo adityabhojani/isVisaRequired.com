@@ -60,3 +60,4 @@ export function trackEvent(
 }
 
 export const isAnalyticsEnabled = !!GA_ID;
+export const isClarityEnabled = !!CLARITY_ID;

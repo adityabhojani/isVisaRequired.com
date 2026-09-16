@@ -165,9 +165,13 @@ function wrap(Component: React.LazyExoticComponent<React.ComponentType>) {
 function AppRoutes() {
   usePageTracking();
   useEffect(() => {
+    // Both need consent, and the cookie banner tells visitors they only run if
+    // accepted — so neither may start before that choice is on record.
     const consent = localStorage.getItem("cookie_consent");
-    if (consent === "accepted") initGA();
-    initClarity();
+    if (consent === "accepted") {
+      initGA();
+      initClarity();
+    }
     initAdSense();
   }, []);
 
