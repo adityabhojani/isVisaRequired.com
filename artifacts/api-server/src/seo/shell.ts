@@ -11,7 +11,11 @@
 // Everything here mirrors artifacts/visa-checker/src/index.css: the same
 // navy, the same cool near-white ground, Inter + Playfair Display, and the
 // same navy-tinted shadow scale (rgb 15 23 41 is --foreground's hue).
-import { DATA_LAST_UPDATED } from "./hubLayout";
+import { FOOTER_GROUPS, FOOTER_LINKS, FOOTER_TAGLINE, FOOTER_DISCLAIMER } from "@workspace/travel-data";
+
+function esc(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
 
 export const FONT_LINKS =
   `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>` +
@@ -65,13 +69,15 @@ h2{font-size:20px;font-weight:600;letter-spacing:-.01em;margin:26px 0 10px}
 .keep a:hover{box-shadow:var(--sh-md);border-color:rgb(10 47 161/.35)}
 .keep a small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
 footer.site{margin-top:40px;border-top:1px solid var(--line);background:#fff;color:var(--muted);font-size:13px;padding:32px 0 28px;text-align:left}
-footer.site .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:24px;column-width:auto}
+footer.site .top{display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;margin-bottom:28px}footer.site .top p{margin:0;max-width:640px;font-size:12px;line-height:1.55}
+footer.site .cols{display:grid;grid-template-columns:repeat(4,1fr);gap:28px 24px;column-width:auto}
 footer.site h4{margin:0 0 10px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 footer.site a{color:var(--muted);text-decoration:none;display:block;padding:3px 0}footer.site a:hover{color:var(--ink)}
 footer.site .cols a{display:block;padding:3px 0}
 footer.site a.brand{display:inline-flex;padding:0}
-footer.site .legal{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:12px}
-@media(max-width:640px){footer.site .cols{grid-template-columns:1fr 1fr}footer.site .cols>div:first-child{grid-column:1/-1}}
+footer.site .legal{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:10px 20px;flex-wrap:wrap}footer.site .legal nav{display:flex;flex-wrap:wrap;gap:4px 18px}footer.site .legal nav a{display:inline;padding:0}
+footer.site .disclaimer{margin:10px 0 0;font-size:12px}
+@media(max-width:640px){footer.site .cols{grid-template-columns:1fr 1fr}}
 `;
 
 const GLOBE = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
@@ -90,14 +96,19 @@ export function renderHeader(): string {
 }
 
 export function renderFooter(): string {
+  const groups = FOOTER_GROUPS.map(
+    (g) =>
+      `<div><h4>${esc(g.title)}</h4>${g.links.map((l) => `<a href="${l.href}">${esc(l.label)}</a>`).join("")}</div>`,
+  ).join("");
+  const links = FOOTER_LINKS.map(
+    (l) => `<a href="${l.href}"${l.newTab ? ' target="_blank" rel="noopener noreferrer"' : ""}>${esc(l.label)}</a>`,
+  ).join("");
   return `<footer class="site"><div class="wrap">
-<div class="cols">
-<div><a class="brand" href="/" style="margin-bottom:8px"><span class="mark">${GLOBE}</span><span class="word">isvisarequired</span><span class="tld">.com</span></a>
-<p style="margin:8px 0 0;max-width:38ch;line-height:1.55">Built from an open base dataset and corrected against official government portals. Independent — not a visa agency, and we never charge for applications.</p></div>
-<div><h4>Explore</h4><a href="/">Visa checker</a><a href="/visa-requirements">All 195 passports</a><a href="/countries">All 195 destinations</a><a href="/guides">Visa &amp; travel guides</a><a href="/transit-visa">Transit visa guides</a><a href="/travel-authorization">ETIAS, ESTA &amp; ETA</a><a href="/reports/passport-power-2026">Passport Power Report</a><a href="/reports/most-welcoming-countries-2026">Most Welcoming Countries</a><a href="/visa-changes">Verified rule changes</a></div>
-<div><h4>Tools</h4><a href="/compare">Compare two passports</a><a href="/dual-citizenship">Dual citizenship checker</a><a href="/tier-list">Passport tier list</a><a href="/schengen">Schengen calculator</a><a href="/trip-planner">Trip planner</a><a href="/digital-nomad">Digital nomad visas</a><a href="/methodology">How we source our data</a><a href="/contact">Contact &amp; corrections</a></div>
-</div>
-<div class="legal">© ${new Date().getFullYear()} isvisarequired.com — general guidance only; always confirm with official government sources before booking travel. <a href="/privacy" style="display:inline">Privacy</a> · <a href="/terms" style="display:inline">Terms</a></div>
+<div class="top"><a class="brand" href="/"><span class="mark">${GLOBE}</span><span class="word">isvisarequired</span><span class="tld">.com</span></a>
+<p>${esc(FOOTER_TAGLINE)}</p></div>
+<nav class="cols" aria-label="Footer">${groups}</nav>
+<div class="legal"><span>© ${new Date().getFullYear()} isvisarequired.com · Data: ilyankou/passport-index-dataset</span><nav aria-label="Site">${links}</nav></div>
+<p class="disclaimer">${esc(FOOTER_DISCLAIMER)}</p>
 </div></footer>`;
 }
 

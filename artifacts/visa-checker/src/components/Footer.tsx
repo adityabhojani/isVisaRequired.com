@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Globe, Mail, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
+import { FOOTER_GROUPS, FOOTER_LINKS, FOOTER_TAGLINE, FOOTER_DISCLAIMER } from "@workspace/travel-data";
 
 export function Footer() {
   const [email, setEmail] = useState("");
@@ -85,83 +86,59 @@ export function Footer() {
 
       {/* Main footer */}
       <div className="bg-card">
-        <div className="max-w-5xl mx-auto px-4 py-10">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
-            {/* Brand */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-                  <Globe className="h-3.5 w-3.5 text-primary-foreground" />
-                </div>
-                <span className="font-serif font-bold text-foreground">isvisarequired.com</span>
+        <div className="max-w-5xl mx-auto px-4 pt-10 pb-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-9">
+            <a href="/" className="flex items-center gap-2 w-fit">
+              <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+                <Globe className="h-3.5 w-3.5 text-primary-foreground" />
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Free visa requirement checker covering 195 countries and 37,830 passport–destination combinations.
-              </p>
-            </div>
-
-            {/* Tools */}
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Tools</p>
-              <nav className="flex flex-col gap-2">
-                {[
-                  { href: "/", label: "Check Visa Requirements" },
-                  { href: "/visa-requirements", label: "Visa Requirements by Passport" },
-                  { href: "/countries", label: "Visa Requirements by Country" },
-                  { href: "/compare", label: "Compare Two Passports" },
-                  { href: "/dual-citizenship", label: "Dual Citizenship Checker" },
-                  { href: "/discover", label: "Discover Destinations" },
-                  { href: "/map", label: "World Visa Map" },
-                  { href: "/trip-planner", label: "Trip Planner" },
-                  { href: "/schengen", label: "Schengen Calculator" },
-                  { href: "/tier-list", label: "Passport Tier List" },
-                  { href: "/digital-nomad", label: "Digital Nomad Visas" },
-                  { href: "/reciprocity", label: "Visa Reciprocity" },
-                  { href: "/my-travels", label: "My Travels" },
-                  { href: "/alerts", label: "Visa Alerts" },
-                  { href: "/stats", label: "Passport Power Index" },
-                  { href: "/reports/passport-power-2026", label: "Passport Power Report 2026" },
-                  { href: "/reports/most-welcoming-countries-2026", label: "Most Welcoming Countries 2026" },
-                  { href: "/visa-changes", label: "Verified Visa Rule Changes" },
-                  { href: "/popular", label: "Popular Destinations" },
-                  { href: "/transit-visa", label: "Transit Visa Guides" },
-                  { href: "/travel-authorization", label: "ETIAS, ESTA & ETA" },
-                  { href: "/residence-permit-visa-benefits", label: "Residence Permit Travel" },
-                  { href: "/guides", label: "Visa & Travel Guides" },
-                  { href: "/blog", label: "Travel Blog" },
-                  { href: "/methodology", label: "How We Source Our Data" },
-                ].map(({ href, label }) => (
-                  <a key={href} href={href} className="text-sm text-muted-foreground hover:text-foreground hover:translate-x-0.5 transition-all inline-block">
-                    {label}
-                  </a>
-                ))}
-              </nav>
-            </div>
-
-            {/* Legal */}
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Legal</p>
-              <nav className="flex flex-col gap-2">
-                <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</a>
-                <a href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Terms of Service</a>
-                <a href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contact &amp; Corrections</a>
-              </nav>
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3 mt-6">Embed</p>
-              <a href="/widget" target="_blank" rel="noopener noreferrer"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium">
-                Widget for your site →
-              </a>
-            </div>
+              <span className="font-serif font-bold text-foreground">isvisarequired.com</span>
+            </a>
+            <p className="text-xs text-muted-foreground leading-relaxed sm:max-w-xl sm:text-right">
+              {FOOTER_TAGLINE}
+            </p>
           </div>
 
-          <div className="border-t border-border pt-5 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <nav aria-label="Footer" className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-9">
+            {FOOTER_GROUPS.map((group) => (
+              <div key={group.title}>
+                <p className="text-xs font-semibold uppercase tracking-widest text-foreground/70 mb-3.5">
+                  {group.title}
+                </p>
+                <ul className="space-y-2.5">
+                  {group.links.map((link) => (
+                    <li key={link.href}>
+                      <a
+                        href={link.href}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </nav>
+
+          <div className="border-t border-border mt-10 pt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs text-muted-foreground">
               © {new Date().getFullYear()} isvisarequired.com · Data: ilyankou/passport-index-dataset
             </p>
-            <p className="text-xs text-muted-foreground text-center sm:text-right">
-              Visa data is indicative only. Always verify with official embassy sources before travel.
-            </p>
+            <nav aria-label="Site" className="flex flex-wrap gap-x-5 gap-y-2">
+              {FOOTER_LINKS.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  {...(link.newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </nav>
           </div>
+          <p className="text-xs text-muted-foreground/80 mt-3">{FOOTER_DISCLAIMER}</p>
         </div>
       </div>
     </footer>

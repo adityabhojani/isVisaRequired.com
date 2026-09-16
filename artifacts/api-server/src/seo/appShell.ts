@@ -89,7 +89,7 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     title: "Is Visa Required? | Free Visa Checker for 195 Countries",
     description: "Check visa requirements instantly for any passport and destination. Find out if you need a visa, visa on arrival, e-visa, ETA/ETIAS, or can travel visa-free — free, no sign-up.",
     h1: "Do you need a visa?",
-    body: `<p>Select your passport and destination to instantly see whether you need a visa, visa on arrival, an e-visa, an electronic travel authorisation (ETIAS/ESTA/ETA), or can travel visa-free — across 195 countries and 37,830 passport–destination combinations. Free, no account needed.</p>`,
+    body: `<p>Select your passport and destination to instantly see whether you need a visa, visa on arrival, an e-visa, an electronic travel authorisation (ETIAS/ESTA/ETA), or can travel visa-free. Free, no account needed.</p>`,
     jsonLd: [
       {
         "@context": "https://schema.org",

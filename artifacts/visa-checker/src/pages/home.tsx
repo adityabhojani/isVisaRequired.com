@@ -12,7 +12,7 @@ import {
 import type { Country, VisaResult, VisaRequirement } from "@workspace/api-client-react";
 import {
   Search, Globe, ChevronDown, X, CheckCircle2, AlertCircle, Clock,
-  XCircle, Shield, ArrowUpDown,
+  XCircle, ArrowUpDown,
   Share2, Link2, Check as CheckIcon, Plane, Users, Zap, Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -590,25 +590,12 @@ export default function HomePage() {
       {/* Hero strip */}
       <div className="relative bg-hero">
         <div className="max-w-5xl mx-auto px-4 pt-6 pb-16 md:pt-12 md:pb-24 text-center">
-          <a
-            href="/methodology"
-            className="inline-flex items-center gap-2 bg-white/10 text-white/90 rounded-full px-3.5 py-1 text-xs font-semibold mb-3 border border-white/20 backdrop-blur-sm hover:bg-white/[0.18] transition-colors">
-            <Shield className="h-3 w-3" />
-            How we source our data
-          </a>
           <h1 className="font-serif text-[2.5rem] md:text-[3.25rem] font-semibold text-white mb-3 leading-[1.06] tracking-[-0.022em] text-balance">
             Do you need a visa?
           </h1>
-          <p className="text-lg text-white/75 max-w-lg mx-auto leading-relaxed">
-            Any passport, any destination — the rule in one tap.
-          </p>
-          {/* One line, real numbers. Fixed min-height so the async subscriber
-              count cannot add a wrap line and shove the search card down. */}
+          {/* Fixed min-height so the async subscriber count cannot add a wrap
+              line and shove the search card down. */}
           <div className="mt-4 min-h-[20px] text-sm text-white/65">
-            <span className="tabular-nums">{COVERAGE.countries} countries</span>
-            <span className="mx-2 text-white/25">·</span>
-            <span className="tabular-nums">{COVERAGE.pairsLabel} rules</span>
-            <span className="mx-2 text-white/25">·</span>
             <span>Free, no sign-up</span>
             {/* Only once the number reads as a community. The live page was
                 showing "1+ subscribed", which is worse than showing nothing:
