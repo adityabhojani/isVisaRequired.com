@@ -28,7 +28,7 @@ import { GUIDES, getGuide } from "../data/guidesData";
 import { renderGuidesHub, renderGuide } from "../seo/guides";
 import { ROUTE_SEO, renderAppRoute, loadShell } from "../seo/appShell";
 import { renderBlogPostShell, type BlogPostRow } from "../seo/blogSeo";
-import { staticPostBySlug, staticPostsNewestFirst } from "../content/posts";
+import { staticPostAsRow, staticPostBySlug, staticPostsNewestFirst } from "../content/posts";
 import { indexNowKey } from "../lib/urlSubmission";
 import { renderPassportPowerReport, renderReportCsv, REPORT_PATH, WELCOMING_PATH } from "../seo/report";
 import { renderWelcomingIndex, renderWelcomingCsv } from "../seo/welcoming";
@@ -371,7 +371,7 @@ router.get("/blog/:slug", async (req: Request, res: Response): Promise<void> => 
   const fallback = slug ? staticPostBySlug(slug) : undefined;
   const sendStatic = (): boolean => {
     if (!fallback) return false;
-    const html = renderBlogPostShell(fallback);
+    const html = renderBlogPostShell(staticPostAsRow(fallback));
     if (!html) return false;
     res.setHeader("Cache-Control", "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400");
     res.type("html").send(html);

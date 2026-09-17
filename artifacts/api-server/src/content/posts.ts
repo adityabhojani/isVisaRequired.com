@@ -18,6 +18,27 @@
 // so a post's own headings start at <h2>. Keep `slug` lowercase and hyphenated;
 // once a post is live the slug is a permanent URL, so don't rename it.
 
+/** A photo with everything needed to credit it properly. */
+export interface PostImage {
+  /** Absolute https URL. Wikimedia Commons thumbnails are served from upload.wikimedia.org. */
+  src: string;
+  width: number;
+  height: number;
+  /** Describes what the photo shows, for screen readers and image search. */
+  alt: string;
+  /** Short editorial caption, shown above the credit. Optional. */
+  caption?: string;
+  credit: {
+    author: string;
+    authorUrl?: string;
+    /** e.g. "CC BY-SA 4.0" — exactly as the licence is named at the source. */
+    license: string;
+    licenseUrl: string;
+    /** The photo's own page, e.g. its Wikimedia Commons file page. */
+    sourceUrl: string;
+  };
+}
+
 export interface StaticPost {
   title: string;
   slug: string;
@@ -45,1034 +66,1042 @@ export interface StaticPost {
    * copy the questions and a one-or-two-sentence answer here.
    */
   faq?: { q: string; a: string }[];
+  /**
+   * The lead photo: shown above the article, on the blog card, and as the
+   * social-sharing image. Freely licensed photos only, always credited.
+   *
+   * Photos inside the article go in `content` as
+   *   ![alt](https://…/foo.jpg#1280x854)
+   * followed by an italic caption-and-credit line. The "#WxH" fragment is the
+   * photo's real pixel size and both renderers turn it into width/height so
+   * the page does not reflow as photos load; without it the text jumps. Get
+   * those numbers from the image itself, not from the Commons API — asking the
+   * API for a 1600px thumbnail returns a URL that actually serves the 1280 or
+   * 1920 bucket while still reporting 1600, which is wrong for every file.
+   */
+  cover?: PostImage;
 }
 
 export const STATIC_POSTS: StaticPost[] = [
   {
-    title: "“Visa-free” is quietly turning into “apply online first”",
+    title: "Travel authorisations are replacing visa-free entry",
     slug: "travel-authorisations-replacing-visa-free-entry",
     excerpt:
-      "Re-checking our dataset against government sources produced 793 corrections across 18 countries. The single biggest pattern: countries that used to let you just turn up now want an authorisation before you board.",
-    author: "isvisarequired.com",
-    tags: ["visa policy", "ETA", "travel authorisation"],
-    created_at: "2026-09-13",
-    updated_at: "2026-09-16",
-    content: `Most visa datasets — ours included, before we started correcting it — record two useful states and one lie. The useful ones are *visa required* and *visa on arrival*. The lie is *visa free*, because in 2025 and 2026 a growing number of countries kept the words “visa free” while adding a mandatory online form you must complete before you travel.
-
-We re-checked our data country by country against each government's own page. That produced **793 corrections across 18 countries**, all listed with sources on our [verified changes log](/visa-changes). Reading them together, one pattern dominates.
-
-## Countries that added an online step
-
-**United Kingdom.** 33 European nationalities that could previously arrive with just a passport now need an Electronic Travel Authorisation. It was rolled out through 2025 and enforced from 25 February 2026 — airlines deny boarding without it. Ireland is unaffected under the Common Travel Area. Source: [gov.uk/eta](https://www.gov.uk/eta).
-
-**Seychelles.** Every visitor — all 194 nationalities in our dataset — must hold a Travel Authorisation obtained before departure. Seychelles has never issued tourist visas, which is exactly why the old “visa free” label was so misleading here. Source: Seychelles Immigration, [ics.gov.sc](https://www.ics.gov.sc/permits/visitors-permit).
-
-**Ghana.** The Ghana Immigration Service e-Visa portal launched on 25 May 2026. Its own eligibility engine returns just two answers: ECOWAS and AES nationals enter visa-free, and all 180 other nationalities must get an ETA or e-Visa online first. We checked every nationality individually against the portal.
-
-**Guinea-Bissau.** Prior authorisation is now required for the 180 nationalities outside ECOWAS, per UK FCDO, France Diplomatie and Global Affairs Canada travel advice.
-
-**Cabo Verde.** Despacho n.º 244/GMAI/2026, published in the Boletim Oficial on 23 January 2026, requires nationals of 91 countries to hold a visa before arrival — including for transit. 89 of them are in our dataset.
-
-**Namibia.** Visa-free entry ended for 33 nationalities on 1 April 2025.
-
-**Sri Lanka and Kenya** both went the other way in tone but the same way in practice: Sri Lanka's ETA became free from 25 May 2026, and Kenya's eTA carries tiered exemptions — free or cheap, but still a form to file before you fly.
-
-## And countries going the other way
-
-The trend is not one-directional. China extended its unilateral visa-exemption scheme to a dozen more nationalities and pushed the expiry to 31 December 2027. Saudi Arabia broadened its visitor e-Visa, Oman published a wider exemption list, and Uzbekistan's presidential decree of 3 November 2025 opened up further from 1 January 2026.
-
-The difference is that expansions get press releases and contractions do not. A country adding an ETA rarely announces it in a way that reaches the comparison sites — which is why stale "visa free" entries survive for years.
-
-## What this means before you book
-
-An ETA is not a visa, and that distinction matters less than it sounds. Practically:
-
-- **The airline enforces it, not the border.** Without the authorisation you are refused at check-in, so there is no arguing your case on arrival.
-- **Approval is usually fast but not instant.** Most systems answer in minutes; some take up to three working days, and a mismatch on your passport details restarts that clock.
-- **It is tied to your passport.** Renew the passport and most authorisations die with it, even if they had months left.
-- **"Visa free for 90 days" is a separate question from validity.** See [visa validity vs duration of stay](/guides/visa-validity-vs-duration-of-stay) for why those two numbers are not the same thing.
-
-Check your own combination on the [visa checker](/). Where we have individually verified a rule, its page names the official source we checked it against. Where a rule has changed since our base dataset was frozen, the [verified changes log](/visa-changes) records what it was, what it is now, and who says so.`,
-  },
-  {
-    title: "Five digital nomad visas that no longer exist",
-    slug: "digital-nomad-visas-that-have-closed",
-    excerpt:
-      "Iceland, Bermuda, the Cayman Islands, Antigua & Barbuda and Anguilla have all closed their remote-work routes. Every one of them is still listed as available somewhere — including, until this week, by us.",
-    author: "isvisarequired.com",
-    tags: ["digital nomad", "visa policy"],
-    created_at: "2026-09-13",
-    updated_at: "2026-09-13",
-    content: `We went through all 37 programmes in our [digital nomad visa directory](/digital-nomad) and checked each one against the government's own page. Five of them are not programmes any more. They had been sitting in our directory with income thresholds and fees next to them, which is worse than not listing them at all: a closed programme with a number beside it looks researched.
-
-Here is each one, what actually happened, and where the traffic went.
-
-## Iceland — Long-Term Visa for remote workers
-
-**Repealed on 13 May 2026**, when the new Visa Act (No. 37/2026) came into force. The provision of the Foreign Nationals Act that the long-term remote-work visa rested on was struck out.
-
-There is a replacement, but not a like-for-like one. Stays longer than 90 days now go through a short-term residence permit, and the Directorate of Immigration has not yet published its requirements — no income threshold, no fee, no maximum length. Anyone quoting you €7,000 a month for Iceland is quoting a rule that no longer exists, and nobody can currently tell you what replaced it.
-
-Official source: the [Directorate of Immigration](https://island.is/en/o/directorate-of-immigration). The old utl.is address now redirects there and hosts no remote-work page.
-
-## Bermuda — Work From Bermuda Certificate
-
-**Concluded on 28 February 2025.** The application page carries the closure notice itself, which is more than most closed programmes manage.
-
-The successor route is Permission to Reside on an Annual Basis. It is a different thing with different conditions, not a rebranding.
-
-## Cayman Islands — Global Citizen Concierge Programme
-
-Closed, and closed thoroughly. The programme's own website, eworkcayman.com, no longer resolves in DNS at all — the domain is gone, not merely returning a 404. The programme appears in no current WORC immigration form and in no 2026 fee schedule. Long stays now go through the ordinary immigration framework.
-
-This is the one most likely to still be listed elsewhere at US$100,000 a year, because there is no closure announcement anywhere to pick up. The evidence is entirely absence.
-
-## Antigua & Barbuda — Nomad Digital Residence
-
-Ended. Unusually, the programme's own government portal says so outright.
-
-## Anguilla — Work from Anguilla
-
-No live official page anywhere on gov.ai. A site-wide search returns a dozen results, none of them a programme page.
-
-We want to be straight about this one: we found no official notice announcing the closure, only the complete absence of the programme from the government's own site. That is why we mark it ended rather than merely dormant — but it is an inference from absence, and we say so on the directory page too.
-
-## Why closed programmes outlive their governments
-
-Launches get press releases. Closures get a quietly deleted page. Comparison sites, ours included, are built to ingest announcements, so a programme that stops existing without saying so can sit in a directory for years.
-
-The specific failure mode worth knowing about: **a dead official link is not treated as a signal.** Most listings check that a URL exists, not that it still describes the thing they are listing. Cayman's link had not just broken, its domain had been given up — and the listing survived.
-
-We now record a status and a check date against every programme, and closed ones are pulled out of the directory into their own section instead of being deleted, so that searching for "Iceland digital nomad visa" lands you on the fact that it was repealed rather than on a stale income figure.
-
-The [37 programmes we track](/digital-nomad) each show the government page their numbers came from and the date we last read it. If you are planning around one of these, read the [full write-up of what else was wrong](/blog/what-we-found-checking-every-digital-nomad-visa) — the closures were not the only problem.`,
-  },
-  {
-    title: "What we found checking every digital nomad visa against its own government's page",
-    slug: "what-we-found-checking-every-digital-nomad-visa",
-    excerpt:
-      "37 programmes, every field read off the issuing government's own page, every finding then re-checked by someone trying to disprove it. 218 values changed. Japan's income requirement was out by a factor of ten.",
-    author: "isvisarequired.com",
-    tags: ["digital nomad", "data quality", "visa policy"],
-    created_at: "2026-09-13",
-    updated_at: "2026-09-13",
-    content: `Our digital nomad directory carried income thresholds, government fees and durations for 37 countries. None of them had a source attached. They were roughly the same numbers you find on every other nomad visa site, which is not a coincidence and not a defence.
-
-So we checked all of them: every field, against the page published by the government that issues the visa. Each finding was then handed to a second reviewer whose only job was to try to disprove it. **218 field values changed.** Five programmes turned out not to exist at all — that is [its own article](/blog/digital-nomad-visas-that-have-closed).
-
-Here is what was wrong, sorted by how badly.
-
-## Errors of magnitude
-
-**Japan: out by a factor of ten.** We listed ¥1,000,000 a year. The Immigration Services Agency requires **¥10,000,000**. At the lower figure the visa looks like an easy option for a junior remote worker; at the real one it is out of reach for most people who would consider it.
-
-**Thailand: out by two orders of magnitude.** We listed a US$200 government fee. The Long-Term Resident visa costs **50,000 baht** per person, roughly US$1,400. Two other things were wrong in the same record and both matter more than the fee: a work permit is *not* granted to the Work-from-Thailand Professionals category, and the well-publicised 17% flat tax applies only to Highly-skilled Professionals, not to remote workers.
-
-**Belize: out by an order of magnitude.** We listed US$2,500 a month. The Belize Tourism Board's own page states an annual figure and only an annual figure: **US$75,000** for an individual, US$100,000 for couples and families. That is US$6,250 a month.
-
-**The Philippines: the wrong programme entirely.** Our record described the SRRV, a retirement visa run by a different agency. Since that record was written the Philippines created an actual Digital Nomad Visa by Executive Order No. 86, signed 24 April 2025 and issued by the Department of Foreign Affairs. One year, renewable, health insurance mandatory, open only to nationals of countries that offer nomad visas to Filipinos in return. One caveat we are publishing alongside it: we could not confirm from any official source that the DFA has actually started issuing them.
-
-**Portugal: the wrong visa code.** We called it the D8. Portugal's remote-work residence visa is the **D9**; D8 is family accompaniment of a residence-visa applicant. If you turn up at a consulate asking for the D8 you are asking for something else.
-
-**Malaysia: the wrong currency.** We listed RM 24,000 a year, about US$5,400. MDEC's official FAQ requires **US$24,000** a year for tech professions and **US$60,000** for everything else — a fivefold difference for most applicants.
-
-**The UAE: too high, for once.** We listed US$5,000 a month. The official requirement is **US$3,500**.
-
-## The numbers nobody's government ever said
-
-A subtler category, and the one that taught us the most. Several of our figures were not wrong so much as invented by arithmetic: a government states a monthly threshold, a comparison site multiplies by twelve, and the result circulates as an official annual requirement.
-
-Malta publishes €42,000 a year and no monthly figure. Hungary publishes €3,000 net a month and no annual figure. Costa Rica's rentista law sets US$2,500 a month, in dollars, and our record showed an annual figure in euros that matched nothing. The UAE publishes a monthly figure only. Spain's own consular sheets state a percentage, not an amount.
-
-Our reviewer rejected every one of those derived numbers, and rightly. So the directory now shows whichever figure the government actually states and leaves the other one blank. It is less tidy. It is also the difference between reporting and guessing.
-
-## Thresholds that move while you read them
-
-The deeper problem with a fixed number in a comparison table is that a lot of these requirements are not fixed numbers at all:
-
-- **Spain** — 200% of the minimum wage (SMI), re-set by royal decree each year. €2,442 a month in 2026.
-- **Portugal** — four times the guaranteed minimum monthly wage, €920 in 2026. It moves every January.
-- **Croatia** — 2.5 average monthly net Croatian salaries, recalculated annually. €3,622.50 today.
-- **Colombia** — three times the legal monthly minimum wage. COP 5,252,715 in 2026.
-- **Ecuador** — three Salarios Básicos Unificados a month; the 2026 SBU is US$482.
-- **Romania** — three times the Romanian average gross monthly salary, for each of the six months before you apply.
-- **South Korea** — tiered against the previous year's GNI per capita, and the tier depends on your age, whether you will live inside the Seoul metropolitan area, and whether family come with you.
-- **Mexico** — expressed in UMA, not pesos and certainly not dollars.
-
-A site that prints one euro figure for these is publishing a snapshot with no expiry date on it. We now name the formula as well as this year's value, so you can tell when the number has gone stale.
-
-## What changed on the site
-
-Every programme in the [directory](/digital-nomad) now carries the government page its figures were read from and the date we read it, shown as a "Verified" badge you can click through to. Where a checker could not verify something — Spain's consular fee is set by reciprocity and quoted in local currency, Costa Rica's fee page sits behind bot protection we did not try to defeat — the field is blank rather than filled with a tilde and a guess.
-
-Where two official sources disagree, we say so instead of picking one: Cape Verde's immigration authority lists a 5,000 CVE fee while Turismo de Cabo Verde lists €20 a person plus a €34 airport fee.
-
-None of this makes the data permanent. Governments change these rules without announcing them — that is the whole lesson of the five closed programmes. What it does is make the data checkable: you can see where every number came from and how old it is, and go and look for yourself.
-`,
-  },
-  {
-    title: "Can you work remotely on a tourist visa? The real test",
-    slug: "can-you-work-remotely-on-a-tourist-visa",
-    excerpt:
-      "Three governments say in writing that a visitor may work remotely for a foreign employer. No other government we checked publishes a position. The rules that exist are written about who pays you, not about where your laptop is open.",
+      "Countries that used to let you simply turn up increasingly want an online authorisation before you board. It was the biggest pattern in the 793 corrections we made across 18 countries.",
     metaDescription:
-      "New Zealand, the UK and Canada allow remote work on a visitor entry in writing. The US and most of Europe say nothing. What the rules actually say.",
+      "Visa free increasingly means apply online first: the UK, Seychelles, Ghana and others want an authorisation before you board, and most sites haven't noticed.",
     author: "isvisarequired.com",
-    tags: ["digital nomad", "remote work", "tourist visa", "visitor visa", "tax residency"],
-    created_at: "2026-09-15",
-    updated_at: "2026-09-15",
-    faq: [
-      {
-        q: "Can I work on a tourist visa?",
-        a: "If \"work\" means paid work for a local employer or local clients, none of the countries here permit it. If it means logging into your foreign employer's systems, New Zealand, the UK and Canada say yes in writing, and no other government we checked publishes a position either way.",
+    tags: ["visa policy", "ETA", "travel authorisation", "visa-free travel"],
+    created_at: "2026-09-13",
+    updated_at: "2026-09-17",
+    cover: {
+      src: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/%C4%B0stanbul_Havaliman%C4%B1_Airport_2019_16.jpg/1920px-%C4%B0stanbul_Havaliman%C4%B1_Airport_2019_16.jpg",
+      width: 1920,
+      height: 1280,
+      alt: "Travellers at check-in desks in the wide, marble-floored international departures hall of Istanbul Airport.",
+      caption: "The decision about whether you fly is increasingly made here, at the check-in desk — not at the border.",
+      credit: {
+        author: "Arne Müseler",
+        authorUrl: "https://commons.wikimedia.org/wiki/User:Arne_mueseler",
+        license: "CC BY-SA 4.0",
+        licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:%C4%B0stanbul_Havaliman%C4%B1_Airport_2019_16.jpg",
       },
-      {
-        q: "Which countries allow you to work remotely on a tourist visa?",
-        a: "New Zealand, for visitor visas applied for on or after 27 January 2025, with no limit on the amount of work. The UK, under Appendix Visitor PA 4(h), provided remote work is not the primary purpose of the visit. Canada, on visitor status for up to six months with no work permit.",
-      },
-      {
-        q: "Can digital nomads legally work in the US?",
-        a: "USCIS's B-1 page takes no position on remote work for a foreign employer, and we could not load the State Department's detailed guidance at 9 FAM 402.2 to establish its position. The State Department's visa regulation, 22 CFR 41.31(b)(1), excludes \"local employment or labor for hire\" from B-1 business activity, but it does not define \"local\" or say whether that phrase reaches work for a foreign employer. Treat that as unread rather than as permission.",
-      },
-      {
-        q: "What happens if you get caught working on a tourist visa?",
-        a: "We found no government publishing a penalty schedule for remote work specifically. What happens instead is refusal under the general entry rules: UK rule V 4.4 tests what you intend, and Schengen Article 6(1)(c) requires you to justify the purpose and conditions of your stay. Working for local clients is a separate matter and is squarely prohibited.",
-      },
-      {
-        q: "Do I need a digital nomad visa or can I just use a tourist visa?",
-        a: "If your destination is New Zealand, the UK or Canada and your stay fits the visitor period, the government has already answered in writing. A nomad visa buys a longer stay in some countries and an explicit tax position in others, though Japan's runs six months with no extension, which is no longer than Canada's ordinary visitor stay.",
-      },
-      {
-        q: "What is the 183-day rule for tax residency?",
-        a: "It is not one rule. The US applies a weighted three-year formula. The UK can treat you as resident well below 183 days, and guarantees non-residence only under 16 days, or 46 if you have not been resident for the three previous tax years, or 91 if you work full-time abroad with no more than 30 of those days worked. New Zealand counts more than 183 days in any 12-month period, with part-days counted as whole days, unless you qualify as a non-resident visitor: for arrivals on or after 1 April 2026, a visitor who is not working for a New Zealand employer or selling to people or businesses in New Zealand can stay up to 275 days in any 18-month period before becoming resident under the day count.",
-      },
-      {
-        q: "How long can I stay in a country before I have to pay tax there?",
-        a: "There is no universal number, and the immigration limit and the tax limit are set by different authorities. South Africa's remote work visa notice shows the split cleanly: with a double-taxation agreement in force you register with SARS after 183 aggregate days in 12 months, and without one you register regardless.",
-      },
-      {
-        q: "Can you hire workers on tourist, student or digital nomad visas?",
-        a: "The prohibitions quoted here are aimed at exactly this. UK rule V 4.4 bars a visitor from \"doing work for an organisation or business in the UK\", and the Croatian and Spanish nomad definitions exclude local clients beyond a fixed share. If someone is doing work for your local entity, their permission is the thing that fails.",
-      },
-    ],
-    content: `Three governments say in writing that a visitor may work remotely for an employer abroad: New Zealand and the United Kingdom in their immigration rules, Canada on IRCC's pages though not in any regulation. No other government we checked publishes a position. Whether you can work remotely on a tourist visa turns on who pays you, not where your laptop is open.
+    },
+    content: `Say you're flying to London on one of the European passports that used to need nothing but the passport itself. A comparison site says "visa free", so you don't think about it again. Then at check-in the airline asks for your UK Electronic Travel Authorisation, and without it you aren't getting on the plane.
 
-The question people actually ask — "is it illegal to open my laptop?" — has no published answer in most of the countries we checked, because their visitor rules do not mention remote work at all. The UK's permission is conditional. New Zealand's is dated to a policy change in January 2025, so anything written before then describes a different rule. And tax is a separate body of law with its own thresholds, one of which bites at 16 days.
+That label is going stale well beyond the UK. Through 2025 and 2026 a growing number of countries kept the words "visa free" while adding a mandatory online form you have to complete before you travel. Most visa datasets missed it, ours included. When we re-checked our data country by country against each government's own pages, we ended up making 793 corrections across 18 countries, all listed with sources in our [verified changes log](/visa-changes). This was the biggest single pattern in them.
 
-## The rules that answer the question name a local counterparty
+## Countries that now want a form before you fly
 
-The clearest drafting is British. Rule V 4.4 of [Appendix V: Visitor](https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-v-visitor) says a visitor must not intend to "work in the UK, which includes: (i) taking employment in the UK; and (ii) doing work for an organisation or business in the UK; and (iii) establishing or running a business as a self-employed person; and (iv) doing a work placement or internship; and (v) direct selling to the public; and (vi) providing goods and services". Every limb names a UK counterparty. None of the six mentions where the visitor is physically sitting.
+In the UK, 33 European nationalities that could previously arrive with just a passport now need an [Electronic Travel Authorisation](https://www.gov.uk/eta). It was rolled out through 2025 and enforced from 25 February 2026. Ireland is unaffected under the Common Travel Area. If you hold one of those passports and fly to Britain regularly you have probably absorbed the change already; the people getting caught are the ones who checked once, years ago, and reasonably assumed the answer would keep. Our [UK ETA page](/travel-authorization/uk-eta) sets out who needs one.
 
-V 4.6 completes it by prohibiting "payment from a UK source for any activities undertaken in the UK", subject to seven listed exceptions at (a) to (g): expenses; international drivers and seafarers; prize money; billing a UK client where the visitor's overseas employer is contracted to provide services to a UK company and the majority of the contract work is carried out overseas; multi-national companies that handle payment of employees' salaries from the UK for administrative reasons; permit-free festival performances; and permitted paid engagements.
+Anyone flying to Seychelles needs a [Travel Authorisation](https://www.ics.gov.sc/permits/visitors-permit) issued before departure. Every nationality, no exceptions, which in our dataset means all 194 of them. It is also the clearest case of why the old label misled people: Seychelles has never issued tourist visas at all, so "visa free" was true in the narrow sense and useless in the practical one.
 
-New Zealand draws the same line and says so on the face of the page. Remote work must be for "a company, employer or client that is not in New Zealand", and Immigration New Zealand adds that it "does not include any work you do that is for a New Zealand employer" or "with a New Zealand business or person in New Zealand in exchange for goods or services".
+West Africa is where the shift is easiest to underestimate. Ghana's e-Visa portal, live since 25 May 2026, gives two answers and no third. ECOWAS and AES nationals enter visa free; the other 180 nationalities need an ETA or e-Visa online first. We put every nationality through the portal individually rather than rely on someone's summary of it. Guinea-Bissau has landed in the same place, with prior authorisation now required for the 180 nationalities outside ECOWAS, according to British, French and Canadian government travel advice.
 
-Canada gives the reason outright. An [IRCC committee note](https://www.canada.ca/en/immigration-refugees-citizenship/corporate/transparency/committees/cimm-nov-07-2023/tech-talent-strategy-digital-nomads.html) on its Tech Talent Strategy says of digital nomads: "As they are not entering the Canadian labour market, they may enter as visitors and reside where they like for up to six months." South Africa's Minister of Home Affairs made the identical argument on another continent, describing remote workers as "highly paid individuals who are employed abroad and thus do not compete with local workers" in a [government media statement](https://www.gov.za/news/media-statements/minister-leon-schreiber-cutting-edge-visa-reform-combat-corruption-and-create).
+Cabo Verde asks for a visa rather than a form. Under a rule published in its official bulletin on 23 January 2026, nationals of 91 countries must hold one before arrival, even for transit. 89 of those countries are in our dataset.
 
-## Which countries allow you to work remotely on a tourist visa?
+Namibia is the shortest line in the log and the easiest to skim past: visa-free entry ended there for 33 nationalities on 1 April 2025.
 
-| Country | What the government states | Where it is written |
-|---|---|---|
-| New Zealand | "All visitor visas applied for on or after 27 January 2025 allow you to work remotely in New Zealand", and "There is no limit to the amount of remote work you can do" | [Immigration New Zealand visitor visa guidance](https://www.immigration.govt.nz/visit/checking-or-changing-the-conditions-of-your-visitor-visa-or-nzeta/working-remotely-in-new-zealand-on-a-visitor-visa) |
-| United Kingdom | A visitor may "undertake activities relating to their employment overseas remotely from within the UK, providing this is not the primary purpose of their visit" | [Appendix Visitor: Permitted Activities](https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-visitor-permitted-activities), PA 4(h) |
-| Canada | "Digital nomads working remotely for an employer outside of Canada can live and work here for up to 6 months at a time. They don't need a work permit. All they need is visitor status." | [IRCC Tech Talent page](https://www.canada.ca/en/immigration-refugees-citizenship/campaigns/tech-talent.html) |
+Sri Lanka and Kenya sound friendlier and work the same way. Sri Lanka's ETA became free from 25 May 2026, and Kenya's eTA carries tiered exemptions. Cheap or free, you still have to file it before check-in, and both are easy to miss precisely because nobody thinks of them as visa countries.
 
-Before 27 January 2025 the answer for New Zealand was different, which is why pages recycling 2024 research get this country wrong.
 
-The UK provision arrived in the January 2024 visitor route rewrite and is still live. The most recent statement of changes, [HC 584 of 3 September 2026](https://www.gov.uk/government/publications/statement-of-changes-to-the-immigration-rules-hc-584-3-september-2026/explanatory-memorandum-to-the-statement-of-changes-in-immigration-rules-hc-584-3-september-2026-accessible), touches Appendix V only to let visitors study at state-funded schools on Erasmus+ projects and to add eligibility requirements for those participants. It says nothing about remote working.
+![A smooth granite boulder on a La Digue beach at sunset, surf blurred around it under a pink sky.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/198_Granite_rock_in_La_Digue_Island_at_sunset_Photo_by_Giles_Laurent.jpg/1280px-198_Granite_rock_in_La_Digue_Island_at_sunset_Photo_by_Giles_Laurent.jpg#1280x854)
 
-IRCC uses the words "live and work here" and permits it anyway.
+*Seychelles has never issued tourist visas — and every visitor now needs a Travel Authorisation before departure. Photo: [Giles Laurent](https://commons.wikimedia.org/wiki/User:Giles_Laurent) / [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:198_Granite_rock_in_La_Digue_Island_at_sunset_Photo_by_Giles_Laurent.jpg).*
 
-## Can digital nomads legally work in the US?
+## Countries going the other way
 
-The United States has no answer we could load, and that gap is the honest finding. The governing regulation, [22 CFR 41.31(b)(1)](https://www.govinfo.gov/content/pkg/CFR-2023-title22-vol1/xml/CFR-2023-title22-vol1-sec41-31.xml), says B-1 "business" covers "conventions, conferences, consultations and other legitimate activities of a commercial or professional nature" but excludes "local employment or labor for hire". The word carrying the weight is *local*.
+The trend doesn't run in one direction only. China extended its unilateral visa-exemption scheme to a dozen more nationalities and pushed the expiry out to 31 December 2027. Saudi Arabia broadened its visitor e-Visa, Oman published a wider exemption list, and a presidential decree of 3 November 2025 opened Uzbekistan up further from 1 January 2026.
 
-[USCIS's B-1 page](https://www.uscis.gov/working-in-the-united-states/temporary-visitors-for-business/b-1-temporary-business-visitor) lists eligible activities as consulting with business associates, attending conventions, settling an estate, negotiating a contract, short-term training, transiting and deadheading. Remote work for a foreign employer appears on neither the permitted list nor a prohibited one.
+Good news is still news, and it can still expire. China's scheme carries an end date, which is a useful reminder that an exemption is a policy rather than a right. It can be widened, narrowed or left to lapse, and the version you read about somewhere is the version that applied on the day that page was written.
 
-We searched state.gov, travel.state.gov, fam.state.gov and uscis.gov and found no position we could open. The detailed State Department guidance at 9 FAM 402.2, which nearly every law-firm blog paraphrases, returned a TLS certificate error on every attempt and travel.state.gov returned HTTP 403, so we are not repeating anyone else's paraphrase of it ([how we source](/methodology)).
+## Why the "visa free" label goes stale
 
-## Europe never mentions work at all
+The asymmetry behind all of this is simple. A country that opens up wants you to know, so the expansion arrives with a press release, a tourism-board push and a round of coverage. A country that adds an authorisation requirement has no such interest. The announcement goes out through immigration channels, often in the local language, sometimes as a numbered item in an official bulletin, and rarely in a form that reaches the sites travellers actually use. Errors in the generous direction therefore get corrected fast, because someone complains. Errors in the restrictive direction sit quietly for years, because the only people who find them are already at the airport.
 
-Article 6(1) of the [Schengen Borders Code, Regulation (EU) 2016/399](https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0399), sets out the entry conditions a border guard applies to a third-country national: a valid travel document, a valid visa if required, justification of "the purpose and conditions of the intended stay" plus "sufficient means of subsistence", no SIS alert, no threat to public policy, internal security, public health or international relations, and, under point (f) added for the Entry/Exit System, biometric data where required. Employment appears in none of subparagraphs (a) to (e).
+Our own data had exactly that problem before we started fixing it. A visa matrix gets built once from whatever sources were good at the time, and then it needs maintaining, and maintenance is the part nobody enjoys. There is no clever shortcut either. The only reliable method is to open the government's own page for a given pair of countries, read what it says, and record when you read it. Doing that across the dataset is what produced the 793 corrections, and it is why the log keeps the old rule alongside the new one and names the source for each, rather than silently overwriting the answer we used to give. Our [methodology](/methodology) page describes how the checking works.
 
-The condition that actually bites is 6(1)(c), a purpose and affordability test. Member States then regulate employment in national law, and that is where the silence continues: Germany is the case we checked hardest and found nothing addressing remote work for a foreign employer on a short stay, in either direction. Treat it as unanswered. The constraint that ends most European stays is the [90 days in any 180](/schengen), not anything about work.
+What that means for you is mostly a matter of how much weight to put on any given answer. A "visa free" claim with no date and no named source isn't wrong so much as unverifiable, and the restrictive direction is exactly where such claims fail. Where two sites disagree, prefer the one that tells you which official page it read. Where neither does, the destination's own immigration site is the only thing that settles it, and it is what the airline's system is following anyway.
 
-Australia is blunter. Condition 8101 in Schedule 8 of the [Migration Regulations 1994](https://www.legislation.gov.au/F1996B03551/latest/text), the provision usually cited, reads in full: "The holder must not engage in work in Australia." It is imposed on Tourist stream visitor visas (subclass 600); the Electronic Travel Authority (subclass 601) and eVisitor (subclass 651) instead carry condition 8115, "The holder must not work in Australia other than by engaging in a business visitor activity." Regulation 1.03 defines work as "an activity that, in Australia, normally attracts remuneration", and neither condition mentions an overseas employer. We found no published Australian carve-out for remote work for an overseas employer either.
+## What an authorisation means for your trip
 
-## What happens if you get caught working on a tourist visa?
+A travel authorisation isn't a visa, though that distinction matters less than it sounds, because the airline enforces it rather than the border. Without it you are turned away at [check-in](/guides/why-airlines-deny-boarding), where there is nobody to argue your case with. So don't leave the application to the night before: most systems answer in minutes, but some take up to three working days, and a mismatch on your passport details restarts that clock.
 
-UK rule V 4.4 is an intention test: a visitor "must not intend to" work in the UK. The Home Office's [visit caseworker guidance](https://www.gov.uk/government/publications/visit-guidance/visit-caseworker-guidance-accessible--2) tells officers to weigh "the proposed length of their stay and whether a stay of such a length would be financially viable without remote working on an ongoing basis", and to check that the "primary purpose for coming to the UK is to undertake another permitted activity, rather than specifically to work remotely from the UK". It also warns the arrangement must not amount to a secondment to a UK company or to the UK branch of the overseas employer.
+Two other things catch people out. The authorisation is tied to the passport you applied with, so if you renew, assume it died with the old book, whatever validity was left on it. Duration of stay is a different number again: "visa free for 90 days" tells you how long you may stay once you have been admitted, not how long your permission to travel lasts, and our guide to [visa validity vs duration of stay](/guides/visa-validity-vs-duration-of-stay) explains why the two numbers drift apart.
 
-That is an affordability and purpose test. A fortnight's holiday with some email is not what it is aimed at. Eight months in the UK on a stay that only balances because you keep billing is.
 
-None of the seven governments whose visitor rules we read for this article — the UK, New Zealand, Canada, the US, Germany, Australia and South Africa — publishes a penalty schedule for remote work on a visitor entry. Most have no rule about it to breach. What exists instead is refusal under the general entry conditions or the intention rules, which is blunter: it happens at the desk, with no appeal you would recognise as one. If it does happen, [a refusal follows you into later applications](/guides/visa-refused-what-happens-next).
+![The departures waiting area of Heathrow Terminal 2 seen from above, under its curved white roof.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Heathrow_Airport_Terminal_2%2C_London%2C_England_-_Diliff.jpg/1280px-Heathrow_Airport_Terminal_2%2C_London%2C_England_-_Diliff.jpg#1280x657)
 
-## How long can you stay before you owe tax?
+*From 25 February 2026, thirty-three European nationalities need a UK ETA before an airline will let them board. Photo: [Diliff](https://commons.wikimedia.org/wiki/User:Diliff) / [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Heathrow_Airport_Terminal_2,_London,_England_-_Diliff.jpg).*
 
-Immigration New Zealand puts both bodies of law on one page. Having said yes to remote work, it adds that "You may have to pay tax if you are visiting New Zealand and working remotely for an overseas business or client"; that if your income is taxed in another country or territory you "may not need to pay tax in New Zealand" when you are here for less than 92 days in a 12-month period; and that if you are a tax resident in one of the countries and territories New Zealand has a tax treaty with, you "may be able to stay in New Zealand for up to 183 days before you need to pay tax". Then it tells you to "Contact Inland Revenue to discuss your situation and to check if you will need to pay tax in New Zealand."
+## Before you book
 
-[Inland Revenue's own test](https://www.ird.govt.nz/international-tax/individuals/tax-residency-status-for-individuals) makes you resident if "you've been in New Zealand for more than 183 days in any 12-month period (unless you're a non-resident visitor)", with "Parts of days (such as the day you arrive and leave) count as whole days" and no requirement that they be consecutive. That exception is the one that matters here: you are a non-resident visitor if you visit for up to 275 days in any 18-month period and, among other conditions, are not working for or paid by a New Zealand resident, do not sell goods or services to people or businesses in New Zealand, and are required to pay tax in the country where you are tax resident. Inland Revenue's IR292 guide applies this to arrivals on or after 1 April 2026. A permanent place of abode in New Zealand also makes you resident, with no day count at all. Ceasing residence requires both no permanent place of abode and being "away from New Zealand for more than 325 days in any 12-month period".
+Check each traveller separately. These rules attach to nationality, so a couple holding two different passports can get two different answers for the same flight, and a child on their own passport is a separate case again. Transit deserves the same care: Cabo Verde's requirement covers people merely passing through, which is a reminder that a layover is not automatically outside a country's rules.
 
-The 183-day rule is not one rule:
-
-- The [US substantial presence test](https://www.irs.gov/individuals/international-taxpayers/substantial-presence-test) is a weighted three-year formula: 31 days in the current year, plus 183 days across three years counting all current-year days, one third of the first prior year and one sixth of the second. The IRS's own worked example: 120 days in each of 2023, 2024 and 2025 gives 120 + 40 + 20 = 180, just under.
-- [The UK](https://www.gov.uk/tax-foreign-income/residence) treats 183 days as automatic residence, but automatic *non*-residence requires fewer than 16 days in the UK, or 46 if you have not been resident in the three previous tax years, or full-time work abroad averaging at least 35 hours a week with fewer than 91 UK days, no more than 30 of them worked. Sixteen is the number to remember: 183 is a ceiling, not a floor.
-- South Africa's [remote work visa notice](https://www.dha.gov.za/images/notices/8october24/Remote_Work_Visa_-_requirements_-_9_Oct_2024.pdf), effective 9 October 2024, splits on treaties. If you are tax resident in a country with a double-taxation agreement in force with South Africa, you must register with SARS once present "for longer than an aggregate of 183 days during any 12-month period". If you are not, the notice requires registration outright.
-
-Japan wires the two together at the eligibility stage. Its [digital nomad status](https://www.moj.go.jp/isa/applications/status/designatedactivities53_00001.html) is open only to nationals of countries "which are under the scope of the visa exemption arrangements (Temporary Visitor) and also subjected to Japan's Tax Conventions".
-
-These are the published tests, not a view on your position. Where two countries both claim you, the treaty tie-breaker decides, and that is a question to put to a revenue authority in writing, not to a border officer.
-
-## Digital nomad visa vs tourist visa: what you actually get
-
-Certainty, mostly. Duration only sometimes: Japan's status runs "Six months (No extension will be granted.)", requires annual income of at least ¥10 million and medical travel insurance of ¥10 million or more, and so buys no longer than the six-month visitor stay Canada gives for free.
-
-What these programmes share is a definition written around the employer. The test is where the paying entity sits:
-
-| Programme | The test it applies | Money |
-|---|---|---|
-| [Croatia](https://mup.gov.hr/aliens-281621/temporary-stay-of-digital-nomads-286853/286853) | Works "for a company or his own company that is not registered in the Republic of Croatia" and has no Croatian clients; up to 18 months | "at least 2.5 average monthly net salaries" — €3,622.50 monthly, €43,470 for 12 months, €65,205 for 18 |
-| [Spain](https://www.exteriores.gob.es/Consulados/nuevayork/en/ServiciosConsulares/Paginas/Consular/Visado-de-teletrabajo.aspx) | Employees "will only be able to work for companies located outside the national territory"; the self-employed may also work for a company located in Spain where that work does "not exceed 20 % of the total of his professional activity"; 1 year | "200% of the minimum wage (SMI) per month"; the consular page publishes no euro figure, and the SMI itself is set at €1,221 a month for 2026 by [Royal Decree 126/2026](https://www.boe.es/buscar/act.php?id=BOE-A-2026-3815), re-fixed by decree each year |
-| [Indonesia (E33G)](https://www.imigrasi.go.id/wna/daftar-visa-indonesia/E33G) | Residence to carry out duties for a company abroad (our translation of the Indonesian-language page); selling goods or services is prohibited except where the holder's work duties require it; 1 year | US$60,000 a year from a company established outside Indonesia, verified by bank records |
-| [Estonia](https://www.politsei.ee/en/instructions/visa-and-extending-period-of-stay/long-term-visa) | The applicant "continues working for an employer registered in a foreign country"; up to 365 days in 12 consecutive months | Proof of legal income over the preceding six months; the page publishes no figure |
-| [South Africa](https://www.dha.gov.za/images/notices/8october24/Remote_Work_Visa_-_requirements_-_9_Oct_2024.pdf) | A visitor's visa under section 11(1)(b)(iv) for a "prescribed activity of remote work", over 3 months to 3 years, requiring a signed contract with a foreign-based employer | Gross salary of no less than the equivalent of R650,796 a year, shown by three months of bank statements |
-
-Spain has quantified how much of your work may touch the local market before the permission stops applying. You can only legislate that number if what you are regulating is the counterparty.
-
-The South African figure is settled, whatever you read elsewhere. The Department of Home Affairs notice, effective 9 October 2024, sets a gross salary of no less than the equivalent of R650,796 per annum, and South Africa's High Commission in Ottawa gives the same figure for the nomad visa; the Minister's media statement of the same date uses that R650,796 figure as the General Work Visa threshold outside the Trusted Employer Scheme. The R1 million figure still in circulation comes from then-Minister Aaron Motsoaledi's 9 April 2024 briefing on the draft regulations, before the requirement was finalised. We could not load the Government Gazette itself, but every official source we could load gives R650,796. Note (c) of the notice separately bars the holder from taking up employment in South Africa, and provides that "no person holding a remote work visa may apply for a change of status to his or her visa while in the Republic, unless under exceptional circumstances as prescribed for visitors visas."
-
-We track [32 open nomad programmes across 31 countries](/digital-nomad), each checked against the issuing government's page, with Costa Rica running two. Five more are recorded as ended, which is the argument for reading the instrument itself: [these programmes close](/blog/digital-nomad-visas-that-have-closed).
-
-## What to ask before you book
-
-Where is the entity that pays you registered? Move that registration into the country you are visiting and every rule above flips to no.
-
-Will anyone in the destination pay you, hire you or buy from you? That is what converts permitted remote work into prohibited local work. Spain sets the line at 20% of a self-employed teleworker's professional activity and allows employed teleworkers no Spanish work at all; the UK sets it at any UK source, with seven listed exceptions.
-
-How long, and counted how? Immigration and tax authorities in the same country count days differently, and part-days count as whole days in New Zealand.
-
-Does the government publish anything at all? If it does, read the instrument. If it does not, you are relying on silence, which is not permission, and you should say that to yourself out loud before you commit to six months.
+The pair is what matters, your passport and your destination, so run it through the [visa checker](/) before you book rather than after. If the answer has moved since our base dataset was frozen, the [changes log](/visa-changes) says who moved it.
 
 ## Common questions
 
-### Can I work on a tourist visa?
+### Is a travel authorisation the same thing as a visa?
 
-If "work" means paid work for a local employer or local clients, none of the countries here permit it. If it means logging into your foreign employer's systems, New Zealand, the UK and Canada say yes in writing, and no other government we checked publishes a position either way.
+Legally no, but the practical effect is close enough: no authorisation, no boarding pass. The difference that matters is who checks it, because that happens at the airline desk rather than at the border.
 
-### Which countries allow you to work remotely on a tourist visa?
+### How far ahead should I apply?
 
-New Zealand, for visitor visas applied for on or after 27 January 2025, with no limit on the amount of work. The UK, under Appendix Visitor PA 4(h), provided remote work is not the primary purpose of the visit. Canada, on visitor status for up to six months with no work permit.
+As soon as the trip is booked. Most systems come back within minutes, but some take up to three working days, and any mismatch with your passport details starts the wait over.
+
+### I've just renewed my passport. Do I have to reapply?
+
+Assume you do. Most authorisations are tied to the passport used in the application and lapse with it, even when they still had months left to run.`,
+    faq: [
+      {
+        q: "Is a travel authorisation the same thing as a visa?",
+        a: "Legally no, but the practical effect is close enough: no authorisation, no boarding pass. The difference that matters is who checks it, because that happens at the airline desk rather than at the border.",
+      },
+      {
+        q: "How far ahead should I apply?",
+        a: "As soon as the trip is booked. Most systems come back within minutes, but some take up to three working days, and any mismatch with your passport details starts the wait over.",
+      },
+      {
+        q: "I've just renewed my passport. Do I have to reapply?",
+        a: "Assume you do. Most authorisations are tied to the passport used in the application and lapse with it, even when they still had months left to run.",
+      },
+    ],
+  },
+  {
+    title: "Five digital nomad visas that have closed",
+    slug: "digital-nomad-visas-that-have-closed",
+    excerpt:
+      "Iceland's remote-work visa still turns up on shortlists with €7,000 a month attached to it. It was repealed in May, and it's one of five closed programmes still listed as available.",
+    metaDescription:
+      "Iceland repealed its remote-work visa in May 2026 and Bermuda closed its certificate in February 2025. Five digital nomad visas that no longer exist.",
+    author: "isvisarequired.com",
+    tags: ["digital nomad", "visa policy", "remote work"],
+    created_at: "2026-09-13",
+    updated_at: "2026-09-17",
+    cover: {
+      src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Jokulsarlon_lake%2C_Iceland.jpg/1920px-Jokulsarlon_lake%2C_Iceland.jpg",
+      width: 1920,
+      height: 1269,
+      alt: "Icebergs drifting on Jökulsárlón glacier lagoon in Iceland, with snow-capped mountains lit pink at sunset",
+      caption: "Jökulsárlón at sunset. Iceland's remote-work route was repealed in May 2026, and nothing has yet replaced it.",
+      credit: {
+        author: "Kenneth Muir",
+        authorUrl: "https://www.flickr.com/people/krmuir/",
+        license: "CC BY 2.0",
+        licenseUrl: "https://creativecommons.org/licenses/by/2.0",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:Jokulsarlon_lake,_Iceland.jpg",
+      },
+    },
+    content: `Iceland's remote-work visa still turns up on shortlists with €7,000 a month attached to it. The visa was repealed in May.
+
+When we checked all 37 programmes in our [digital nomad visa directory](/digital-nomad) against each government's own page, five had closed: Iceland, Bermuda, the Cayman Islands, Antigua & Barbuda and Anguilla. Every one is still listed as available somewhere, and until recently that included our directory, with income thresholds and fees beside them. That's worse than not listing them at all, because a closed programme with a number next to it looks researched.
+
+## Iceland repealed its visa in May 2026
+
+Iceland's long-term visa for remote workers was repealed on 13 May 2026, when the new Visa Act (No. 37/2026) came into force. The legal provision it rested on was struck out.
+
+The replacement isn't like-for-like. Stays longer than 90 days now go through a short-term residence permit, and the requirements for that permit haven't been published, so there's no income threshold, fee or maximum stay to plan around. Anyone quoting you €7,000 a month is quoting a rule that's gone, and nobody can currently tell you what replaced it.
+
+The official source is the [Directorate of Immigration](https://island.is/en/o/directorate-of-immigration). It has published nothing on the replacement yet. The old utl.is address forwards there and has no remote-work page.
+
+## Bermuda closed its certificate in February 2025
+
+The Work From Bermuda Certificate concluded on 28 February 2025. Its application page carries the closure notice, which is more than most closed programmes manage.
+
+The route that followed, Permission to Reside on an Annual Basis, is a different thing with different conditions. Don't read it as the old certificate renamed.
+
+## The Cayman Islands let the programme vanish
+
+The Cayman Islands did not announce anything. The Global Citizen Concierge Programme simply stopped being there. Its website, eworkcayman.com, isn't showing an error page — the domain itself is gone. The programme appears in no current WORC immigration form and no 2026 fee schedule, and long stays now go through the ordinary immigration framework.
+
+It's also the one you're most likely to still see listed at US$100,000 a year, since there's no closure notice anywhere for other sites to pick up.
+
+## Antigua & Barbuda said so plainly
+
+Antigua & Barbuda's Nomad Digital Residence has ended, and unusually, the government's own portal says so outright.
+
+
+![Backlit view over English Harbour, Antigua, from Shirley Heights, with yachts anchored in a green bay](https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Antigua_Shirley%27s_Heights_English_Harbour.jpg/1280px-Antigua_Shirley%27s_Heights_English_Harbour.jpg#1280x720)
+
+*English Harbour from Shirley Heights. Antigua & Barbuda's Nomad Digital Residence has ended. Photo: [Dr. Thomas Liptak](https://commons.wikimedia.org/wiki/User:Dr._Thomas_Liptak) / [CC BY 4.0](https://creativecommons.org/licenses/by/4.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Antigua_Shirley%27s_Heights_English_Harbour.jpg).*
+
+## Anguilla just went quiet
+
+Work from Anguilla is murkier. We found no live official page for it anywhere on gov.ai, and no notice announcing a closure either. We mark it ended rather than dormant because it has disappeared from the government's own site so completely, but that's a conclusion drawn from absence, and the directory page says so.
+
+## Why closed visas stay listed
+
+Launches get press releases. Closures get a quietly deleted page. Comparison sites, ours included, are built to pick up announcements, so a programme that stops existing without saying so can sit in a directory for years.
+
+Worse, a dead official link isn't treated as a warning. Most listings check that a URL exists, not that it still describes the programme. Cayman's link hadn't merely broken. Its domain had been given up, and the listing survived anyway.
+
+## What we do differently now
+
+Our directory now records a status and a check date for every programme, and closed ones move to their own section rather than being deleted, so a search for "Iceland digital nomad visa" lands you on the repeal instead of a stale income figure. Before you plan around an income figure anywhere, open the government page it came from. That's the check we run before a number goes back into the directory.
+
+If one of these five was your plan, read [what else we found wrong when checking every digital nomad visa](/blog/what-we-found-checking-every-digital-nomad-visa) — the closures weren't the only problem.`,
+  },
+  {
+    title: "What we found checking every digital nomad visa",
+    slug: "what-we-found-checking-every-digital-nomad-visa",
+    excerpt:
+      "Our directory quoted income figures no government had ever published. What a field-by-field re-check turned up, and how to spot a threshold that has gone stale.",
+    metaDescription:
+      "We re-checked 37 digital nomad visas against each issuing government's own page. 218 values changed, and Japan's income threshold was out by a factor of ten.",
+    author: "isvisarequired.com",
+    tags: ["digital nomad", "data quality", "visa policy"],
+    created_at: "2026-09-13",
+    updated_at: "2026-09-17",
+    cover: {
+      src: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Minato_City%2C_Tokyo%2C_Japan.jpg/1920px-Minato_City%2C_Tokyo%2C_Japan.jpg",
+      width: 1920,
+      height: 1080,
+      alt: "Dense Tokyo skyline at golden hour, the red-and-white Tokyo Tower rising at centre among Minato high-rises.",
+      caption: "Tokyo at golden hour. Japan's real income floor is ten times the figure most nomad-visa sites print.",
+      credit: {
+        author: "David Kernan",
+        license: "CC BY 4.0",
+        licenseUrl: "https://creativecommons.org/licenses/by/4.0",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:Minato_City,_Tokyo,_Japan.jpg",
+      },
+    },
+    content: `Say you're pricing up a year of remote work in Japan. Until recently our own directory told you the income requirement was ¥1,000,000 a year. That sounds doable on a normal salary. Japan's Immigration Services Agency actually requires ¥10,000,000, which puts the visa out of reach for most people who would consider it.
+
+That wrong figure was ours. Our digital nomad directory carried income thresholds, government fees and durations for 37 countries with no source attached to any of them, and the numbers were roughly the ones you'll find on every other nomad visa site. That isn't a coincidence and it isn't a defence.
+
+So we read every field off the page published by the government that issues the visa, then handed each finding to a second reviewer whose only job was to disprove it. 218 values changed. Five programmes turned out not to exist at all, which is [its own article](/blog/digital-nomad-visas-that-have-closed).
+
+## What was wrong
+
+Japan was the largest single error, out by a factor of ten. Thailand's was the oddest. We showed a US$200 government fee, where the Long-Term Resident visa costs 50,000 baht a person, roughly US$1,400. The fee was the least of it. A work permit is not granted to the Work-from-Thailand Professionals category, and the well-publicised 17% flat tax applies only to Highly-skilled Professionals, not to remote workers. If the tax rate was your reason for choosing Thailand, read that sentence again.
+
+We published a monthly threshold Belize has never stated. The Belize Tourism Board gives one figure and it is annual: US$75,000 for an individual, US$100,000 for couples and families — US$6,250 a month for a single applicant. Anyone who budgeted off our figure was planning for a different visa.
+
+Malaysia was wrong twice over, wrong currency and wrong tier for most applicants. We listed RM 24,000 a year, about US$5,400. MDEC's official FAQ requires US$24,000 a year for tech professions and US$60,000 for everything else, so anyone outside tech was looking at five times what we published. That is the difference between a visa you can plan around and one you can't.
+
+The UAE was the rare case where we'd set the bar too high, at US$5,000 a month against an official US$3,500. Being wrong in a reader's favour is still being wrong, and it may have talked someone out of a visa they qualified for.
+
+Almost every error above pointed the same way, making a visa look easier to get than it is. That is the direction numbers drift when they are copied between sites rather than read off a government page, and it is why two sites agreeing tells you nothing at all.
+
+
+![Bangkok's high-rise skyline behind the grass islands and still water channels of Benjakitti Forest Park.](https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Benjakitti_Forest_Park_%28I%29.jpg/1280px-Benjakitti_Forest_Park_%28I%29.jpg#1280x853)
+
+*Bangkok. Thailand's Long-Term Resident visa costs 50,000 baht a head, not the US$200 we had on file. Photo: [Supanut Arunoprayote](https://commons.wikimedia.org/wiki/User:Supanut_Arunoprayote) / [CC BY 4.0](https://creativecommons.org/licenses/by/4.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Benjakitti_Forest_Park_(I).jpg).*
+
+## The records that pointed at the wrong visa
+
+Portugal's remote-work residence visa is the D9, not the D8 we had on file. The D8 covers family accompanying a residence-visa applicant. Ask a consulate for it and you are asking for something else, which is a slow and avoidable way to get nowhere.
+
+Worse, our Philippines record wasn't a nomad visa at all. It described the SRRV, a retirement visa run by a different agency. The Philippines does now have a real nomad visa, created by Executive Order No. 86 and signed in April 2025. It lasts a year, renews, and needs health insurance. The catch is reciprocity: you qualify only if your own country offers Filipinos a nomad visa in return. No official source confirms the Department of Foreign Affairs has begun issuing them, so treat the programme as announced rather than operating.
+
+## Numbers no government ever published
+
+The next category was harder to spot, because the arithmetic looks sound. A government states a monthly threshold, a comparison site multiplies it by twelve, and the annual figure that falls out starts circulating as an official requirement. Nobody invented anything. Nobody checked either.
+
+Malta publishes €42,000 a year and no monthly figure. Hungary publishes €3,000 net a month and no annual one. The UAE gives a monthly figure and stops there. Costa Rica's rentista law sets US$2,500 a month, in dollars, while our record carried an annual figure in euros that matched nothing at all. Spain's consular sheets state a percentage rather than an amount.
+
+Our reviewer rejected every derived number, which was right even though it cost us tidy-looking rows. The directory now shows whichever figure the government actually states and leaves the other blank. A blank is honest. A number produced by multiplication is not, and it is exactly the sort of thing that gets repeated until it looks like a fact. If the government you're applying to states a monthly figure, work from the monthly figure, and be suspicious of any site that shows you both.
+
+## Income requirements that aren't fixed numbers
+
+A good many of these thresholds are formulas rather than sums, tied to a national wage or income measure that moves:
+
+- Spain: 200% of the minimum wage (SMI), re-set by royal decree each year. €2,442 a month in 2026.
+- Portugal: four times the guaranteed minimum monthly wage, which is €920 in 2026 and moves every January.
+- Croatia: 2.5 average monthly net Croatian salaries, recalculated annually. €3,622.50 today.
+- Colombia: three times the legal monthly minimum wage, COP 5,252,715 in 2026.
+- Ecuador: three Salarios Básicos Unificados a month, and the 2026 SBU is US$482.
+- Romania: three times the Romanian average gross monthly salary, for each of the six months before you apply.
+- Mexico: expressed in UMA, not in pesos and certainly not in dollars.
+- South Korea: tiered against the previous year's GNI per capita, with the tier depending on your age, whether you'll live inside the Seoul metropolitan area, and whether family come with you.
+
+Romania's version is worth reading twice, because it is the one that catches people out. The test is not what you earn now but what you earned in each of the six months before you apply, so a pay rise in the wrong quarter doesn't save you and a gap between contracts can sink an application that looks comfortable on paper.
+
+A single fixed figure for any of these is a snapshot with no expiry date printed on it. The directory now names the formula alongside this year's value, so you can tell when a number has gone stale and roughly which way it will move.
+
+
+![Aerial view of turquoise shallows and reef around Caye Caulker, a low palm-covered island split by a channel.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Caye_Caulker_Belize_aerial_%2820688990128%29.jpg/1280px-Caye_Caulker_Belize_aerial_%2820688990128%29.jpg#1280x719)
+
+*Caye Caulker, Belize. The Tourism Board publishes an annual income figure only: US$75,000. Photo: [dronepicr](https://www.flickr.com/people/132646954@N02) / [CC BY 2.0](https://creativecommons.org/licenses/by/2.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Caye_Caulker_Belize_aerial_(20688990128).jpg).*
+
+## What the directory shows now
+
+Every programme in the [digital nomad directory](/digital-nomad) now carries the government page its figures were read from and the date they were read, behind a "Verified" badge you can click through. Where a figure couldn't be verified the field is blank rather than a tilde and a guess. Spain's consular fee is one of those, set by reciprocity and quoted in local currency, and Costa Rica's fee page sits behind bot protection, so that one is blank as well.
+
+Where two official sources disagree, the directory says so instead of picking the more convenient one. Cape Verde's immigration authority lists a 5,000 CVE fee, while Turismo de Cabo Verde lists €20 a person plus a €34 airport fee. Both are official, they don't agree, and we're not going to guess on your behalf.
+
+None of this makes the data permanent. Governments change these rules without announcing them, which is the whole lesson of the five programmes that had quietly closed. You can now see where every number came from and how old it is.
+
+Drawing up a shortlist? Open the Verified link for every country you're serious about and read the requirement on the government's own page before you pay a fee or give notice on your flat. For anything pegged to a minimum wage or average salary, check the badge date against this year's figure. And if the plan is to skip the visa and work on a tourist stamp, [read this first](/blog/can-you-work-remotely-on-a-tourist-visa).
+
+## Common questions
+
+### A site shows both a monthly and an annual income figure. Which one counts?
+
+Only the figure the issuing government publishes. Where a government states a monthly threshold and a site also shows an annual one, that annual number has usually come out of a calculator rather than an official page, and nothing will back it up when a consulate asks.
+
+### Can I apply for the Philippines digital nomad visa now?
+
+It exists on paper, created by Executive Order No. 86 in April 2025, and it requires your own country to offer Filipinos the same thing. No official source confirms the Department of Foreign Affairs has started issuing it, so treat it as announced rather than available and plan around your other options.
+
+### Why does an income requirement change from one year to the next?
+
+Several countries peg the threshold to a national wage measure instead of a fixed sum, and those measures are reset annually. Spain's is a percentage of the minimum wage and Portugal's a multiple of the guaranteed minimum monthly wage, so both shift in the new year whatever the comparison tables still say.
+
+### Does Thailand's 17% flat tax apply to remote workers?
+
+No. It belongs to the Highly-skilled Professionals category of the Long-Term Resident visa, not to Work-from-Thailand Professionals. That second category also doesn't come with a work permit, which is the part most write-ups leave out.`,
+    faq: [
+      {
+        q: "A site shows both a monthly and an annual income figure. Which one counts?",
+        a: "Only the figure the issuing government publishes. Where a government states a monthly threshold and a site also shows an annual one, that annual number has usually come out of a calculator rather than an official page, and nothing will back it up when a consulate asks.",
+      },
+      {
+        q: "Can I apply for the Philippines digital nomad visa now?",
+        a: "It exists on paper, created by Executive Order No. 86 in April 2025, and it requires your own country to offer Filipinos the same thing. No official source confirms the Department of Foreign Affairs has started issuing it, so treat it as announced rather than available and plan around your other options.",
+      },
+      {
+        q: "Why does an income requirement change from one year to the next?",
+        a: "Several countries peg the threshold to a national wage measure instead of a fixed sum, and those measures are reset annually. Spain's is a percentage of the minimum wage and Portugal's a multiple of the guaranteed minimum monthly wage, so both shift in the new year whatever the comparison tables still say.",
+      },
+      {
+        q: "Does Thailand's 17% flat tax apply to remote workers?",
+        a: "No. It belongs to the Highly-skilled Professionals category of the Long-Term Resident visa, not to Work-from-Thailand Professionals. That second category also doesn't come with a work permit, which is the part most write-ups leave out.",
+      },
+    ],
+  },
+  {
+    title: "Can you work remotely on a tourist visa? Where it's allowed",
+    slug: "can-you-work-remotely-on-a-tourist-visa",
+    excerpt:
+      "New Zealand, the UK and Canada say in writing that visitors may work remotely for an employer abroad. Elsewhere the visitor rules mostly say nothing, and what matters is who pays you, not where you sit.",
+    metaDescription:
+      "New Zealand, the UK and Canada let visitors work remotely for an employer abroad. What the US, Europe and Australia say, and when tax becomes the issue.",
+    author: "isvisarequired.com",
+    tags: ["digital nomad", "remote work", "tourist visa", "visitor visa", "tax residency"],
+    created_at: "2026-09-15",
+    updated_at: "2026-09-17",
+    cover: {
+      src: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Milford_Sound_in_Fiordland_National_Park_08.jpg/1920px-Milford_Sound_in_Fiordland_National_Park_08.jpg",
+      width: 1920,
+      height: 1053,
+      alt: "Mitre Peak and the blue water of Milford Sound framed by beech forest under a clear summer sky.",
+      caption: "Fiordland, New Zealand — the one visitor rule that says yes to remote work in so many words.",
+      credit: {
+        author: "Krzysztof Golik",
+        authorUrl: "https://www.wikidata.org/wiki/Q51955005",
+        license: "CC BY-SA 4.0",
+        licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:Milford_Sound_in_Fiordland_National_Park_08.jpg",
+      },
+    },
+    content: `Say your employer is happy for you to spend a month working from somewhere with better weather, and you plan to arrive as an ordinary visitor, doing the same job for the same salary. The question is whether answering email from a rented flat breaks the terms of your entry.
+
+In three countries the government has answered in writing, and the answer is yes. New Zealand, the United Kingdom and Canada all allow visitors to work remotely for an employer abroad. Elsewhere the visitor rules mostly don't mention remote work at all, which is not a ban but is not permission either. And where rules do exist, they turn on who pays you, not on where your laptop happens to be open.
+
+## Where remote work on a visitor visa is allowed
+
+New Zealand's permission has no ceiling on the amount of work. [Immigration New Zealand's guidance](https://www.immigration.govt.nz/visit/checking-or-changing-the-conditions-of-your-visitor-visa-or-nzeta/working-remotely-in-new-zealand-on-a-visitor-visa) says all visitor visas applied for on or after 27 January 2025 allow you to work remotely, with no limit on how much of it you do. The work has to be for a company, employer or client that isn't in New Zealand. Before that date the answer was different, which is why advice based on 2024 research still gets New Zealand wrong.
+
+The UK's permission comes with a condition attached. Paragraph PA 4(h) of the [visitor rules on permitted activities](https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-visitor-permitted-activities) lets a visitor "undertake activities relating to their employment overseas remotely from within the UK, providing this is not the primary purpose of their visit". It arrived in the January 2024 rewrite of the visitor route, and the most recent statement of changes to the rules, dated 3 September 2026, says nothing about remote working. So work fitted around a holiday can be fine. A trip whose real point is to work from the UK is not.
+
+Canada says it most plainly, though on a web page rather than in regulation. [IRCC's Tech Talent page](https://www.canada.ca/en/immigration-refugees-citizenship/campaigns/tech-talent.html) says digital nomads working remotely for an employer outside Canada can live and work there for up to six months at a time, with no work permit and nothing more than visitor status. An IRCC committee note gives the reasoning: these workers aren't entering the Canadian labour market.
+
+That reasoning runs through all three permissions. The UK's list of what counts as working covers taking UK employment, doing work for an organisation or business in the UK, running a business, selling to the public and similar — every item is about the UK end of the deal, and none of them about where the visitor physically sits. UK visitors also can't be paid from a UK source for what they do in the UK, apart from seven listed exceptions. New Zealand likewise excludes work for a New Zealand employer, or with a New Zealand business or person in exchange for goods or services.
+
+Move your employer or your clients into the country you're visiting and each of these permissions falls away.
+
+## Where nobody has written the rule down
+
+Start with the US, where the rules we could read don't answer the question. The visa regulation for business visitors excludes "local employment or labor for hire" from B-1 activity, but it doesn't define "local" or say whether the phrase reaches work for an employer abroad. [USCIS's B-1 page](https://www.uscis.gov/working-in-the-united-states/temporary-visitors-for-business/b-1-temporary-business-visitor) lists things like consulting with business associates, attending conventions and negotiating a contract, and remote work for a foreign employer sits on neither the permitted side nor the prohibited one. The State Department publishes more detailed B-1 guidance, and that is not a document we will paraphrase at second hand ([how we source](/methodology)). Treat it as unread, not as a yes.
+
+Europe's entry rules don't mention work either. A Schengen border guard checks your travel document, your visa, your money and whether you can explain why you've come. Work is not on the list. Employment is left to each country's national law, and Germany publishes nothing about remote work for a foreign employer on a short stay, in either direction. In practice the rule that ends most European trips is the [90 days in any 180](/schengen), not anything to do with work.
+
+Australia's tourist visa says only that the holder must not engage in work in Australia. That is the whole condition, and it doesn't say whose work. Electronic Travel Authority and eVisitor holders get a slightly different version, barring work other than business visitor activity. Work is defined as an activity that, in Australia, normally attracts remuneration. We found nothing in the Australian rules that carves out work for an overseas employer.
+
+## What happens if a border officer thinks you're working
+
+None of the governments whose visitor rules we read for this article publishes a penalty schedule for remote work on a visitor entry, and most have no rule about it to break. The risk is refusal under the general entry rules. That happens at the desk, with no appeal you would recognise as one, and [a refusal follows you into later applications](/guides/visa-refused-what-happens-next).
+
+The UK shows how the test runs. Visitors must not intend to work in the UK, and the Home Office's [visit caseworker guidance](https://www.gov.uk/government/publications/visit-guidance/visit-caseworker-guidance-accessible--2) tells officers to weigh how long you plan to stay and "whether a stay of such a length would be financially viable without remote working on an ongoing basis". Officers also check that your main reason for coming is something other than working remotely, and that the arrangement isn't really a secondment to a UK company or to your employer's UK branch.
+
+A fortnight's holiday with some email is not what that test is aimed at. A long stay that only adds up because you keep billing is. Schengen's purpose-of-stay condition is an affordability test too, so have a simple, honest answer ready about why you're there and how you're paying for it.
+
+
+![Lit office towers of the City of London at dusk with a full moon rising beside a curved glass skyscraper.](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Super_moon_over_City_of_London_from_Tate_Modern_2018-01-31_4.jpg/1280px-Super_moon_over_City_of_London_from_Tate_Modern_2018-01-31_4.jpg#1280x720)
+
+*The UK rule bars work for a business in the UK — not work done from the UK for a business abroad. Photo: [© User:Colin](https://commons.wikimedia.org/wiki/User:Colin) / [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Super_moon_over_City_of_London_from_Tate_Modern_2018-01-31_4.jpg).*
+
+## How long you can stay before you owe tax
+
+Immigration and tax are separate bodies of law with their own day counts, and the tax line can arrive well before the visa runs out.
+
+New Zealand puts both on one page. The same guidance that allows remote work warns that you may have to pay tax. If your income is taxed in another country or territory, you may not need to pay New Zealand tax when you're there for less than 92 days in a 12-month period, and if you're tax resident in a country New Zealand has a tax treaty with, you may be able to stay up to 183 days before New Zealand tax is due. The page tells you to contact Inland Revenue about your own situation.
+
+[Inland Revenue's residence test](https://www.ird.govt.nz/international-tax/individuals/tax-residency-status-for-individuals) makes you resident after more than 183 days in any 12-month period, with part-days counted as whole days, unless you're a non-resident visitor. For arrivals on or after 1 April 2026, that status allows up to 275 days in any 18-month period if, among other conditions, you aren't working for or paid by a New Zealand resident and don't sell goods or services to people or businesses in New Zealand.
+
+The UK is the one to watch. [Its residence rules](https://www.gov.uk/tax-foreign-income/residence) make 183 days automatic residence, but automatic non-residence needs fewer than 16 days in the UK. The limit is 46 if you weren't resident in the three previous tax years, or fewer than 91 days if you work full-time abroad, averaging at least 35 hours a week, with no more than 30 of those UK days spent working. So the UK number to carry around is sixteen, not 183.
+
+The US substantial presence test is a weighted formula over three years: at least 31 days this year, and 183 in total once you add every day this year, a third of last year's days and a sixth of the year before that. Spend 120 days a year there for three years running and you reach 180, just under.
+
+Where two countries both claim you, the treaty tie-breaker decides. That's a question to put to a revenue authority in writing, not to a border officer.
+
+## Do you need a digital nomad visa instead?
+
+If you're going to New Zealand, the UK or Canada and the trip fits the visitor period, the government has already answered the question for you. A nomad visa mostly buys certainty. In some countries it also buys a longer stay or a clear tax position, but not always more time: Japan's digital nomad status runs six months with no extension and asks for annual income of at least ¥10 million, which gets you no longer than Canada's ordinary visitor stay.
+
+The nomad schemes are drafted around the same counterparty test as the visitor rules. Croatia's permit is for people working for a company not registered in Croatia, with no Croatian clients, for up to 18 months. Spain's [teleworking visa](https://www.exteriores.gob.es/Consulados/nuevayork/en/ServiciosConsulares/Paginas/Consular/Visado-de-teletrabajo.aspx) lets employees work only for companies outside Spain, while the self-employed may take on work for a Spanish company up to 20% of their total professional activity. You can only put a percentage on something if what you're regulating is the client.
+
+Before you book, find out where the company that pays you is registered and whether anyone at your destination will pay you, hire you or buy from you. If the money comes from abroad and nobody local is buying, look for a published position. If there isn't one, you're relying on silence. For a longer stay, our [digital nomad visa tracker](/digital-nomad) lists the open programmes, each checked against the issuing government's own page.
+
+## Common questions
+
+### Can I work on a tourist visa if my clients are local?
+
+No. None of the countries covered here lets a visitor do paid work for a local employer or local clients, including the three that allow remote work. The permission only covers work for an employer or client outside the country.
 
 ### Can digital nomads legally work in the US?
 
-USCIS's B-1 page takes no position on remote work for a foreign employer, and we could not load the State Department's detailed guidance at 9 FAM 402.2 to establish its position. The State Department's visa regulation, 22 CFR 41.31(b)(1), excludes "local employment or labor for hire" from B-1 business activity, but it does not define "local" or say whether that phrase reaches work for a foreign employer. Treat that as unread rather than as permission.
+The two US sources you can open don't settle it. USCIS's list of business visitor activities doesn't mention remote work for a foreign employer, and the visa regulation excludes "local employment or labor for hire" without defining "local". The State Department's detailed B-1 guidance is the document that would probably answer it, and we haven't read it, so treat the question as unanswered rather than as permission.
 
-### What happens if you get caught working on a tourist visa?
+### Is there a 183-day rule for tax?
 
-We found no government publishing a penalty schedule for remote work specifically. What happens instead is refusal under the general entry rules: UK rule V 4.4 tests what you intend, and Schengen Article 6(1)(c) requires you to justify the purpose and conditions of your stay. Working for local clients is a separate matter and is squarely prohibited.
+Not a single one, and immigration and tax limits are set by different authorities. South Africa's remote work visa notice shows the split: if you're tax resident in a country with a double-taxation agreement in force with South Africa, you register with SARS once you've been there more than 183 days in total in any 12-month period, and if you're not, you register regardless.
 
-### Do I need a digital nomad visa or can I just use a tourist visa?
+### Can a business hire someone who is visiting on a tourist or nomad visa?
 
-If your destination is New Zealand, the UK or Canada and your stay fits the visitor period, the government has already answered in writing. A nomad visa buys a longer stay in some countries and an explicit tax position in others, though Japan's runs six months with no extension, which is no longer than Canada's ordinary visitor stay.
-
-### What is the 183-day rule for tax residency?
-
-It is not one rule. The US applies a weighted three-year formula. The UK can treat you as resident well below 183 days, and guarantees non-residence only under 16 days, or 46 if you have not been resident for the three previous tax years, or 91 if you work full-time abroad with no more than 30 of those days worked. New Zealand counts more than 183 days in any 12-month period, with part-days counted as whole days, unless you qualify as a non-resident visitor: for arrivals on or after 1 April 2026, a visitor who is not working for a New Zealand employer or selling to people or businesses in New Zealand can stay up to 275 days in any 18-month period before becoming resident under the day count.
-
-### How long can I stay in a country before I have to pay tax there?
-
-There is no universal number, and the immigration limit and the tax limit are set by different authorities. South Africa's remote work visa notice shows the split cleanly: with a double-taxation agreement in force you register with SARS after 183 aggregate days in 12 months, and without one you register regardless.
-
-### Can you hire workers on tourist, student or digital nomad visas?
-
-The prohibitions quoted here are aimed at exactly this. UK rule V 4.4 bars a visitor from "doing work for an organisation or business in the UK", and the Croatian and Spanish nomad definitions exclude local clients beyond a fixed share. If someone is doing work for your local entity, their permission is the thing that fails.`,
-  },
-  {
-    title: "What happens if you overstay your visa, by country",
-    slug: "what-happens-if-you-overstay-a-visa",
-    excerpt:
-      "The fine is rarely the punishment. Four legal systems that borrowed nothing from each other — Thai, Japanese, American and EU — size the re-entry ban by how you left, not only by how long you stayed. Figures taken only from government sources we loaded and read.",
-    metaDescription:
-      "Overstay penalties by country, from primary law: the fine is capped and small, the re-entry ban is the real cost, and how you leave changes its length.",
-    author: "isvisarequired.com",
-    tags: ["visa overstay", "entry bans", "immigration law", "schengen", "united states visas", "japan", "thailand"],
-    created_at: "2026-09-16",
-    updated_at: "2026-09-16",
+These rules are aimed at exactly that. UK visitors must not do work for an organisation or business in the UK, and Croatia's and Spain's nomad schemes exclude or cap local clients. If someone is working for your local entity, it's their permission that fails.`,
     faq: [
       {
-        q: "What happens if I overstay my visa by one day?",
-        a: "In the US, no bar: the 3-year bar needs more than 180 days. But if you were admitted to a date certain, your nonimmigrant visa is void from the moment your authorised stay ended under INA 222(g), and you will normally need a new visa issued in your country of nationality. In the Netherlands the published one-year ban band starts at an overstay of more than three days, and the IND does not say what applies at or below three. Elsewhere it is a fine and an officer's discretion.",
+        q: "Can I work on a tourist visa if my clients are local?",
+        a: "No. None of the countries covered here lets a visitor do paid work for a local employer or local clients, including the three that allow remote work. The permission only covers work for an employer or client outside the country.",
       },
       {
-        q: "Is there a grace period for overstaying a visa?",
-        a: "Not for a short visitor stay in any country we checked. The UAE publishes one for residence permits: its official portal says residents are \"granted longer flexible grace periods that reach up to 6 months (according to resident category)\" after the permit expires or is cancelled. That is a different thing from a visitor margin. The Dutch three-day line is the only published visitor threshold we found, and it does one narrow thing, marking where the one-year ban band starts. The overstay is still recorded and the fine still falls due. Everything else is officer discretion, plus the named legal remedies (satisfactory departure, force majeure extension, rebuttal with evidence).",
+        q: "Can digital nomads legally work in the US?",
+        a: "The two US sources you can open don't settle it. USCIS's list of business visitor activities doesn't mention remote work for a foreign employer, and the visa regulation excludes \"local employment or labor for hire\" without defining \"local\". The State Department's detailed B-1 guidance is the document that would probably answer it, and we haven't read it, so treat the question as unanswered rather than as permission.",
       },
       {
-        q: "How many days can you overstay before you are banned?",
-        a: "There is no universal number, and the EU deliberately refuses to set one: Article 11(2) of the Return Directive requires the ban length to be assessed on the individual case. The published thresholds that do exist are national: the Dutch one-year band starting above 3 days, over 90 days in Thailand's surrender column, and over 180 days for the US 3-year bar.",
+        q: "Is there a 183-day rule for tax?",
+        a: "Not a single one, and immigration and tax limits are set by different authorities. South Africa's remote work visa notice shows the split: if you're tax resident in a country with a double-taxation agreement in force with South Africa, you register with SARS once you've been there more than 183 days in total in any 12-month period, and if you're not, you register regardless.",
       },
       {
-        q: "What is the 3-year bar and the 10-year bar?",
-        a: "Under 8 U.S.C. 1182(a)(9)(B), more than 180 days but less than a year of unlawful presence plus a voluntary departure before proceedings gives a 3-year bar; a year or more gives a 10-year bar with no voluntary-departure element. Both are measured on a single stay, per USCIS. The clock runs from your departure; the bar itself only bites at your next application for admission.",
-      },
-      {
-        q: "Does an overstay cancel my visa automatically?",
-        a: "In the United States, yes, for an admission to a date certain. INA 222(g) voids a nonimmigrant visa \"beginning after the conclusion of\" the authorised period of stay, and readmission normally requires a new visa issued in your country of nationality. We found no other country that voids the visa by statute the way INA 222(g) does. Everywhere else we checked, cancellation is an officer's decision on the individual file.",
-      },
-      {
-        q: "Does an overstay in one Schengen country affect all of them?",
-        a: "An entry ban does. Article 24(1) of Regulation (EU) 2018/1861 requires the issuing state to enter an alert for refusal of entry in the Schengen Information System, which every Schengen border post can see. A ban from one member state is enforced across all 29 Schengen states. Ireland sits outside Schengen and does not receive the refusal-of-entry alert.",
-      },
-      {
-        q: "Can you be deported for overstaying a visa?",
-        a: "Yes, and several countries make it a criminal offence too: up to three years or ¥3 million in Japan under Article 70(1)(v), up to a year in Germany where no departure period was granted or it has expired, jail and caning in Singapore above 90 days. The ordinary outcome for a cooperative short overstayer is a fine and a departure, not a prosecution.",
-      },
-      {
-        q: "How much is the fine for overstaying a visa?",
-        a: "In the US, there appears to be no fine at all for the overstay itself. Published figures elsewhere include 500 baht per day in Thailand (capped at 20,000 baht), AED 50 per day in the UAE, €501–€10,000 in Spain and up to RM10,000 in Malaysia, compoundable at RM3,000. Any \"Schengen-wide\" fine figure you see quoted is not traceable to any EU instrument.",
-      },
-      {
-        q: "Can I still get a visa in the future after an overstay?",
-        a: "Usually, once the ban expires. The US bars run 3 or 10 years from departure, EU bans are capped at five years in principle, and the Netherlands can lift a one-year ban once half of it has passed, on request, if you left the EU voluntarily and independently within the set departure period and meet five further conditions. What a past overstay does is make the next application harder to win, which is the same territory as a refusal on your record.",
-      },
-      {
-        q: "Do I have to declare a past overstay on a visa application?",
-        a: "We could not find a government page stating a universal declaration duty. The duty is created by the question on the form in front of you, not by the overstay, and a false answer is its own ground of refusal, separate from and worse than the thing you were hiding. Assume the record exists regardless: the EES automatically flags entry records with no matching exit, and entry bans are held as SIS alerts.",
+        q: "Can a business hire someone who is visiting on a tourist or nomad visa?",
+        a: "These rules are aimed at exactly that. UK visitors must not do work for an organisation or business in the UK, and Croatia's and Spain's nomad schemes exclude or cap local clients. If someone is working for your local entity, it's their permission that fails.",
       },
     ],
-    content: `You pay a fine, you fly home, and nothing else happens that day. It gets serious later, and somewhere else. The real penalty is a re-entry ban, and in four legal systems that borrowed nothing from each other — Thai, Japanese, American and EU — the length of that ban turns on how you left, not only on how long you stayed.
+  },
+  {
+    title: "What happens if you overstay a visa: fines and bans",
+    slug: "what-happens-if-you-overstay-a-visa",
+    excerpt:
+      "Overstay in Thailand by four years and the fine is no bigger than at 40 days. The ban is where it counts, and whether you surrender or get caught can be the difference between five years and ten.",
+    metaDescription:
+      "Overstay penalties by country: the fine is usually small and capped, but the re-entry ban can run from one year to ten depending on how you leave.",
+    author: "isvisarequired.com",
+    tags: ["visa overstay", "entry bans", "schengen", "united states visas", "japan", "thailand"],
+    created_at: "2026-09-16",
+    updated_at: "2026-09-17",
+    cover: {
+      src: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/DSC-0053-passport-control-skopje-airport-july-2017.jpg/1920px-DSC-0053-passport-control-skopje-airport-july-2017.jpg",
+      width: 1920,
+      height: 1272,
+      alt: "Empty airport passport control booths under a sign reading Passport Control All Departures, queue barriers in front.",
+      caption: "Exit passport control: the desk where an overstay finally surfaces, and where how you leave starts to matter.",
+      credit: {
+        author: "Rakoon",
+        authorUrl: "https://commons.wikimedia.org/wiki/User:Rakoon",
+        license: "CC0",
+        licenseUrl: "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:DSC-0053-passport-control-skopje-airport-july-2017.jpg",
+      },
+    },
+    content: `Say you misread the date on your entry record and leave a week late, or a cancelled flight keeps you in the country past the end of your permitted stay. At the airport, the day itself is usually undramatic. You pay a fine if the country charges one, and you get on the plane.
 
-That second half is the part nobody writes down. Thailand runs two separate ban schedules depending on whether you surrendered or were arrested. Japan gives one year to someone who comes forward and leaves under a departure order, and five to someone who is deported. Spanish law says that, in circumstances set by regulation, the ban shall not be imposed if you leave while the sanction proceedings are still running, and shall be revoked if you leave inside the voluntary compliance window of the expulsion order. Identical conduct, different exit, five times the ban.
+The real cost lands later, at the border you want to come back through. Overstay four years in Thailand and the fine is the same 20,000 baht as at 40 days — but you're barred for five years if you walked into immigration yourself, and ten if they found you.
 
-## The fine is capped. The ban is not.
+## Overstay fines and bans by country
 
-Thailand puts the arithmetic on a government page. The overstay fine is **500 baht per day** and stops growing at 20,000 baht once you pass 40 days, per the [Royal Thai Embassy in Washington D.C.](https://washingtondc.thaiembassy.org/en/page/advice-on-thailand-visa-overstay-regulations) Stay 40 days over and you pay the full 20,000 baht, roughly US$600 at September 2026 exchange rates, which is our arithmetic and not the embassy's. Stay four years over and you pay exactly the same 20,000 baht, plus a five-year ban if you surrender or a ten-year ban if you are arrested. The money is not the sanction.
+Thailand shows why the fine is the small part. The overstay fine is 500 baht a day and stops rising at 20,000 baht once you pass 40 days, according to the [Royal Thai Embassy in Washington D.C.](https://washingtondc.thaiembassy.org/en/page/advice-on-thailand-visa-overstay-regulations) That's roughly US$600 at September 2026 rates, on our arithmetic rather than the embassy's.
 
-The UAE charges AED 50 per day on the federal immigration authority's own [service fee schedule](https://icp.gov.ae/en/services-details/?serviceid=68e73faf5ae59b00117389f1). Spain treats irregular presence as an administrative offence under Article 53(1)(a) of [Ley Orgánica 4/2000](https://www.boe.es/buscar/act.php?id=BOE-A-2000-544), fined €501 to €10,000 under Article 55(1)(b), a range set by the officer rather than a per-day meter.
+The US doesn't fine the overstay itself at all.
 
-No US fine attaches to the overstay itself. We read INA 212(a)(9)(B), INA 222(g) and 8 CFR part 217 in full and found no fining provision; the pages carrying "a $2,000 fine for each violation" cite no provision for it. What the INA does fine is failure to depart under an order: up to **$998 for each day** in violation under 8 U.S.C. 1324d, where someone under a final removal order wilfully refuses to leave, and $1,992 to $9,970 under 8 U.S.C. 1229c(d) for blowing a voluntary departure deadline. Both figures are the inflation-adjusted amounts in [8 CFR 280.53](https://www.ecfr.gov/api/renderer/v1/content/enhanced/current/title-8?part=280&section=280.53), published 2 January 2025. Neither reaches the traveller who overstays and flies home.
+The pages quoting "a $2,000 fine for each violation" cite no provision for it. American fines are aimed at people who ignore an order to leave — up to US$998 a day for wilfully refusing to depart under a final removal order. They don't reach someone who overstays and simply flies home.
 
-The endlessly copied "Schengen fine of €500–1,000" is worse. There is no EU-wide overstay fine schedule, because penalties are set nationally, and the figure does not appear in any EU act, Commission page or member state fee list we could find. It reads as an invented number that aggregators now cite to each other. Our [sourcing rules](/methodology) are why it is not in the table below.
+Be sceptical, too, of the "Schengen fine of €500–1,000" copied from site to site. We could not find it in any EU act, Commission page or national fee list. There's no EU-wide fine schedule in any case, because each country sets its own penalties. So it isn't in the table.
 
-## How you leave decides the ban
-
-[Article 11(1) of the EU Return Directive](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32008L0115) states the rule more plainly than any guidance page: a return decision **shall** carry an entry ban if no period for voluntary departure was granted, or if the obligation to return was not complied with. "In other cases return decisions may be accompanied by an entry ban." Shall against may. Article 7(1) sets that voluntary departure window at seven to thirty days, and Article 11(2) caps bans at five years in principle while requiring the length to be fixed "with due regard to all relevant circumstances of the individual case". No EU-wide days-to-years tariff exists, whatever the calculator sites publish.
-
-Spain wrote the mechanism into statute. Article 58(2) of Ley Orgánica 4/2000 directs the authority, in circumstances set by regulation, not to impose an entry ban where the person left national territory while sanction proceedings for irregular stay or unauthorised work under Article 53.1(a) or (b) were running, and to revoke a ban imposed on those grounds where the person leaves inside the voluntary compliance period of the expulsion order. The same article allows up to ten years, rather than the ordinary five, where the person is a serious threat to public order, public security, national security or public health.
-
-In Germany the trigger is a list of events, and every item on it is an official act against you. Section 11(1) of the [Residence Act](https://www.gesetze-im-internet.de/aufenthg_2004/__11.html) applies a ban to foreigners who have been expelled, removed or deported, who are subject to a deportation order under section 58a, or who have been refused entry for attempting to enter on forged or falsified documents. The ban covers the federal territory and every other EU and Schengen state, except one where the person is separately allowed to enter and stay. Section 95(1) makes unlawful residence punishable by up to a year's imprisonment only where three conditions are all met: you are enforceably required to leave, no departure period was granted or it has expired, and deportation has not been suspended.
-
-The IND publishes real numbers. Its [entry ban page](https://ind.nl/en/entry-ban) sets a one-year ban for an overstay "of over 3 and up to 90 days" and two years as the usual period. It will lift the one-year ban halfway through, but only on request, and only where you left the EU voluntarily and on your own initiative within the set period, have stayed outside the EU without interruption for at least half the ban, and meet four further conditions on criminal record, prosecution and public order.
-
-In Japan the one-year and five-year outcomes sit side by side, in the same item of the same Act. Under Article 5(1)(ix) of the [Immigration Control and Refugee Recognition Act](https://laws.e-gov.go.jp/law/326CO0000000319), a person deported from Japan is generally barred for five years, a repeat deportee for ten, and a person who leaves under a departure order for one. Overstaying is separately a crime: Article 70(1)(v) punishes remaining beyond the permitted period of stay with up to **3 years' imprisonment or a fine not exceeding ¥3 million**, or both. Since 10 June 2024, Article 24-3 of the Japanese original has made a departure order available to two groups: someone who appeared voluntarily at an immigration office, intending to leave Japan promptly, before any violation investigation began; or someone who, after an investigation began but before being notified that they are subject to deportation, told an immigration inspector or immigration control officer that they intend to leave promptly. In both cases the person must also fall outside the listed deportation grounds in Article 24, have no conviction carrying imprisonment for the listed Penal Code and other offences, never have been deported or left under a departure order before, and be expected with certainty to leave Japan promptly. Saying you will leave is necessary and nowhere near sufficient, and when you say it matters: someone who only declared it after an investigation began is barred for five years rather than one if they want to come back for a short stay. The official English translation predates the 2023 amendment that made these changes, which is why most English-language summaries still describe the old rule. The Japanese original governs.
-
-## The US 3-year and 10-year bars
-
-Both sit in [8 U.S.C. 1182(a)(9)(B)](https://www.govinfo.gov/content/pkg/USCODE-2023-title8/html/USCODE-2023-title8-chap12-subchapII-partII-sec1182.htm). The 3-year bar requires more than 180 days but less than one year of unlawful presence, a voluntary departure "prior to the commencement of proceedings", and it bites at your next application for admission, and not a day earlier. The 10-year bar requires one year or more and carries no voluntary-departure element at all.
-
-[USCIS](https://www.uscis.gov/laws-and-policy/other-resources/unlawful-presence-and-inadmissibility) states both are measured on unlawful presence accrued "during a single stay", so two separate 100-day overstays do not add up to a 3-year bar. The permanent bar under 212(a)(9)(C) is a different provision entirely: it needs either an aggregate of more than one year of unlawful presence or a prior removal order, and in both cases a re-entry or attempted re-entry "without being admitted". Overstaying and flying home cannot trigger it.
-
-For the 3-year bar only, clause (iv) tolls the count for up to 120 days while a timely, non-frivolous extension or change-of-status application is pending, provided you were lawfully admitted or paroled and have not worked without authorisation. It does not toll the one-year period behind the 10-year bar.
-
-## Overstaying by a day, or by three
-
-Grace periods are rare and narrow, but they are not unknown. The UAE publishes one: its [official portal](https://u.ae/en/information-and-services/visa-and-emirates-id/Visa-information/general-provisions-for-the-residence-visa) states that residents "are granted longer flexible grace periods that reach up to 6 months (according to resident category) to stay in the country after the residence permit is cancelled or expired". That is a residence provision. For short visitor stays we found no published grace period in the countries we checked. The closest thing to a published visitor threshold is the Dutch one-year band, which starts at an overstay of more than three days; the IND does not say what applies at or below three, and the threshold governs the ban rather than whether the overstay is recorded.
-
-A one-day US overstay does one thing at once, if you were admitted to a date certain: it kills the visa. Under [8 U.S.C. 1202(g)](https://www.govinfo.gov/content/pkg/USCODE-2023-title8/html/USCODE-2023-title8-chap12-subchapII-partIII-sec1202.htm) the nonimmigrant visa is "void beginning after the conclusion of such period of stay", and you can then normally only be readmitted on a new visa issued "in a consular office located in the country of the alien's nationality". No bar. But the multiple-entry sticker is dead and you have lost the option of reapplying from a convenient third country.
-
-The date that matters is the one on the I-94, not the one on the visa. USCIS recommends applying to extend "at least 45 days before your authorized stay expires" and points you to [the lower right-hand corner of the Form I-94](https://www.uscis.gov/visit-the-united-states/extend-your-stay). We wrote a separate guide on [why visa validity and permitted duration of stay are two different numbers](/guides/visa-validity-vs-duration-of-stay): the visa expiry is the date people read, and the I-94 date is the one that counts.
-
-## When the flight is cancelled and you overstay by six hours
-
-Three legal instruments cover this situation, although none of them mentions cancelled flights by name.
-
-On the US Visa Waiver Programme, [8 CFR 217.3(a)](https://www.ecfr.gov/api/renderer/v1/content/enhanced/current/title-8?part=217&section=217.3) lets the district director grant **satisfactory departure** of up to 30 days where an emergency prevents departure. It is discretionary, it covers admissions under part 217, and the favourable treatment is conditional: only "if departure is accomplished during that period" are you regarded as "having satisfactorily accomplished the visit without overstaying the allotted time".
-
-In the Schengen area, [Article 33(1) of the Visa Code](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32009R0810) says a visa "shall be extended" free of charge where the holder proves force majeure prevented them leaving. Article 33(2) offers a discretionary extension for serious personal reasons at €30.
-
-Force majeure is read narrowly, and one immigration service says so out loud. The IND's [extension page](https://ind.nl/en/short-stay/extend-schengen-visa-or-visa-exempt-term) states that if the airline cancelled your flight but you could still travel home with another airline or from another airport, you cannot extend. A delay is not force majeure if a rebooking existed.
-
-Where no record of your movement exists, Article 12 of the [Schengen Borders Code](https://eur-lex.europa.eu/eli/reg/2016/399/2024-07-11) puts the burden on you. The article was rewritten for the Entry/Exit System: Article 12(1) now turns on there being no EES individual file, or an entry/exit record carrying no exit date after the authorised stay expired, rather than on a missing passport stamp. Authorities "may presume" you overstayed, and Article 12(3) lets you rebut that with "credible evidence, such as transport tickets". Keep the boarding pass and the cancellation email.
-
-## Schengen: the system now counts for you
-
-The EU [Entry/Exit System](https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/entry-exit-system_en) began operating on 12 October 2025 and replaced passport stamping entirely on 10 April 2026. Article 12 of [Regulation (EU) 2017/2226](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32017R2226) requires the EES to "automatically identify which entry/exit records do not have exit data immediately following the date of expiry of an authorised stay". The overstayer list generates itself. Every article suggesting a short overstay might slip past a tired officer is describing a system that has been switched off. Our [guide to the Entry/Exit System](/guides/eu-entry-exit-system-ees) covers what it records.
-
-The limit being measured is 90 days in any 180-day period, assessed against the 180 days preceding each day of stay under Article 6(1) of the Borders Code. If you are anywhere near it, count it on the [90/180-day calculator](/schengen) rather than in your head.
-
-One country's ban is 29 countries' ban. Article 24(1) of [Regulation (EU) 2018/1861](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32018R1861) says member states "shall enter an alert for refusal of entry and stay" where an entry ban has been issued under the Return Directive. Overstay in Portugal, get banned, and Norwegian border police see the alert. Germany's Section 11(1) says it from the other end, extending the ban across the EU and Schengen states. Breaching it is punished three times as hard as the original offence, at up to three years' imprisonment under Section 95(2).
-
-## How likely is any of this?
-
-DHS publishes the figures for the US. In [Fiscal Year 2024](https://www.dhs.gov/sites/default/files/2025-09/25_0912_cbp_entry-exit-overstay-report-fiscal-year-2024.pdf), of 46,657,108 expected departures by air and sea, the total overstay rate was 1.15%, or 538,548 events. Only 55,594 of those were out-of-country overstays: people who overstayed and then left. That is the audience for this page, roughly one traveller in a thousand.
-
-Most of the rest resolve. By 6 February 2025 the FY2024 suspected in-country overstay count had fallen from 482,954 to 427,204, and DHS had confirmed the departure or status adjustment of more than **99.08%** of FY2024 nonimmigrants scheduled to depart by air and sea. The report does not say how many of those departures followed enforcement. Suspected in-country overstay rates differ sharply by group: 0.43% for Visa Waiver Programme countries, 2.22% for non-VWP countries excluding Canada and Mexico, and 2.45% for students and exchange visitors, against 1.04% overall. The equivalent total overstay rates are 0.49%, 2.33% and 3.23%, against 1.15% overall. We could not find a government dataset isolating arrests of visa overstayers, so we are not giving you an arrest figure.
-
-## Penalties by country
-
-| Where | Fine or criminal penalty | Re-entry ban |
+| Country | Fine or criminal penalty | Re-entry ban |
 | --- | --- | --- |
-| United States | No fine found in INA 212(a)(9)(B), INA 222(g) or 8 CFR part 217. Separate penalties apply to failure to depart under an order | 3 years after more than 180 days and under a year, where you left voluntarily before proceedings; 10 years after a year or more |
-| EU / Schengen framework | Set nationally; no EU-wide schedule exists | Mandatory only where no voluntary departure period was granted or it was ignored; 5 years in principle |
-| Germany | Up to 1 year's imprisonment or a fine, and only where no departure period was granted or it has expired | Mandatory after expulsion, removal, deportation, a section 58a order or refusal of entry on forged documents; can also be ordered under section 11(6) if you miss a departure deadline set for you (normally no more than 1 year the first time); 5 years maximum outside the section 11(5) to (5b) cases; breaching it carries up to 3 years |
+| United States | No fine for the overstay itself | 3 years after more than 180 days and under a year, if you left voluntarily before proceedings; 10 years after a year or more |
+| EU rules | Set by each country | Required if no voluntary departure period was granted or it was ignored; 5 years maximum in principle |
+| Germany | Up to 1 year in prison or a fine, and only where you are enforceably required to leave, no departure period was granted or it has expired, and deportation is not suspended | Mandatory after expulsion, removal or deportation, among other cases; breaching it carries up to 3 years |
 | Netherlands | No fine published | 1 year for an overstay of over 3 and up to 90 days; 2 years is the usual period |
-| Spain | €501–€10,000, administrative | Not imposed if you leave while proceedings run, or revoked if you leave within the voluntary compliance period, in circumstances set by regulation; otherwise up to 5 years, or up to 10 for a serious threat to public order, public security, national security or public health |
+| Spain | €501 to €10,000, as an administrative penalty | Up to 5 years, or up to 10 for a serious threat to public order, public or national security, or public health |
 | UAE | AED 50 per day | No figure published |
-| Thailand | 500 baht per day, capped at 20,000 baht from 40 days | Surrender: 1 year (over 90 days) up to 10 years (over 5 years). Arrested: 5 years (under a year), 10 years (over a year) |
-| Singapore | Up to S$4,000 or 6 months' jail for 90 days or less; over 90 days, jail plus at least 3 strokes of the cane | Not stated in section 15(3) |
-| Japan | Up to 3 years' imprisonment or ¥3 million under Article 70(1)(v) | Departure order 1 year, or 5 years for a short-stay return if you only declared your intent to leave after an investigation began; deported 5 years (1 year for a non-short-stay return if allowed to self-depart under Article 52(5)); repeat deportee 10 years |
-| Malaysia | Up to RM10,000 or 5 years under section 15(4); compoundable at RM3,000 | No figure published |
+| Thailand | 500 baht per day, capped at 20,000 baht from 40 days | If you surrender, 1 year (over 90 days) up to 10 years (over 5 years); if arrested, 5 years (under a year) or 10 years (over a year) |
+| Singapore | Up to S$4,000 or 6 months in jail for 90 days or less; over 90 days, jail plus at least 3 strokes of the cane, though women and men over 50 face up to S$6,000 instead | Not stated |
+| Japan | Up to 3 years in prison, a fine of up to ¥3 million, or both | 1 year under a departure order; generally 5 years if deported; 10 years for a repeat deportee |
 
-Four caveats, because the cells above are not all equally solid. Thailand's two-column schedule comes from the [Royal Thai Consulate-General in Ho Chi Minh City](https://hochiminh.thaiembassy.org/en/publicservice/64058-thailand-overstay-measures) summarising Ministry of Interior Order 1/2558, enforced from 20 March 2016; we could not load immigration.go.th to confirm it at source. Malaysia's RM3,000 figure is the compound for section 15(4) on the Immigration Department's [frequently committed offences page](https://www.imi.gov.my/index.php/en/main-services/entry-requirement-into-malaysia-en/frequently-committed-offences/); the department's separate [compound action page](https://www.imi.gov.my/index.php/en/enforcement/compound-action/) sets the schedule under the Immigration (Compounding of Offences) Regulations 2003 with two ceilings, RM3,000 and RM15,000, and does map them to sections, section 15(4) falling in the RM3,000 group. The UAE rate conflicts: ICP's live fee schedule says AED 50 per day, secondary sites quote AED 100 from Dubai GDRFA material we could not locate anywhere on gdrfad.gov.ae, and GDRFA's own [legal awareness page](https://gdrfad.gov.ae/en/node/74) confirms a daily fine exists while publishing no rate. Singapore's caning provision is [section 15(3) of the Immigration Act 1959](https://sso.agc.gov.sg/Act/IA1959?ProvIds=pr15-); section 325(1) of the Criminal Procedure Code exempts women and men over 50, who face up to S$6,000 instead.
+Two rows deserve a note. The Thai surrender and arrest schedule comes from a consulate summary of Ministry of Interior Order 1/2558, and we could not confirm it on immigration.go.th. AED 50 is the federal ICP rate, and Dubai figures of AED 100 circulate, but we could not source them.
+
+
+![Symmetrical vaulted glass-and-steel airport concourse in Bangkok, seen from the top of an escalator.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Suvarnabhumi_Airport_Terminal_C_interior_%28I%29.jpg/1280px-Suvarnabhumi_Airport_Terminal_C_interior_%28I%29.jpg#1280x861)
+
+*Bangkok's Suvarnabhumi concourse, where the overstay fine runs at 500 baht a day and stops dead at 20,000. Photo: [Supanut Arunoprayote](https://commons.wikimedia.org/wiki/User:Supanut_Arunoprayote) / [CC BY 4.0](https://creativecommons.org/licenses/by/4.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Suvarnabhumi_Airport_Terminal_C_interior_(I).jpg).*
+
+## Why the way you leave matters
+
+Under the [Return Directive](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32008L0115), a ban is compulsory only if you were never given a window to leave voluntarily, or ignored the one you got. Otherwise it's optional. Bans are capped at five years in principle and the length is decided on the circumstances of each case, so no EU-wide table converts days overstayed into years banned, whatever the calculator sites publish.
+
+Spain writes the incentive into statute. In circumstances set by regulation, no ban is imposed if you leave while proceedings over your irregular stay are still running, and a ban already imposed is revoked if you leave within the voluntary compliance period of the expulsion order.
+
+The IND, unusually, publishes actual numbers. Its [entry ban page](https://ind.nl/en/entry-ban) sets a one-year ban for an overstay of more than three and up to 90 days, and two years as its usual period. It will lift a one-year ban halfway through if you ask, but only if you left the EU voluntarily and on your own initiative within the set period, among other conditions.
+
+In Japan the one-year and five-year outcomes sit in the same article. Under the [Immigration Control and Refugee Recognition Act](https://laws.e-gov.go.jp/law/326CO0000000319), leaving under a departure order means a one-year bar, being deported generally means five, and a repeat deportee gets ten. Overstaying is also a crime there.
+
+Since 10 June 2024 there have been two routes to a departure order. You can go to an immigration office voluntarily, intending to leave promptly, before any investigation into you begins. Or, once an investigation has started but before you're told you're subject to deportation, you can tell an immigration officer that you intend to leave promptly. Further conditions apply either way, including never having been deported or left under a departure order before.
+
+So if you've overstayed in Japan, go to an immigration office before anyone comes looking for you. Declare it only after an investigation has begun and the bar on returning for a short stay is five years rather than one. Most English-language summaries still describe the old rule, because the official English translation predates the 2023 amendment that changed it.
+
+## Overstaying in the US
+
+Your visa dies first. If you were admitted until a specific date, it's void the moment that stay ends, even one day over. To return you'll normally need a new visa issued in your country of nationality, so a multiple-entry visa is gone, and so is the option of applying from a more convenient third country.
+
+The date that counts is on your I-94 record, not the expiry printed on the visa. USCIS points you to [the lower right-hand corner of Form I-94](https://www.uscis.gov/visit-the-united-states/extend-your-stay) and recommends applying to extend at least 45 days before your authorised stay ends. Our guide to [visa validity versus length of stay](/guides/visa-validity-vs-duration-of-stay) explains why those two dates so often differ.
+
+The bars themselves need longer overstays. Three years needs more than 180 days but less than a year of unlawful presence, followed by a voluntary departure before proceedings begin. Ten years needs a year or more, with no condition about how you left. Both run from the day you leave, and neither bites until you next apply for admission.
+
+[USCIS](https://www.uscis.gov/laws-and-policy/other-resources/unlawful-presence-and-inadmissibility) measures both on a single stay, so two separate 100-day overstays don't add up to a 3-year bar.
+
+## Overstaying in the Schengen area
+
+The EU's [Entry/Exit System](https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/entry-exit-system_en) began operating on 12 October 2025 and replaced passport stamping entirely on 10 April 2026. It automatically identifies entry records with no exit after an authorised stay has expired, so the overstayer list writes itself. Our [guide to the Entry/Exit System](/guides/eu-entry-exit-system-ees) covers what it records.
+
+Any advice suggesting a short overstay might slip past a tired border officer is describing a system that's been switched off.
+
+The limit being measured is 90 days in any 180-day period, counted against the 180 days before each day of your stay. If you're anywhere close, work it out on the [90/180-day calculator](/schengen) rather than in your head.
+
+A ban from one Schengen country is a ban from all 29. The country that issues it must enter an alert in the Schengen Information System, which every Schengen border post can see. Overstay in Portugal, get banned, and Norwegian border police will see the alert. Ireland sits outside Schengen and doesn't receive it.
+
+
+![Rows of empty airline check-in counters lit warm under a curved roof in an airport departure lobby at dusk.](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Departure_Lobby_of_Haneda_Airport_International_Terminal_longitudinal_view_dllu.jpg/1280px-Departure_Lobby_of_Haneda_Airport_International_Terminal_longitudinal_view_dllu.jpg#1280x843)
+
+*Haneda's international departure lobby. Leaving under a departure order costs one year; being deported costs five. Photo: [Daniel L. Lu (user:dllu)](https://commons.wikimedia.org/wiki/User:Dllu) / [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Departure_Lobby_of_Haneda_Airport_International_Terminal_longitudinal_view_dllu.jpg).*
+
+## If a cancelled flight makes you overstay
+
+No rule mentions cancelled flights by name, but a few cover the situation.
+
+Travellers on the US Visa Waiver Programme can be granted "satisfactory departure" of up to 30 days when an emergency prevents them leaving. It's discretionary, and it only protects you if you actually leave within that period.
+
+In the Schengen area, [Article 33 of the EU Visa Code](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32009R0810) says a visa shall be extended free of charge if you prove force majeure kept you from leaving. A separate extension for serious personal reasons is discretionary and costs €30.
+
+Force majeure is read narrowly. The IND's [extension page](https://ind.nl/en/short-stay/extend-schengen-visa-or-visa-exempt-term) says that if your airline cancelled the flight but you could still have got home with another airline or from another airport, you can't extend.
+
+If the records point to an overstay, the burden is on you. Where the Entry/Exit System has no file on you, or shows no exit after your stay expired, authorities may presume you overstayed. You can rebut that with credible evidence such as transport tickets, so keep the boarding pass and the cancellation email.
+
+If you're still planning, check the rules for your passport on [the visa checker](/) and leave yourself a margin at the end of the trip instead of flying out on the last permitted day. If you've already overstayed, keep everything that shows when you left and why.
 
 ## Common questions
 
 ### What happens if I overstay my visa by one day?
 
-In the US, no bar: the 3-year bar needs more than 180 days. But if you were admitted to a date certain, your nonimmigrant visa is void from the moment your authorised stay ended under INA 222(g), and you will normally need a new visa issued in your country of nationality. In the Netherlands the published one-year ban band starts at an overstay of more than three days, and the IND does not say what applies at or below three. Elsewhere it is a fine and an officer's discretion.
+It won't trigger a US re-entry bar, but if you were admitted until a set date it voids your US visa, and you'll normally need a new one issued in your country of nationality. In the Netherlands the one-year ban band starts above three days, and the IND doesn't say what applies at or below three. Elsewhere, expect a fine and an officer's discretion.
 
 ### Is there a grace period for overstaying a visa?
 
-Not for a short visitor stay in any country we checked. The UAE publishes one for residence permits: its official portal says residents are "granted longer flexible grace periods that reach up to 6 months (according to resident category)" after the permit expires or is cancelled. That is a different thing from a visitor margin. The Dutch three-day line is the only published visitor threshold we found, and it does one narrow thing, marking where the one-year ban band starts. The overstay is still recorded and the fine still falls due. Everything else is officer discretion, plus the named legal remedies (satisfactory departure, force majeure extension, rebuttal with evidence).
+Not for short visitor stays in any country we checked. The UAE gives residents grace periods of up to six months, depending on their category, after a residence permit expires or is cancelled, but that isn't a margin for visitors. Even the Dutch three-day line only marks where the one-year ban band begins, and the overstay is still recorded.
 
-### How many days can you overstay before you are banned?
+### Can I get a visa again after an overstay?
 
-There is no universal number, and the EU deliberately refuses to set one: Article 11(2) of the Return Directive requires the ban length to be assessed on the individual case. The published thresholds that do exist are national: the Dutch one-year band starting above 3 days, over 90 days in Thailand's surrender column, and over 180 days for the US 3-year bar.
+Usually, once any ban has run out. US bars last three or ten years from departure, and EU bans are capped at five years in principle. A past overstay does make the next application harder to win, in much the same way as [a refusal on your record](/guides/visa-refused-what-happens-next).
 
-### What is the 3-year bar and the 10-year bar?
+### Do I have to declare a past overstay?
 
-Under 8 U.S.C. 1182(a)(9)(B), more than 180 days but less than a year of unlawful presence plus a voluntary departure before proceedings gives a 3-year bar; a year or more gives a 10-year bar with no voluntary-departure element. Both are measured on a single stay, per USCIS. The clock runs from your departure; the bar itself only bites at your next application for admission.
-
-### Does an overstay cancel my visa automatically?
-
-In the United States, yes, for an admission to a date certain. INA 222(g) voids a nonimmigrant visa "beginning after the conclusion of" the authorised period of stay, and readmission normally requires a new visa issued in your country of nationality. We found no other country that voids the visa by statute the way INA 222(g) does. Everywhere else we checked, cancellation is an officer's decision on the individual file.
-
-### Does an overstay in one Schengen country affect all of them?
-
-An entry ban does. Article 24(1) of Regulation (EU) 2018/1861 requires the issuing state to enter an alert for refusal of entry in the Schengen Information System, which every Schengen border post can see. A ban from one member state is enforced across all 29 Schengen states. Ireland sits outside Schengen and does not receive the refusal-of-entry alert.
-
-### Can you be deported for overstaying a visa?
-
-Yes, and several countries make it a criminal offence too: up to three years or ¥3 million in Japan under Article 70(1)(v), up to a year in Germany where no departure period was granted or it has expired, jail and caning in Singapore above 90 days. The ordinary outcome for a cooperative short overstayer is a fine and a departure, not a prosecution.
-
-### How much is the fine for overstaying a visa?
-
-In the US, there appears to be no fine at all for the overstay itself. Published figures elsewhere include 500 baht per day in Thailand (capped at 20,000 baht), AED 50 per day in the UAE, €501–€10,000 in Spain and up to RM10,000 in Malaysia, compoundable at RM3,000. Any "Schengen-wide" fine figure you see quoted is not traceable to any EU instrument.
-
-### Can I still get a visa in the future after an overstay?
-
-Usually, once the ban expires. The US bars run 3 or 10 years from departure, EU bans are capped at five years in principle, and the Netherlands can lift a one-year ban once half of it has passed, on request, if you left the EU voluntarily and independently within the set departure period and meet five further conditions. What a past overstay does is make the next application harder to win, which is the same territory as [a refusal on your record](/guides/visa-refused-what-happens-next).
-
-### Do I have to declare a past overstay on a visa application?
-
-We could not find a government page stating a universal declaration duty. The duty is created by the question on the form in front of you, not by the overstay, and a false answer is its own ground of refusal, separate from and worse than the thing you were hiding. Assume the record exists regardless: the EES automatically flags entry records with no matching exit, and entry bans are held as SIS alerts.`,
-  },
-  {
-    title: "How long does a visa take? Two clocks, not one",
-    slug: "how-long-does-a-visa-take",
-    excerpt:
-      "A Schengen visa must be decided in 15 calendar days. A UK visit visa is published at 3 weeks. Both clocks only start once your application is lodged and your biometrics are in, and one US embassy publishes 398 days just to reach that appointment.",
-    metaDescription:
-      "Visa processing times start only once your biometrics are in. The months go on the appointment queue before that. What the law guarantees, country by country.",
-    author: "isvisarequired.com",
-    tags: ["visa processing times", "schengen visa", "uk visa", "us visa", "administrative processing", "visa appointments", "travel authorisation"],
-    created_at: "2026-09-16",
-    updated_at: "2026-09-16",
+If the form asks, yes. The duty comes from the question in front of you rather than from the overstay, and a false answer is a separate ground for refusal that's worse than the thing you were hiding. Assume the record exists anyway, since the Entry/Exit System flags missing exits automatically and entry bans are held as alerts in the Schengen Information System.`,
     faq: [
       {
-        q: "How long does it take to get a visa appointment?",
-        a: "Anywhere from days to nearly two years, depending on the post. The US Embassy in Bogota publishes 398 days for a B1/B2 interview and 634 for applicants who are not resident in Colombia or Venezuela, while Bratislava publishes 16. Schengen is the exception that legislated the wait: Article 9(2) of the Visa Code says the appointment \"shall, as a rule, take place within a period of two weeks\".",
+        q: "What happens if I overstay my visa by one day?",
+        a: "It won't trigger a US re-entry bar, but if you were admitted until a set date it voids your US visa, and you'll normally need a new one issued in your country of nationality. In the Netherlands the one-year ban band starts above three days, and the IND doesn't say what applies at or below three. Elsewhere, expect a fine and an officer's discretion.",
       },
       {
-        q: "How long after the visa interview will I get my visa?",
-        a: "For Schengen, 15 calendar days from lodging, extendable to 45. For the US, there is no deadline in law at all, and no government source we could load publishes a routine post-interview issuance time.",
+        q: "Is there a grace period for overstaying a visa?",
+        a: "Not for short visitor stays in any country we checked. The UAE gives residents grace periods of up to six months, depending on their category, after a residence permit expires or is cancelled, but that isn't a margin for visitors. Even the Dutch three-day line only marks where the one-year ban band begins, and the overstay is still recorded.",
       },
       {
-        q: "How long does a visa take after biometrics?",
-        a: "That is precisely when the published clock starts. UKVI says it begins processing once you attend your appointment to give fingerprints and a photograph, so its published 3 weeks (or 12 for family routes) runs from that day. Schengen is the same in substance, because Article 19 makes biometrics part of what an admissible application requires. Repeat Schengen applicants may be exempt from giving them again under Article 13(3) if their prints are less than 59 months old in the Visa Information System.",
+        q: "Can I get a visa again after an overstay?",
+        a: "Usually, once any ban has run out. US bars last three or ten years from departure, and EU bans are capped at five years in principle. A past overstay does make the next application harder to win, in much the same way as [a refusal on your record](/guides/visa-refused-what-happens-next).",
       },
       {
-        q: "How long does administrative processing take?",
-        a: "No official source states a limit. The US Embassy in Panama says \"there is no estimate how long it may take\" and that cases can run beyond a year, after which they may be administratively closed unless you ask for them to remain open. The widely repeated \"60 days\" figure is not something we could confirm on any government page.",
-      },
-      {
-        q: "What is 221(g)?",
-        a: "Section 221(g) of the Immigration and Nationality Act, codified at 8 U.S.C. § 1201(g), is the provision under which a consular officer refuses a visa where the applicant appears ineligible or the application is incomplete. A 221(g) letter means your application is currently refused; it may be overcome if administrative processing completes in your favour. The statute sets no time limit.",
-      },
-      {
-        q: "How long does an ETA take?",
-        a: "The UK ETA costs £20 and is usually decided by email within a day, though it can take up to 3 working days. Australia's ETA is usually granted immediately, and the NZeTA averages 24 hours. These schemes are fast because they are automated and involve no interview or biometrics appointment.",
+        q: "Do I have to declare a past overstay?",
+        a: "If the form asks, yes. The duty comes from the question in front of you rather than from the overstay, and a false answer is a separate ground for refusal that's worse than the thing you were hiding. Assume the record exists anyway, since the Entry/Exit System flags missing exits automatically and entry bans are held as alerts in the Schengen Information System.",
       },
     ],
-    content: `A Schengen visa must be decided within 15 calendar days of lodging. A UK visit visa is published at 3 weeks. So how long does a visa take? Those numbers are honest and nearly useless, because both clocks only start once your application is lodged and your biometrics are in, which for most applicants means an in-person appointment, and the US Embassy in Bogota publishes 398 days just to reach a visa interview appointment.
+  },
+  {
+    title: "How long does a visa take? Start with the appointment",
+    slug: "how-long-does-a-visa-take",
+    excerpt:
+      "A Schengen visa must be decided in 15 calendar days and a UK visit visa is published at 3 weeks, but neither clock starts until your application is lodged and your biometrics are in. At one US embassy, the wait for that appointment is 398 days.",
+    metaDescription:
+      "Visa processing times only start after your appointment and biometrics. What Schengen, UK and US rules actually promise, and how to plan for the real wait.",
+    author: "isvisarequired.com",
+    tags: ["visa processing times", "schengen visa", "uk visa", "us visa", "administrative processing", "visa appointments"],
+    created_at: "2026-09-16",
+    updated_at: "2026-09-17",
+    cover: {
+      src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/St_Pancras_July_2015-1.jpg/1920px-St_Pancras_July_2015-1.jpg",
+      width: 1920,
+      height: 1243,
+      alt: "Two large antique station clocks, one black-faced and one white, side by side on blue ironwork at St Pancras.",
+      caption: "Two clocks, not one: the published decision time and the queue for an appointment run on separate schedules.",
+      credit: {
+        author: "Alvesgaspar",
+        authorUrl: "https://commons.wikimedia.org/wiki/User:Alvesgaspar",
+        license: "CC BY-SA 4.0",
+        licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:St_Pancras_July_2015-1.jpg",
+      },
+    },
+    content: `Say you've been invited to a wedding in the United States next spring, and you apply for a visitor visa through the US Embassy in Bogotá. Before anyone looks at your application you need an interview slot, and the embassy's page lists the wait for one at 398 days. The wedding will be over before you're through the door.
 
-The published figure measures adjudication. It does not measure the queue in front of adjudication, and at the worst US posts that queue is the bigger number by an order of magnitude. Both systems say so: the UK outright, in a heading on its own guidance page, and the EU through Article 23(1) of the Visa Code, which runs the 15 days only from an application admissible under Article 19.
+So how long does a visa take? If yours needs an in-person appointment, it's two waits added together. One is getting in the door. The other is the decision itself, and that's the only half anyone publishes: 15 calendar days for a Schengen visa, 3 weeks for a UK visit visa. Those figures are accurate. They just start later than most people assume.
 
-## When does the processing clock actually start?
+## When the processing clock starts
 
-UK Visas and Immigration puts a heading on it. Its guidance on [visa processing times for applications outside the UK](https://www.gov.uk/guidance/visa-decision-waiting-times-applications-outside-the-uk) contains the section "When your application processing time starts", and the answer is that UKVI begins processing once you either verify your identity using the UK Immigration: ID Check app, or "attend your appointment at a visa application centre (VAC) to provide your fingerprints and a photograph (biometric information)". Finding a slot and getting to the centre both sit outside the published 3 weeks entirely.
+UK Visas and Immigration puts a heading on it. Its [guidance on processing times](https://www.gov.uk/guidance/visa-decision-waiting-times-applications-outside-the-uk) says processing starts once you've either verified your identity with the UK Immigration: ID Check app or attended a visa application centre for fingerprints and a photograph. Finding a slot and getting to the centre come first, and neither counts.
 
-Schengen reaches the same place through its statute rather than its guidance. Article 23(1) of the [EU Visa Code, Regulation (EC) No 810/2009](https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02009R0810-20240628) says applications "shall be decided on within 15 calendar days of the date of the lodging of an application which is admissible in accordance with Article 19". Article 19 defines admissibility to require that "the biometric data of the applicant have been collected" and "the visa fee has been collected". Both happen at the appointment. So the 15 days cannot, as a matter of construction, cover the wait to get one.
+Schengen gets there through its statute rather than its guidance. The 15 days run from the lodging of an admissible application, and an application isn't admissible until your biometrics and the visa fee have been collected. Both happen at the appointment.
 
-One exception worth knowing if you are a repeat applicant: Article 13(3) provides that fingerprints entered in the Visa Information System for the first time less than 59 months before a new application "shall be copied to the subsequent application", so you may not need to give them again.
+Other countries use the phrase "processing time" for different things, which makes comparisons slippery. Canada publishes the time it took to process 80% of past applications of that type. For a visitor visa from outside Canada, IRCC says its figure covers most complete applications and leaves out the time you need to give your biometrics. New Zealand publishes both a median and an 80th percentile in working days, which is more honest and no easier to plan with. Australia doesn't pretend at all. Its guide, it says, doesn't guarantee a decision within the timeframe.
 
-## How long does a Schengen visa take to process?
 
-Fifteen calendar days, extendable to 45. Article 23(2) allows the extension "in individual cases, notably when further scrutiny of the application is needed". On its face "notably" introduces an example rather than closing the list, but the Commission's own Visa Code Handbook I restates the rule as allowing the extension "in individual cases, where further scrutiny of the application is necessary", so expect it to be used for that. Article 23(2a), inserted by [Regulation (EU) 2019/1155](https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32019R1155), adds a rule that most summaries omit: "Applications shall be decided on without delay in justified individual cases of urgency."
+![High-rise towers of Bogotá's Santa Fe district under bright cumulus cloud, seen across low city rooftops.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Bogot%C3%A1%2C_Santa_Fe%2C_2023-06_CN-02.jpg/1280px-Bogot%C3%A1%2C_Santa_Fe%2C_2023-06_CN-02.jpg#1280x730)
 
-If you find a page quoting **60 days** for a Schengen visa, it is citing repealed law. The old Article 23(3) was deleted by the 2019 reform, and the consolidated text now shows only a deletion marker where it stood.
+*Bogotá, where the US embassy publishes 398 days just to reach a B1/B2 interview, and 634 for non-residents. Photo: [© Steffen Schmitz (Carschten)](https://commons.wikimedia.org/wiki/User:Carschten) / [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Bogot%C3%A1,_Santa_Fe,_2023-06_CN-02.jpg).*
 
-The European Commission's own [guidance on applying for a Schengen visa](https://home-affairs.ec.europa.eu/policies/schengen-borders-and-visa/visa-policy/applying-schengen-visa_en) restates the rule as "15 days", extendable "to up to 45 days". It drops the word *calendar* and recasts a legal deadline as a "normal processing time".
+## How long a Schengen visa takes
 
-## The rule nobody quotes: Schengen also regulated the appointment
+The [EU Visa Code](https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02009R0810-20240628) gives consulates 15 calendar days to decide. In individual cases it can be extended to 45 — the law gives further scrutiny as the example, not the only ground. Justified urgent cases are supposed to be decided without delay.
 
-Article 9(2) of the Visa Code: "Applicants may be required to obtain an appointment for the lodging of an application. The appointment shall, as a rule, take place within a period of two weeks from the date when the appointment was requested."
+If a website tells you a Schengen visa can take 60 days, it's quoting law that no longer exists. That provision was deleted in a 2019 reform.
 
-Two weeks, in law, for the thing everyone else leaves unmeasured. It is weak law: "as a rule" carries a great deal of weight, no remedy is stated, and we could find no Member State publishing a compliance rate against it. But the EU is the one system that put a number on the queue itself. Article 9(3) goes further: in justified cases of urgency the consulate "may allow applicants to lodge their applications either without appointment, or an appointment shall be given immediately". That is a stated route rather than a matter of goodwill, though the consulate decides what counts as a justified urgency, and, like Article 9(2), the provision carries no remedy; the Commission's handbook says that in such cases "an appointment should be given immediately or direct access to the consulate for submitting the application should be allowed".
+The more useful rule is about the appointment, and it rarely gets a mention. Article 9(2) of the Visa Code says the appointment "shall, as a rule, take place within a period of two weeks from the date when the appointment was requested". "As a rule" carries a lot of weight there, and the law names no remedy if a consulate misses it. Even so, this is the only system covered here that puts a number on the queue itself, and if you're offered a slot far beyond two weeks, it's a sentence worth quoting politely.
 
-Article 9(1) sets both edges of the window: no more than six months before travel, and as a rule no later than 15 calendar days before it.
+Urgency has its own route. In justified urgent cases the consulate may let you lodge your application without an appointment, or give you one immediately. The consulate decides what counts as urgent, so be ready to explain why yours is.
 
-## How long does it take to get a US visa appointment?
+The window has two edges: no more than six months before you travel, and as a rule no later than 15 calendar days before.
 
-It depends almost entirely on which building you are queuing at. Two official embassy pages, both live when we checked them on 15 September 2026:
+## How long a UK visa takes
 
-| Category | Bratislava | Bogota |
+The Home Office publishes 3 weeks for most visit, study and work visas applied for from outside the UK. Family routes — partner or spouse, parent, child, and adult coming to be cared for by a relative — are 12 weeks, and so is British National (Overseas). The tidiness of those numbers tells you what they are. They're service targets rather than measurements, and how often they're met is published separately, in the Home Office's quarterly transparency data.
+
+The weeks are UK working weeks, Monday to Friday, and they include UK public holidays but not public holidays in other countries. The guidance doesn't say which way a holiday moves your date, so leave slack around them. Applying from inside the UK is a different scheme again, and a slower one. A Standard Visitor application made in-country has an 8-week standard, against 3 weeks from outside.
+
+The UK sells speed openly. [Priority services](https://www.gov.uk/faster-decision-visa-settlement) cost £500 for a decision within 5 working days and £1,000 for one by the end of the next working day, counted from the day of your appointment if you prove your identity in person. On a Family visa from outside the UK, priority buys 30 working days rather than 5. If the decision runs late, you won't usually get your money back. The fee shortens the decision but does nothing about the appointment in front of it, so priority is only worth buying once you have a slot.
+
+## The US: it depends which embassy
+
+Which building you queue at decides almost everything. Two official embassy pages, as they stood on 15 September 2026:
+
+| Category | Bratislava | Bogotá |
 |---|---|---|
 | Visitor (B1/B2), interview required | 16 days | 398 days |
 | Students and exchange visitors (F, M, J) | 16 days | 20 days |
-| Petition-based workers (H, L, O, P) | 16 days | 24 days |
 | Non-residents of Colombia or Venezuela | not published | 634 days |
 | Interview waiver | 7 days | 4 days |
 
-Same visa, same adjudication, a wait that differs by a factor of 25. [Bratislava's figures](https://sk.usembassy.gov/visa-appointment-wait-time/) were last updated on 8 September 2026 and apply to residents and citizens of Slovakia. [Bogota's](https://co.usembassy.gov/visas/bogota-nonimmigrant-visa-wait-times/) carry no visible date and the page's embedded modification stamp reads 14 April 2025, so treat them as roughly seventeen months old. The US Embassy in Canada separately tells applicants who are [not resident in Canada](https://ca.usembassy.gov/consular-services/) to "anticipate a wait time of approximately 600 calendar days for an appointment", on a page stamped June 2025.
+Same visa, a wait 25 times longer. [Bratislava's figures](https://sk.usembassy.gov/visa-appointment-wait-time/) were updated on 8 September 2026 and apply to residents and citizens of Slovakia. [Bogotá's](https://co.usembassy.gov/visas/bogota-nonimmigrant-visa-wait-times/) carry no visible date, and the page's own modification stamp reads 14 April 2025, so treat them as roughly seventeen months old.
 
-The non-resident figures are not an accident of demand. [8 U.S.C. § 1202(h)](https://www.govinfo.gov/content/pkg/USCODE-2023-title8/html/USCODE-2023-title8-chap12-subchapII-partIII-sec1202.htm) requires an in-person interview of every applicant aged 14 to 79 unless the requirement is waived, with the waiver authority sitting in the same subsection, and requires one regardless of age where the applicant is applying in a country where they are neither a national nor a resident, or was previously refused a visa, unless that refusal was overcome or a waiver of ineligibility obtained. Congress built the queue into the statute.
+US law requires an in-person interview for applicants aged 14 to 79 unless it's waived, and for applicants of any age who are applying in a country where they're neither a national nor a resident, or who were previously refused a visa (unless that refusal was overcome or a waiver of ineligibility obtained). The non-resident figures therefore aren't an accident of demand — Congress built that queue into the statute.
 
-It then got longer. A [State Department notice effective 1 October 2025](https://cr.usembassy.gov/interview-waiver-update-september-18-2025/) narrowed interview waivers sharply: all applicants, "including applicants under the age of 14 and over the age of 79", now generally need an interview, with the exceptions reduced mainly to diplomatic categories and B1/B2 or H-2A renewals within 12 months of expiry. Every applicant who would previously have skipped the interview now joins the queue Bogota measures in hundreds of days. Embassy sites mirror these notices and go stale: Manila still carried the superseded July version on 15 September 2026.
+A [State Department notice effective 1 October 2025](https://cr.usembassy.gov/interview-waiver-update-september-18-2025/) narrowed interview waivers sharply. All applicants, including those under 14 and over 79, now generally need an interview, and the exceptions are mainly diplomatic categories and B1/B2 or H-2A renewals within 12 months of expiry. Anyone who would once have skipped the interview now joins the queue Bogotá measures in hundreds of days. Embassy websites copy these notices and don't always keep up, and Manila's still showed the superseded July version months later.
 
-The State Department's central wait-times tool at travel.state.gov is the canonical source for these numbers, but it refused automated access on 15 September 2026, so every US figure here comes from an individual embassy's own page. That is also [how we source everything else](/methodology).
+If you do qualify for a waiver, it's the thing that genuinely collapses a US wait, which is why Bogotá shows 4 days against 398. Even that isn't guaranteed. The US Mission in Spain says waiver processing takes about three weeks and that "we may still require you to attend an interview".
 
-## How long does a UK visa take?
+You can ask for an expedited appointment, but the US Embassy in Santo Domingo, for one, only takes requests after you've paid the non-refundable MRV fee and booked a regular slot, which it warns may be more than a year in the future. Expedited appointments are at the consular section's discretion, the qualifying grounds are narrow and set post by post, and a refusal can't be appealed.
 
-Three weeks for most visit, study and work routes. Twelve weeks for family routes — partner or spouse, parent, child, and adult coming to be cared for by a relative — and 12 weeks again for British National (Overseas), which gov.uk lists separately under other visas and permits. The uniformity is the tell: this is a service target, not a measurement.
+## Why is my US visa taking so long?
 
-Two details that eat the margin. UKVI says its weeks "are based on the UK working week (Monday to Friday) and include public holidays in the UK" but "do not include public holidays in other countries"; the page never says which way a holiday moves your date, and its own change log describes the wording as a clarification that "processing times do not include bank holidays", so leave slack for holidays.  And applying from inside the UK is a different scheme altogether: UKVI's [customer service standards for visitors and transit](https://www.gov.uk/government/publications/visitors-and-transit-customer-service-standards/visitors-and-transit-customer-service-standards) give a Standard Visitor application 8 weeks in-country against 3 weeks out.
+If your case has gone into administrative processing, the unwelcome answer is that no deadline exists. The US law behind administrative processing letters is a refusal rule, and nothing in it sets a time limit for a decision.
 
-Unlike Canada, New Zealand and Australia, the Home Office attaches no percentage to these standards. No "90% within". We read the standards document looking for one; there isn't a figure in it.
+The US Embassy in Panama doesn't pretend otherwise. Its page on [administrative processing](https://pa.usembassy.gov/visas/administrative-processing/) says "there is no estimate how long it may take". In rare cases it runs beyond a year, and after a year a case may be administratively closed unless you ask for it to stay open. If you're getting close to that mark and still want the visa, ask.
 
-## "Processing time" is not one kind of number
+The [US Embassy in Ankara](https://tr.usembassy.gov/what-is-the-administrative-processing-system/) asks applicants to wait at least 180 days from the interview, or from when they submitted supplemental documents if that's later, before enquiring about status. Emergency travel is the exception, which it defines as serious illnesses, injuries or deaths in the immediate family. That 180 days is when the embassy will take your question, not when you'll get an answer.
 
-Six systems, six different things behind the same phrase:
+You'll see "most cases resolve within 60 days" repeated on commercial visa sites. Panama's embassy won't give any estimate at all, so don't book anything around that number.
 
-| System | What the published number is |
-|---|---|
-| Schengen | A legal deadline: 15 calendar days, extendable to 45 |
-| UK | A flat service target; the hit rate is published separately, in quarterly Home Office transparency data |
-| Canada | The time taken to process **80%** of past applications of that type |
-| New Zealand | Two figures: the median (50%) and the 80th percentile, in working days |
-| Australia | Recently decided applications, with an express no-guarantee disclaimer |
-| India (e-Visa) | Nothing. The portal publishes no decision time at all |
 
-[IRCC](https://www.canada.ca/en/immigration-refugees-citizenship/services/application/check-processing-times.html) is explicit that its clock "starts the day we receive your complete application", that for a visitor visa applied for from outside Canada its number "tells you how long it took us to process most complete applications in the past" and does not include "the time you need to give your biometrics", so, like the UK's, it leaves the biometrics step off the clock (IRCC's forward-looking forecasts, which do count biometrics, cover other programs such as permanent residence). Canada also publishes its own hidden months, in a line most applicants never reach: add 3 to 4 months for mailing if you are applying from outside Canada and the US.
+![Empty historic post office lobby in one-point symmetry: three walls of numbered metal PO box doors above a grey marble wainscot, a Greek-key mosaic tile floor, and a coffered mahogany ceiling with milk-glass skylight panels](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/PO_boxes_at_the_historic_Chico_Post_Office_%282024%29-L1005460.jpg/1920px-PO_boxes_at_the_historic_Chico_Post_Office_%282024%29-L1005460.jpg#1920x1371)
 
-[Immigration New Zealand](https://www.immigration.govt.nz/process-to-apply/waiting-for-a-visa/processing-a-visa-application/how-long-it-takes-to-process-an-application/visitor-visa-and-nzeta-wait-times/) publishes the most honest methodology of any system here, and its figures show why a single number lies: a Visitor Visa averages 1 week, while the Partner of a New Zealander variant averages 6. [Australia](https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-processing-times/global-visa-processing-times) states that its guide "does not guarantee that applications will be decided within the timeframe". And the [Indian e-Visa portal](https://indianvisaonline.gov.in/evisa/tvoa.html) tells you to apply a minimum of 4 days in advance and no more than 120, then never says how long a decision takes. The fee is non-refundable whether you are granted or rejected.
+*A visa file spends most of its life like this: numbered, closed, and indistinguishable from thousands of others, which is why published processing times are averages rather than promises. Photo: [© Frank Schulenburg](https://commons.wikimedia.org/wiki/User:Frank_Schulenburg) / [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:PO_boxes_at_the_historic_Chico_Post_Office_(2024)-L1005460.jpg).*
 
-## Why is my visa taking so long?
+## How to plan around the wait
 
-If you are waiting on a US case, the honest answer is that no deadline exists. [8 U.S.C. § 1201(g)](https://www.govinfo.gov/content/pkg/USCODE-2023-title8/html/USCODE-2023-title8-chap12-subchapII-partIII-sec1201.htm), the provision behind every "administrative processing" letter, is a refusal rule. Read the whole section and there is no decision deadline anywhere in it.
+Start by checking whether you need a visa at all. [The checker](/) covers 195 passports and answers that in one screen. If you do need one, look up the appointment wait at the specific embassy or consulate you'll use, add the published processing time, and treat the total as your minimum. For US visas the State Department's wait-times tool at travel.state.gov is the main source, but check the date on whatever page you're reading.
 
-The embassies say so plainly. The US Embassy in Panama's page on [administrative processing](https://pa.usembassy.gov/visas/administrative-processing/) states: "Administrative processing can take time; there is no estimate how long it may take." It adds that in rare cases it runs beyond a year, and that a case may be administratively closed after a year unless you ask for it to stay open. The [US Embassy in Ankara](https://tr.usembassy.gov/what-is-the-administrative-processing-system/) asks applicants to wait at least 180 days from the date of interview or submission of supplemental documents, whichever is later, before enquiring about status, except in cases of emergency travel, which it defines as serious illnesses, injuries or deaths in the immediate family. That 180 days is not a deadline; it is the point at which the government will take your question.
+For Schengen, the six-month limit on how early you can apply means the window at a slow post is genuinely tight. Our [guide to how early to apply](/guides/how-early-to-apply-for-a-visa) works through the sums route by route. If you're visiting the UK without needing a visa, the [UK ETA page](/travel-authorization/uk-eta) explains the much faster authorisation you may need instead.
 
-You will see "most cases resolve within 60 days" repeated across commercial pages, attributed to travel.state.gov. We could not load that page, and the embassy page we did load declines to give any estimate at all. Do not plan around the 60.
-
-## Can you pay for a faster visa?
-
-The UK sells speed openly, and the price list shows exactly what is and is not for sale. Its [priority services](https://www.gov.uk/faster-decision-visa-settlement) cost £500 for a decision "within 5 working days" and £1,000 for one "by the end of the next working day". The clock starts "the day of your appointment, if you prove your identity in person". Priority on a Family visa from outside the UK buys 30 working days rather than 5, on the route that already carries the 12-week standard. And "if the decision takes longer, you will not usually get your money back".
-
-Money compresses the adjudication. It does not touch the queue in front of it.
-
-The US has no equivalent at the decision stage. An [expedited appointment](https://do.usembassy.gov/expedited-nonimmigrant-visa-appointments/) can only be requested after you have paid the non-refundable MRV fee and booked a regular slot that "may be more than a year in the future"; expedited appointments "are not guaranteed and will only be granted at the Consular Section's discretion"; and if refused, "the decision cannot be appealed". Qualifying grounds are narrow and set post by post; Santo Domingo's include urgent medical care for the applicant or their minor child, the death, grave illness or life-threatening accident of an immediate relative in the US, urgent business travel, an unexpected visit of significant cultural, political, journalistic, sporting or economic importance, and, for Dominican residents seeking a B1/B2 visa, an ESTA denial.
-
-What genuinely collapses a US wait is qualifying for an interview waiver, which is why Bogota shows 4 days against 398. Even then it is conditional: the [US Mission in Spain](https://es.usembassy.gov/visas/interview-waiver/) says waiver processing takes about three weeks and that "we may still require you to attend an interview".
-
-What does not work: reapplying (Panama, on a case in administrative processing: "submitting a new visa application will not expedite your case") or calling (IRCC: "Calling us won't help your application get processed faster").
-
-## The fast systems are fast by design
-
-The [UK ETA](https://www.gov.uk/eta/apply) costs £20 and you will "usually get a decision by email within a day", though it "can take up to 3 working days". The reason is structural, and the Home Office's own [caseworker guidance](https://www.gov.uk/government/publications/electronic-travel-authorisation-caseworker-guidance/electronic-travel-authorisation-caseworker-guidance-accessible) states it: the process "is designed to be automated insofar as possible", and "there is no right to administrative review or appeal against a decision made on an ETA application". Australia's [subclass 601 ETA](https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/electronic-travel-authority-601) tells applicants the result comes "immediately" in most cases. The NZeTA averages 24 hours.
-
-No interview, no biometrics appointment, no human in the default path. There is no queue to hide, so the published figure means what it says. Our guide to the difference between [visas on arrival, eVisas and travel authorisations](/guides/visa-on-arrival-vs-evisa-vs-eta) sets out which is which, and the [UK ETA page](/travel-authorization/uk-eta) covers who needs one.
-
-## Plan backwards from the appointment
-
-Check first whether you need a visa at all: [the checker](/) covers 195 passports against every destination and will tell you in one screen whether the trip needs anything. If you do need one, look up the appointment wait at the specific post you will use, add the published processing time to it, and treat the sum as your minimum. Schengen caps your lead time at six months, so for a bad post the planning window is genuinely tight. Our [guide to how early to apply](/guides/how-early-to-apply-for-a-visa) works through the arithmetic route by route.
-
-The US Embassy in Bratislava gives the only planning rule that survives all of this: no flights until the visa is in the passport.
+The US Embassy in Bratislava offers the one planning rule that survives all of this: no flights until the visa is in the passport.
 
 ## Common questions
-
-### How long does it take to get a visa appointment?
-
-Anywhere from days to nearly two years, depending on the post. The US Embassy in Bogota publishes 398 days for a B1/B2 interview and 634 for applicants who are not resident in Colombia or Venezuela, while Bratislava publishes 16. Schengen is the exception that legislated the wait: Article 9(2) of the Visa Code says the appointment "shall, as a rule, take place within a period of two weeks".
-
-### How long after the visa interview will I get my visa?
-
-For Schengen, 15 calendar days from lodging, extendable to 45. For the US, there is no deadline in law at all, and no government source we could load publishes a routine post-interview issuance time.
 
 ### How long does a visa take after biometrics?
 
-That is precisely when the published clock starts. UKVI says it begins processing once you attend your appointment to give fingerprints and a photograph, so its published 3 weeks (or 12 for family routes) runs from that day. Schengen is the same in substance, because Article 19 makes biometrics part of what an admissible application requires. Repeat Schengen applicants may be exempt from giving them again under Article 13(3) if their prints are less than 59 months old in the Visa Information System.
+That's when the published clock starts. For the UK, the 3 weeks (or 12 for family routes) run from your biometrics appointment, and for Schengen the 15 calendar days run from lodging an application whose biometrics have been collected. If you've applied for a Schengen visa before, fingerprints first entered in the Visa Information System less than 59 months earlier are copied across, so you may not need to give them again.
 
-### How long does administrative processing take?
+### What does a 221(g) letter mean?
 
-No official source states a limit. The US Embassy in Panama says "there is no estimate how long it may take" and that cases can run beyond a year, after which they may be administratively closed unless you ask for them to remain open. The widely repeated "60 days" figure is not something we could confirm on any government page.
-
-### What is 221(g)?
-
-Section 221(g) of the Immigration and Nationality Act, codified at 8 U.S.C. § 1201(g), is the provision under which a consular officer refuses a visa where the applicant appears ineligible or the application is incomplete. A 221(g) letter means your application is currently refused; it may be overcome if administrative processing completes in your favour. The statute sets no time limit.
+Section 221(g) of the US Immigration and Nationality Act lets a consular officer refuse a visa where the applicant appears ineligible or the application is incomplete. A 221(g) letter means your application is refused for now, though that may be overcome if administrative processing ends in your favour. The law sets no time limit on it.
 
 ### How long does an ETA take?
 
-The UK ETA costs £20 and is usually decided by email within a day, though it can take up to 3 working days. Australia's ETA is usually granted immediately, and the NZeTA averages 24 hours. These schemes are fast because they are automated and involve no interview or biometrics appointment.`,
+The UK ETA costs £20 and you'll usually get a decision by email within a day, though it can take up to 3 working days. Australia's ETA is granted immediately in most cases, and the NZeTA averages 24 hours. They're quick because they're automated, with no interview or biometrics appointment.
+
+### Will reapplying or calling speed up my visa?
+
+Not according to the governments that address it. The US Embassy in Panama says submitting a new application won't expedite a case that's in administrative processing, and Canada's immigration department says calling won't get an application processed faster.`,
+    faq: [
+      {
+        q: "How long does a visa take after biometrics?",
+        a: "That's when the published clock starts. For the UK, the 3 weeks (or 12 for family routes) run from your biometrics appointment, and for Schengen the 15 calendar days run from lodging an application whose biometrics have been collected. If you've applied for a Schengen visa before, fingerprints first entered in the Visa Information System less than 59 months earlier are copied across, so you may not need to give them again.",
+      },
+      {
+        q: "What does a 221(g) letter mean?",
+        a: "Section 221(g) of the US Immigration and Nationality Act lets a consular officer refuse a visa where the applicant appears ineligible or the application is incomplete. A 221(g) letter means your application is refused for now, though that may be overcome if administrative processing ends in your favour. The law sets no time limit on it.",
+      },
+      {
+        q: "How long does an ETA take?",
+        a: "The UK ETA costs £20 and you'll usually get a decision by email within a day, though it can take up to 3 working days. Australia's ETA is granted immediately in most cases, and the NZeTA averages 24 hours. They're quick because they're automated, with no interview or biometrics appointment.",
+      },
+      {
+        q: "Will reapplying or calling speed up my visa?",
+        a: "Not according to the governments that address it. The US Embassy in Panama says submitting a new application won't expedite a case that's in administrative processing, and Canada's immigration department says calling won't get an application processed faster.",
+      },
+    ],
   },
   {
-    title: "How much does a visa cost? The full bill, not the fee",
+    title: "How much does a visa actually cost? The full bill",
     slug: "what-a-visa-actually-costs",
     excerpt:
-      "A Schengen visa is €90 by law and €116 before you have bought anything optional. A US visitor visa is US$185, or US$935 if you want a faster interview. Here is what the fee schedules leave out.",
+      "A Schengen visa is €90 by law, or €116 once a US application centre adds its fee. A US visitor visa is US$185, or US$935 if you pay for a faster interview.",
     metaDescription:
-      "The headline fee is rarely the whole bill. Schengen, US, UK and eVisa routes priced from government fee to final total, with the lines each page leaves out.",
+      "A Schengen visa is €90 and a US visitor visa US$185, but service centres, fast-track fees and surcharges add more. The real bill, and what gets refunded.",
     author: "isvisarequired.com",
     tags: ["visa fees", "visa costs", "schengen visa", "us visas", "uk visas"],
     created_at: "2026-09-16",
-    updated_at: "2026-09-16",
-    faq: [
-      {
-        q: "How much can a visa cost?",
-        a: "The largest published government fees in the schedules we read are the UK's £3,635 for a Route to Settlement application by an other dependant relative and £3,226 for indefinite leave to remain (indefinite leave applications do not pay the immigration health surcharge), and Thailand's 50,000 baht LTR issuance fee. For a visitor visa, the highest single-government fee we found is the UK's £1,128 for a ten-year visit visa; the highest US figure is US$935: the US$185 application fee plus the US$750 expedited-appointment fee.",
+    updated_at: "2026-09-17",
+    cover: {
+      src: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Passports_on_table.jpg/1920px-Passports_on_table.jpg",
+      width: 1920,
+      height: 1280,
+      alt: "Two navy United States passports lying overlapped on a pale weathered wooden tabletop, seen from above.",
+      caption: "The passport is the cheap part. The visa inside it is where the fee schedules start.",
+      credit: {
+        author: "Kristin Hardwick",
+        authorUrl: "https://stocksnap.io/author/kristinhardwick",
+        license: "CC0",
+        licenseUrl: "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:Passports_on_table.jpg",
       },
-      {
-        q: "How much is a Schengen visa?",
-        a: "€90 for an adult, set by Article 16(1) of the Visa Code, €45 for a child aged six to eleven, and nothing for under-sixes, students travelling to study, researchers travelling for scientific research and a few other categories. Add up to €45 for the outsourced application centre, which is charged even when the visa fee is waived.",
-      },
-      {
-        q: "How much does a 10-year Schengen visa cost?",
-        a: "The same €90. The Visa Code prices the application, not the validity: Article 16 provides only for the reduced and waived categories and the €135/€180 readmission provision, with no tier for multi-entry or long-validity visas.",
-      },
-      {
-        q: "What is the total cost of applying for a Schengen visa from the UK?",
-        a: "The government half is €90, charged in sterling at the consulate's own conversion rate. EU law caps the application centre's service fee at €45, and courier, SMS and photograph charges sit outside that cap and are published per centre rather than nationally.",
-      },
-      {
-        q: "Do I get a refund if my visa is refused?",
-        a: "No. The Visa Code refunds the fee in two situations only — wrong consulate, or an application ruled inadmissible and never examined — and refusal is neither. The State Department's answer opens with one word: \"No.\" The UK is the partial exception: the immigration health surcharge, though not the application fee, is refunded in full on refusal.",
-      },
-      {
-        q: "Do I need to pay the visa fee again after refusal?",
-        a: "For a US visa, yes: you file a new application and pay the fee again, with one exception. A 221(g) refusal for missing documents can be re-assessed on the original fee if you supply what is missing within one year of the refusal; after that year, or after a 214(b) refusal, you reapply and pay again.",
-      },
-      {
-        q: "Why does a US visa cost more than US$185?",
-        a: "Two other federal charges can land on the same trip. A State Department temporary final rule in force from 1 July to 31 December 2026 charges US$750 for an expedited B1/B2 interview appointment at selected posts, and F and M students pay a US$350 I-901 SEVIS fee to Immigration and Customs Enforcement, which is separate from the visa fee and paid to a different department.",
-      },
-      {
-        q: "Do tourists have to pay US$250 to enter the US?",
-        a: "Congress enacted a US$250 Visa Integrity Fee in July 2025 that cannot be waived or reduced, but USCIS deferred implementation pending cross-agency coordination and nothing has been published since. No State Department or embassy page tells an applicant how or when to pay it.",
-      },
-      {
-        q: "How much is the visa service fee?",
-        a: "Between €22 and €32.10 on the routes we checked, capped by EU law at €45, or in principle €80 (exceptionally €120) where the Member State has no consulate in your country and is not represented there by another Member State. It is separate from the visa fee, paid to a private contractor, and in at least one published case marked non-refundable.",
-      },
-    ],
-    content: `Between nothing and well over US$1,000 per application (the UK charges £1,128 for a ten-year visit visa), and the government's headline fee is rarely the whole bill. A Schengen visa is €90 by law; lodged for Norway through VFS Global in the United States, it is €116 before you buy anything optional. A US visitor visa is US$185, or US$935 with the State Department's new fee for a faster interview. No single government page adds it up.
+    },
+    content: `Say you live in the United States and you're applying for a Schengen visa to spend a week in Norway. The visa fee is €90, set by EU law. Then the application centre adds its own charge, and offers you courier delivery, photographs and text-message updates on top of that.
 
-The split is not a conspiracy; it is four agencies billing separately. The issuing government publishes its fee. The company that takes your fingerprints publishes its charges on a different website. A fee for a faster appointment sits in a third schedule, and the student registration fee belongs to a fourth agency in another department. Every one of those pages is accurate. None of them adds up.
+Visas run from nothing to well over US$1,000 an application. The UK charges £1,128 for a ten-year visit visa. The headline fee is rarely what leaves your account, though. The issuing government publishes its price, the company that takes your fingerprints lists its charges on a different website, fast-track fees sit in another schedule, and US student visas come with a fee owed to a separate agency. Every one of those pages is accurate, and none of them adds it up for you.
 
-## What a Schengen visa costs once you include the counter
+Four common applications, with the second charge added. The totals are our arithmetic, not a government's.
 
-Article 16(1) of the [EU Visa Code, Regulation (EC) No 810/2009](https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02009R0810-20240611) is one sentence: "Applicants shall pay a visa fee of EUR 90." It became €90 on 11 June 2024 under [Commission Delegated Regulation (EU) 2024/1415](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32024R1415), up from €80. Article 16(9) obliges the Commission to reassess the figure every three years against Eurostat inflation and Member State civil-service salaries, so a further rise is a matter of timing.
+| Application | Government fee | Second charge | Total |
+|---|---|---|---|
+| Norway short-stay visa, applied for in the US | €90 | €26 service fee | €116, or €192.50 with courier in the city, photos and SMS |
+| US B1/B2 visitor visa with an expedited interview | US$185 | US$750 expedite fee | US$935 |
+| US F-1 student visa | US$185 | US$350 SEVIS fee | US$535 |
+| Canadian visitor visa, one adult | CAD 100 | CAD 85 biometrics | CAD 185 |
 
-Children aged six to under twelve pay €45. Under-sixes pay nothing, and so do school pupils, students, postgraduates, accompanying teachers, researchers travelling for research, and non-profit representatives aged 25 or under (Article 16(4)).
+## What a Schengen visa really costs
 
-Then the second bill starts. Article 17(1) lets an external service provider charge you, and Article 17(4) caps that charge at half the Article 16(1) fee — €45 — "irrespective of the possible reductions in or exemptions from the visa fee". A student whose government fee is legally zero still pays the contractor. Where the competent Member State has no consulate collecting applications in your country and is not represented there by another Member State, the service fee should in principle not exceed €80 (Article 17(4a)), and in exceptional circumstances €120 (Article 17(4b)), which the Member State must notify to the Commission at least three months before it takes effect, specifying the detailed costs behind it.
+Under [EU visa rules](https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02009R0810-20240611) the fee is €90 for an adult. It went up from €80 on 11 June 2024, and the European Commission has to reassess it every three years, so don't treat €90 as permanent. Children aged six to under twelve pay €45 and under-sixes pay nothing. School pupils and students travelling to study, researchers travelling for research and a few other groups are exempt.
 
-The cap binds the service fee and nothing else. That is where the money now sits. For a Norwegian visa applied for in the United States, [VFS Global's published service charge](https://visa.vfsglobal.com/usa/en/nor/news/vfs-service-charges) is €26, marked non-refundable. Its [additional services menu for the same route](https://visa.vfsglobal.com/usa/en/nor/additional-services) prices courier at €52 within the city, €63 outside it, four photographs at €17.50 and SMS updates at €7. Courier alone is 58% of the government fee again. VFS states on the page that these extras "have no bearing on expediting your visa process or favourable decision-making", which is both true and the whole point: they are legal, disclosed, and aggregated nowhere.
+The second bill comes from the application centre. EU law caps its service fee at €45, half the visa fee, and the cap applies even when your visa fee has been waived, so a student who owes the consulate nothing still pays the contractor. In principle the cap rises to €80, or exceptionally €120, where the country you're applying to has no consulate collecting applications in yours and no other Schengen country represents it there.
 
-In India the menu is longer. For [a Hungarian visa lodged in India](https://visa.vfsglobal.com/ind/en/hun/additional-services) the same provider sells Form Filling Assistance at INR 2,000, a Premium Lounge at INR 2,928, and "Prime time Collection" — Saturday and extended-hours passport pickup — at INR 554, though the description of that service on the same page quotes INR 585.
+The same contractor charges what it likes by country: €26 for a Norwegian visa lodged in the US, [€22 in India and €32.10 in Nepal](https://visa.vfsglobal.com/ind/en/fra/fees) for the identical French visa.
 
-The service fee itself is not one number either. VFS charges [€22 in India and €32.10 in Nepal](https://visa.vfsglobal.com/ind/en/fra/fees) for the identical French visa, against €26 for Norway from the USA and one unchanging €90 underneath. Article 17(5) says a Member State "may maintain" the option of lodging directly at its consulate. May, not must: the common advice to skip the outsourcer assumes a choice EU law does not require any Member State to offer.
+The cap binds the service fee and nothing else, which is where the rest of your money goes. On the Norway route from the US, the [optional extras](https://visa.vfsglobal.com/usa/en/nor/additional-services) include courier delivery at €52 within the city or €63 outside it, four photographs at €17.50 and SMS updates at €7. VFS says on that page that none of them has any bearing on how fast or how favourably your visa is decided, so buy them only if you'd use them anyway. Courier alone is more than half the government fee again.
 
-Nor does €90 land on your card as €90. Article 16(7) requires the fee to be charged in euro or local currency at the European Central Bank reference rate, and permits rounding up. The [Consulate General of Italy in Los Angeles](https://conslosangeles.esteri.it/en/servizi-consolari-e-visti/servizi-per-il-cittadino-straniero/visti/handling-fees-for-visa-applications/) charged US$104.90 for a short-stay visa in the quarter to 30 September 2026, US$52.50 for a minor aged 6 to 12, and re-sets the rate quarterly.
+You'll often be told to skip the outsourcer and apply at the consulate. EU rules say a country may keep that option open, not that it must, so check it exists before you plan around it.
 
-Article 13 makes fingerprinting compulsory in person for a first application, but fingerprints recorded in the VIS less than 59 months earlier are copied across. A repeat applicant inside that window need not attend at all, which removes the courier, the lounge and the photographs from the bill.
+Nor does €90 always reach your card as €90. Consulates charge in euro or local currency at the European Central Bank reference rate and are allowed to round up. The Italian consulate in Los Angeles charged US$104.90 for a short-stay visa in the quarter to 30 September 2026, and resets the figure every quarter.
 
-Article 16(2a) provides for a **€135 or €180** fee for nationals of countries the Council finds uncooperative on readmission, and expressly does not apply to children under twelve. The power has been used: [Council Implementing Decision (EU) 2022/2459](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022D2459) of 8 December 2022 set the fee for Gambian nationals at €120, the pre-2024 equivalent, and it was repealed by Implementing Decision (EU) 2024/1231 of 12 April 2024, which took effect on 18 April 2024. No decision naming any third country is in force today.
+Repeat applicants get one real saving. Fingerprints must be given in person on a first application, but if yours went into the EU's visa database less than 59 months earlier they're copied across. Inside that window you need not attend at all, and the courier and photographs drop off the bill along with the appointment.
 
-| Route | Government fee | Second bill | Published extras | Our total |
-|---|---|---|---|---|
-| Norway short-stay, applied for in the USA | €90 | €26 VFS service fee | courier €52, photos €17.50, SMS €7 | €116 bare, €192.50 with all three |
-| US B1/B2 visitor, expedited interview | US$185 MRV | US$750 expedite fee | — | US$935 |
-| US F-1 student | US$185 MRV | US$350 SEVIS (charged by ICE) | — | US$535 |
-| Canadian visitor visa, one adult | CAD 100 | CAD 85 biometrics | — | CAD 185 |
 
-The totals in that last column are our arithmetic. No government publishes them.
+![Euro banknotes fanned out on a white surface, with one note folded into a small paper boat sitting on top.](https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/One_stands_out_002_2025_01_01.jpg/1280px-One_stands_out_002_2025_01_01.jpg#1280x676)
 
-## How much does it cost to get a US visa?
+*€90 is the fee the Visa Code sets. The application centre bills separately, and its cap is €45. Photo: [Friedrich Haag](https://commons.wikimedia.org/wiki/User:F._Riedelio) / [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:One_stands_out_002_2025_01_01.jpg).*
 
-The [State Department's fee table](https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/fees/fees-visa-services.html) sets the application fee at US$185 for non-petition categories, which covers B visitor, C-1 transit, F student, J exchange and M vocational visas; US$205 for petition-based categories including H, L, O, P, Q and R; US$315 for E treaty trader and investor. Those amounts were set by a [final rule of 28 March 2023](https://www.federalregister.gov/documents/full_text/text/2023/03/28/2023-06290.txt), and a [temporary final rule published on 9 June 2026](https://www.federalregister.gov/documents/full_text/text/2026/06/09/2026-11513.txt) confirms the headline figure "was last updated in May 2023 and is currently set at $185 for B1/B2 applicants".
+## How much a US visa costs
 
-That same temporary final rule created a second State Department charge: **US$750** for an expedited B1/B2 interview appointment at selected posts, payable on top of the US$185, in force from 1 July to 31 December 2026 as a pilot ahead of the 2028 Olympics. A US tourist visa now has a published fast-lane price of US$935, before any contractor charges anything for lodging it.
+The [State Department's fee table](https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/fees/fees-visa-services.html) sets the application fee at US$185 for visitor (B), transit (C-1), student (F and M) and exchange (J) visas. Petition-based categories, including H, L, O, P, Q and R, pay US$205, and E treaty trader and investor visas US$315.
 
-The MRV fee is non-refundable, and it is non-transferable. The [US Embassy in London](https://uk.usembassy.gov/visa-faqs-information-for-non-immigrant-visa-or-esta-applicants/) spells the second half out: move your application to another embassy and "you will be required to pay a new MRV fee and complete a new Form DS-160".
+Since July 2026 you can also buy your way up the queue. From 1 July to 31 December 2026, selected posts charge US$750 for an expedited B1/B2 interview appointment, on top of the US$185, as a pilot ahead of the 2028 Olympics. That gives a US tourist visa a published price of US$935 if you want to be seen sooner. Worth it if your post is quoting months and the flights are booked. Not worth it if you're merely a fortnight late. The wait is the thing to price first; we set out the realistic lead times in [how early to apply for a visa](/guides/how-early-to-apply-for-a-visa).
 
-Students pay a third agency. The [I-901 SEVIS fee](https://www.ice.gov/sevis/i901) is US$350 for F and M applicants and US$220 for J, collected by Immigration and Customs Enforcement and, in its own words, separate from visa fees. An F-1 applicant therefore pays US$535 to two departments before a consular officer has opened the file.
+The fee is non-refundable, and it doesn't follow you: the US Embassy in London warns that if you move your application to another embassy, you'll pay a new fee and complete a new DS-160 form. Decide where you'll interview before you pay.
 
-[Public Law 119-21, section 100007](https://www.govinfo.gov/content/pkg/PLAW-119publ21/html/PLAW-119publ21.htm) created a Visa Integrity Fee of not less than US$250, indexed to inflation from FY2026, which "shall not be waived or reduced". Subsection (b) allows, but does not require, the Secretary of Homeland Security to reimburse the fee after the visa expires to a holder who complied with all its conditions and either did not seek an extension and left no later than five days after the authorised stay ended, or was granted an extension or adjustment to permanent residence. A [USCIS notice of 22 July 2025](https://www.federalregister.gov/documents/2025/07/22/2025-13738/uscis-immigration-fees-required-by-hr-1-reconciliation-bill) deferred the fee, saying it "requires cross-agency coordination before implementing". No implementing publication has appeared since, and the November 2025 inflation notice sets FY2026 amounts for the parole, ESTA and EVUS fees from the same statute, leaves the I-94 fee unchanged, and says nothing about this one. A fee widely reported as costing travellers US$250 has no published mechanism for paying it, and a statutory refund route with no published procedure either.
+Students owe a second agency. The I-901 SEVIS fee is US$350 for F and M applicants and US$220 for J applicants, collected by Immigration and Customs Enforcement separately from the visa fee, so an F-1 student is US$535 down before a consular officer has opened the file.
 
-ESTA, meanwhile, nearly doubled. The [FY2026 CBP notice](https://www.federalregister.gov/documents/2025/11/19/2025-20304/certain-dhs-immigration-fees-required-by-hr-1-fiscal-year-2026-adjustments-for-inflation) sets it at **US$40.27**, made of three stacked statutory charges (US$17 + US$10.27 + US$13) rather than one price, against US$21 before July 2025. Our [ESTA guide](/travel-authorization/esta) covers who needs one.
+If your passport lets you skip the visa, ESTA now costs US$40.27, made up of three separate statutory charges, against US$21 before July 2025. And the US$250 visa integrity fee you may have read about has no published way to pay it yet, on which more below.
 
-## How much does a visa cost in Canada?
+## UK visa fees and the health surcharge
 
-[IRCC's fee list](https://ircc.canada.ca/english/information/fees/fees.asp) prices a visitor visa at CAD 100 per person, or CAD 500 for a family of five or more. Biometrics are a separate line: CAD 85 per individual, CAD 170 per family. A single adult who must give biometrics therefore pays CAD 185, which is 85% more than the headline. An eTA is CAD 7.
+A UK visit visa costs £135 for up to six months and £1,128 for up to ten years. An [ETA](/travel-authorization/uk-eta) costs £20.
 
-Canada is unusually explicit about what it will not refund: the CAD 600 right of permanent residence fee, charged when your application is approved, "is the only fee that we can refund after we start processing your application."
+The Home Office publishes its own estimated cost of handling each application alongside its prices, in its [visa fees transparency data](https://www.gov.uk/government/publications/visa-fees-transparency-data). In the edition published in September 2026, a six-month visit visa and a ten-year one each cost the department £116. The ten-year visa costs you more than eight times as much for the same work. The Home Office puts the ETA's own unit cost at £10 and sells it for £20.
 
-## Do you get a refund if your visa is refused?
+That makes the ten-year visa a bet on your own travel plans, and one with a catch: if you pay for ten years and are granted a shorter visa, you don't get the difference back.
 
-Almost nothing comes back, and the instruments say so.
+On longer UK routes the visa fee isn't even the biggest number. The [immigration health surcharge](https://www.gov.uk/healthcare-immigration-application/how-much-pay) is £1,035 a year, or £776 for students and their dependants, Youth Mobility Scheme holders and under-18s, and it's paid up front for the full length of the visa. Three years at the standard rate comes to £3,105, against a £2,064 application fee for the Route to Settlement.
 
-Under the Visa Code the fee "shall not be refundable except in the cases referred to in Articles 18(2) and 19(3)". Those two cases are: you applied to a consulate that was not competent, or your application was inadmissible and never examined. A refused application has by definition been examined, so it falls outside both. The Code caps the service fee but says nothing about refunding it — VFS labels its own €26 "(Non-refundable)", and that is a contract term on one route, not a rule of EU law.
+## Visa fees in Canada and India
 
-The State Department's [visa denials page](https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/visa-denials.html) answers the question directly: "No. The fee that you paid is a non-refundable application processing fee." Reapply and you file a new application and pay again, with one carve-out: a 221(g) refusal for incomplete documentation can be resumed without a new fee. A 214(b) refusal cannot. What happens next is covered in our guide to [a refused visa application](/guides/visa-refused-what-happens-next).
+Canada splits its prices into separate lines. [IRCC's fee list](https://ircc.canada.ca/english/information/fees/fees.asp) charges CAD 100 per person for a visitor visa, or CAD 500 for a family of five or more, then CAD 85 per person (CAD 170 per family) for biometrics. A single adult who has to give biometrics pays CAD 185, which is 85% more than the headline. An eTA is CAD 7.
 
-Gov.uk's [Standard Visitor guidance](https://www.gov.uk/standard-visitor/apply-standard-visitor-visa) states you get no refund "if you get a shorter visa or if your application is refused". Pay £1,128 for a ten-year visitor visa, be granted two years, and you keep neither the difference nor any right to argue about it.
+India's e-Tourist visa has a seasonal price for most nationalities. The 30-day visa is US$10 from April to June and US$25 from July to March. A one-year visa is US$40 and a five-year visa US$200. UK nationals, along with those of Gibraltar, Guernsey, the Isle of Man and Jersey, pay US$484 for five years. Twenty-two nationalities pay nothing, and several more, including Malaysia, Thailand and South Africa, pay nothing for the 30-day visa.
 
-ESTA is the exception: CBP publishes exactly what refusal costs. **US$10.27** of your US$40.27 is a cost-recovery fee charged whether you are authorised or denied.
+India's own portal is also unusually blunt about what you shouldn't be paying for. The [official e-visa portal](https://indianvisaonline.gov.in/evisa/tvoa.html) says no intermediary or travel agent is needed, and the government makes no provision for an emergency or express fee at all, so any such line is the seller's own.
 
-## What the fee costs the government charging it
+## Will you get a refund if your visa is refused?
 
-The UK Home Office publishes its own unit costs beside its prices, in a spreadsheet linked from a [transparency data page](https://www.gov.uk/government/publications/visa-fees-transparency-data). We downloaded the current table and parsed it. Fees and estimated unit costs below are from the edition published on 10 September 2026 and dated 8 October 2026.
+Almost certainly not.
 
-| Route | Fee | Home Office estimated unit cost |
-|---|---|---|
-| Electronic travel authorisation (ETA) | £20 | £10 |
-| Visit visa, up to 6 months | £135 | £116 |
-| Visit visa, up to 10 years | £1,128 | £116 |
-| Route to Settlement | £2,064 | £482 |
-| Visitor extension | £1,172 | £287 |
+Under EU rules the Schengen fee comes back in two situations only: you applied to the wrong consulate, or your application was inadmissible and never examined. A refused application has been examined, so it fits neither. The rules say nothing about refunding the service fee, and VFS marks its €26 on the Norway route as non-refundable.
 
-The April 2026 edition put the visit visa unit cost at £159, which made the short visit visa a loss; the September revision cuts it to £116, so the department now covers its cost there and makes its margin on the [ETA](/travel-authorization/uk-eta), priced at double its estimated cost, and on settlement. Note the last column against the third row: a ten-year visitor visa costs the department the same £116 to produce as a six-month one and is priced eight times higher.
+The State Department's [page on visa denials](https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/visa-denials.html) answers the refund question with a flat no. If you reapply, you normally pay again, with one exception covered in the questions below. ESTA at least tells you the price of a no: US$10.27 of the US$40.27 is a cost-recovery charge you pay even if you're denied.
 
-For longer UK routes the visa fee is not even the largest number. The [immigration health surcharge](https://www.gov.uk/healthcare-immigration-application/how-much-pay) is £1,035 per year, or £776 for students and their dependants, Youth Mobility Scheme holders and under-18s, paid up front for the full length of the visa. Three years at the standard rate is £3,105 in surcharge against a £2,064 application fee. Unlike the application fee, the surcharge is [refunded in full](https://www.gov.uk/healthcare-immigration-application/refunds) if the application is refused, or withdrawn before a decision — normally within six weeks. The UK refunds the larger sum and keeps the smaller one.
+A UK visitor visa fee isn't refunded if you're refused. The health surcharge is the exception, refunded in full if your application is refused or withdrawn before a decision, normally within six weeks. On a refused Route to Settlement application with three years of surcharge paid up front, the UK returns the £3,105 and keeps the £2,064 fee.
 
-## Where the official price is zero and the market price is not
+A refusal costs you the whole fee, which is the argument for spending an extra week on your documents rather than US$750 on a faster appointment. If it's already happened, our guide to [what happens after a visa refusal](/guides/visa-refused-what-happens-next) sets out your options.
 
-Sri Lanka's tourist ETA became [free of charge](https://www.eta.gov.lk/slvisa/visainfo/fees.jsp?locale=en_US) for nationals of 40 countries on 25 May 2026, including the US, UK, China, India and most of Western Europe, for 30 days. Everyone else pays US$20 from South Asia or US$50 elsewhere, US$25 or US$60 on arrival, and transit visas are free.
 
-India publishes a [per-country e-Tourist fee schedule](https://indianvisaonline.gov.in/evisa/images/Etourist_fee_final.pdf) with an unusual seasonal split: US$10 for 30 days from April to June, US$25 for the same visa from July to March, US$40 for one year and US$200 for five, for most nationalities. UK nationals and those of Gibraltar, Guernsey, the Isle of Man and Jersey pay US$484 for the five-year visa. Twenty-two nationalities pay nothing at all, from Argentina and Uruguay to Indonesia, Jamaica, Mauritius and most of the Pacific; Malaysia, the Philippines, Thailand, Russia and South Africa pay nothing for the 30-day visa. The Bureau of Immigration's [official portal](https://indianvisaonline.gov.in/evisa/tvoa.html) also says plainly that "no facilitation is required by any intermediary / travel agents" and that the government makes no provision for charging emergency or express fees. That is the issuing government's own description of the reseller market. We have not priced a reseller checkout, so we quote no multiple.
+![Dublin's Georgian Custom House, its green copper dome and columned Portland stone facade lit by low winter sun above the River Liffey.](https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Dublin_Custom_House_in_2025.jpg/1920px-Dublin_Custom_House_in_2025.jpg#1920x1080)
 
-When we [checked all 37 digital nomad visa programmes against the issuing governments' own pages](/blog/what-we-found-checking-every-digital-nomad-visa), 218 field values changed, fees among them. Thailand's long-term resident visa was widely listed at US$200. The [Thai Board of Investment](https://ltr.boi.go.th/page/faq.html) charges nothing to apply and **50,000 baht**, about US$1,500 at September 2026 exchange rates, on issuance, paid at the Immigration Bureau office at TIESC in Bangkok; applicants who choose to have the e-visa issued abroad are told to follow Royal Thai Consular protocol, and no figure is published for that route. Wrong by roughly a factor of seven, and attached to the wrong event.
+*Dublin's Custom House, built in 1791 to tax goods moving through the port and still in government hands. Visa fees are set the same way: by a department, in a published schedule, and revised on its own timetable. Photo: [Christian David](https://commons.wikimedia.org/wiki/User:Espandero) / [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dublin_Custom_House_in_2025.jpg).*
 
-None of this applies if your passport is exempt: our [visa checker](/) covers 195 passports, and the difference between an eVisa, a visa on arrival and a travel authorisation is in [a separate guide](/guides/visa-on-arrival-vs-evisa-vs-eta).
+## How to work out your own total
+
+Start by checking whether your passport needs a visa at all — our [visa checker](/) covers 195 passports — then take the government fee from the issuing government's own page and add only the application-centre lines you'll use.
+
+What not to trust is a third-party listing for the government fee. When we [checked 37 digital nomad visa programmes against official sources](/blog/what-we-found-checking-every-digital-nomad-visa), 218 field values changed, fees among them. Thailand's long-term resident visa was widely listed at US$200, when the Thai Board of Investment charges nothing to apply and 50,000 baht (about US$1,500 at September 2026 exchange rates) once the visa is issued.
+
+If a figure you find online looks tidy, check it against the issuing government's page before you budget on it.
 
 ## Common questions
 
-### How much can a visa cost?
+### Does a 10-year Schengen visa cost more?
 
-The largest published government fees in the schedules we read are the UK's £3,635 for a Route to Settlement application by an other dependant relative and £3,226 for indefinite leave to remain (indefinite leave applications do not pay the immigration health surcharge), and Thailand's 50,000 baht LTR issuance fee. For a visitor visa, the highest single-government fee we found is the UK's £1,128 for a ten-year visit visa; the highest US figure is US$935: the US$185 application fee plus the US$750 expedited-appointment fee.
-
-### How much is a Schengen visa?
-
-€90 for an adult, set by Article 16(1) of the Visa Code, €45 for a child aged six to eleven, and nothing for under-sixes, students travelling to study, researchers travelling for scientific research and a few other categories. Add up to €45 for the outsourced application centre, which is charged even when the visa fee is waived.
-
-### How much does a 10-year Schengen visa cost?
-
-The same €90. The Visa Code prices the application, not the validity: Article 16 provides only for the reduced and waived categories and the €135/€180 readmission provision, with no tier for multi-entry or long-validity visas.
-
-### What is the total cost of applying for a Schengen visa from the UK?
-
-The government half is €90, charged in sterling at the consulate's own conversion rate. EU law caps the application centre's service fee at €45, and courier, SMS and photograph charges sit outside that cap and are published per centre rather than nationally.
-
-### Do I get a refund if my visa is refused?
-
-No. The Visa Code refunds the fee in two situations only — wrong consulate, or an application ruled inadmissible and never examined — and refusal is neither. The State Department's answer opens with one word: "No." The UK is the partial exception: the immigration health surcharge, though not the application fee, is refunded in full on refusal.
-
-### Do I need to pay the visa fee again after refusal?
-
-For a US visa, yes: you file a new application and pay the fee again, with one exception. A 221(g) refusal for missing documents can be re-assessed on the original fee if you supply what is missing within one year of the refusal; after that year, or after a 214(b) refusal, you reapply and pay again.
-
-### Why does a US visa cost more than US$185?
-
-Two other federal charges can land on the same trip. A State Department temporary final rule in force from 1 July to 31 December 2026 charges US$750 for an expedited B1/B2 interview appointment at selected posts, and F and M students pay a US$350 I-901 SEVIS fee to Immigration and Customs Enforcement, which is separate from the visa fee and paid to a different department.
+No, it's the same €90. EU rules price the application rather than the validity, and there's no higher tier for multi-entry or long-validity visas.
 
 ### Do tourists have to pay US$250 to enter the US?
 
-Congress enacted a US$250 Visa Integrity Fee in July 2025 that cannot be waived or reduced, but USCIS deferred implementation pending cross-agency coordination and nothing has been published since. No State Department or embassy page tells an applicant how or when to pay it.
+Congress enacted a Visa Integrity Fee of at least US$250 in July 2025 that can't be waived or reduced. USCIS then deferred it pending cross-agency coordination, nothing has been published since, and no State Department or embassy page tells applicants how or when to pay it.
 
-### How much is the visa service fee?
+### Do I have to pay again if my US visa is refused?
 
-Between €22 and €32.10 on the routes we checked, capped by EU law at €45, or in principle €80 (exceptionally €120) where the Member State has no consulate in your country and is not represented there by another Member State. It is separate from the visa fee, paid to a private contractor, and in at least one published case marked non-refundable.`,
+Usually, yes. A 221(g) refusal for missing documents can be reassessed on the original fee if you supply what's missing within one year of the refusal. After that year, or after a 214(b) refusal, you file a new application and pay again.
+
+### What's the most expensive visa?
+
+Of the fee schedules we read, the steepest are the UK's £3,635 for a Route to Settlement application in the "other dependant relative" category, £3,226 for indefinite leave to remain (which doesn't attract the health surcharge), and Thailand's 50,000 baht long-term resident visa issuance fee. For a visitor visa, the highest is the UK's £1,128 ten-year visa, and the dearest US figure is US$935 with an expedited appointment.`,
+    faq: [
+      {
+        q: "Does a 10-year Schengen visa cost more?",
+        a: "No, it's the same €90. EU rules price the application rather than the validity, and there's no higher tier for multi-entry or long-validity visas.",
+      },
+      {
+        q: "Do tourists have to pay US$250 to enter the US?",
+        a: "Congress enacted a Visa Integrity Fee of at least US$250 in July 2025 that can't be waived or reduced. USCIS then deferred it pending cross-agency coordination, nothing has been published since, and no State Department or embassy page tells applicants how or when to pay it.",
+      },
+      {
+        q: "Do I have to pay again if my US visa is refused?",
+        a: "Usually, yes. A 221(g) refusal for missing documents can be reassessed on the original fee if you supply what's missing within one year of the refusal. After that year, or after a 214(b) refusal, you file a new application and pay again.",
+      },
+      {
+        q: "What's the most expensive visa?",
+        a: "Of the fee schedules we read, the steepest are the UK's £3,635 for a Route to Settlement application in the \"other dependant relative\" category, £3,226 for indefinite leave to remain (which doesn't attract the health surcharge), and Thailand's 50,000 baht long-term resident visa issuance fee. For a visitor visa, the highest is the UK's £1,128 ten-year visa, and the dearest US figure is US$935 with an expedited appointment.",
+      },
+    ],
   },
   {
     title: "The best second passport for visa-free travel depends on yours",
     slug: "which-second-passport-adds-the-most-countries",
     excerpt:
-      "Every ranking page treats passport strength as an absolute number. It is not. We computed the marginal gain of a second passport against the one you already hold, out of 194 destinations, counting only visa-free and visa-on-arrival entry, and the answer inverts depending on where you start.",
+      "Passport rankings treat strength as a fixed number, but what a second passport adds depends on the one you already hold. A German passport gains two destinations from an Irish one and 14 from a Beninese one.",
     metaDescription:
-      "A German passport gains 14 destinations from Benin and 2 from Ireland. We computed the marginal gain of every second passport, and why overlap beats strength.",
+      "A German passport gains 14 destinations from a Beninese one and just 2 from an Irish one. Why overlap, not strength, decides the best second passport.",
     author: "isvisarequired.com",
     tags: ["second passport", "dual citizenship", "visa-free travel", "passport ranking", "ECOWAS", "UAE passport"],
     created_at: "2026-09-16",
-    updated_at: "2026-09-16",
-    faq: [
-      {
-        q: "What is the best second passport for visa-free travel?",
-        a: "The United Arab Emirates, on our count: 156 of 194 destinations, and it produced the largest gain for every first passport we tested. It opens Russia, India and Pakistan, which the strong Western passports do not, and China, which a US passport does not.",
+    updated_at: "2026-09-17",
+    cover: {
+      src: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/006_Dune_45_in_Sossusvlei_at_sunrise_Photo_by_Giles_Laurent.jpg/1920px-006_Dune_45_in_Sossusvlei_at_sunrise_Photo_by_Giles_Laurent.jpg",
+      width: 1920,
+      height: 1280,
+      alt: "Red-orange sand dune in the Namib desert at sunrise, its crest dividing sunlit sand from deep shadow, with camel thorn trees on the gravel plain at its base",
+      caption: "Dune 45 at sunrise, Sossusvlei. What a second passport is worth depends less on its ranking than on which specific places it adds to the map you actually travel.",
+      credit: {
+        author: "Giles Laurent",
+        authorUrl: "https://commons.wikimedia.org/wiki/User:Giles_Laurent",
+        license: "CC BY-SA 4.0",
+        licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:006_Dune_45_in_Sossusvlei_at_sunrise_Photo_by_Giles_Laurent.jpg",
       },
-      {
-        q: "Which second passport adds the most countries to my current passport?",
-        a: "That depends on the one you hold, and the answer often inverts the published rankings. A German passport gains 14 destinations from Benin, Burkina Faso or Senegal, 13 from Tunisia, and only 2 from Ireland.",
-      },
-      {
-        q: "How do you calculate combined visa-free access with two passports?",
-        a: "Take the union of the two, not the sum: across all 194 destinations, count the ones the second passport reaches and the first does not. That difference is the marginal gain.",
-      },
-      {
-        q: "Does a second EU passport add anything if I already have one?",
-        a: "Barely. Directive 2004/38/EC bars member states from imposing an entry visa on Union citizens, so two EU passports overlap completely inside the Union, and German plus Irish adds two destinations, both outside it.",
-      },
-      {
-        q: "Do Irish citizens need a UK ETA?",
-        a: "No. British and Irish citizens are exempt, including dual citizens, under the Common Travel Area. Other EU, EEA and Swiss nationals visiting without a visa have needed one since 2 April 2025, unless they hold status under the EU Settlement Scheme. It now costs £20 and lasts two years or until the passport expires, whichever is sooner; it was £10 when the scheme opened to European travellers in March 2025, and went up to £16 before the rise to £20.",
-      },
-      {
-        q: "Is an ETA the same as a visa?",
-        a: "No, and the UK government says so: \"An ETA is not a visa, it is a digital permission to travel.\" It is still an application approved before you travel, which is why our count excludes it.",
-      },
-      {
-        q: "Do you need a visa to travel within ECOWAS?",
-        a: "Not between member states: Protocol A/P.1/5/79 gives a Community citizen visa-free entry to any other member state for up to 90 days, on a valid travel document and health certificate. A state may still refuse an inadmissible person.",
-      },
-      {
-        q: "Do US citizens need a visa for China?",
-        a: "Yes. China's unilateral waiver now covers 50 countries and the United States is not among them; the UK and Canada were added from 17 February 2026.",
-      },
-      {
-        q: "Do US citizens need a visa for Brazil?",
-        a: "Since 10 April 2025, yes: an electronic visa at US$80.90, reimposed on Australian, Canadian and US nationals. Because it must be obtained before travel, Brazil does not count as accessible on a US passport in our data.",
-      },
-    ],
-    content: `There is no single best second passport for visa-free travel. The answer depends on the passport you already hold: a German passport gains 14 destinations from a Beninese passport and exactly 2 from an Irish one, while a Pakistani passport gains 131 from an Emirati one. Overlap decides this, not strength.
+    },
+    content: `Say you hold a German passport and the chance of a second one comes up. Ireland looks like the obvious choice: on our count its passport reaches 150 destinations without an advance application, one more than yours. Benin's reaches 57, so it looks like no choice at all.
 
-One document wins in every pairing. The United Arab Emirates came top for every first passport we tested, because it is the only passport that is both near-universal and able to reach places a Western passport cannot.
+Do the sums and the Irish passport adds two destinations you can't already reach. The Beninese one adds 14.
 
-## How we counted, and why our numbers are lower than everyone else's
+There is no single best second passport for visa-free travel. What a second passport is worth depends on the one you already hold, and overlap matters more than strength. One document does come out on top whatever you start with: the United Arab Emirates gave the biggest gain for every first passport we tested.
 
-A destination counts if you can arrive with no advance application: visa-free entry, or a visa issued on arrival. Out of 194. Our dataset holds 195 countries, and each passport is scored against the other 194, which is where the denominator comes from. eVisas and electronic travel authorisations are excluded, because both need approval before you board. That is the whole counting rule; our [methodology page](/methodology) covers where the underlying data comes from and how it is checked.
+## How we count visa-free access
 
-That exclusion is why our figures run 20 to 30 below the citizenship-by-investment sites. The UAE government's own [fact sheet](https://u.ae/en/about-the-uae/fact-sheet) says an Emirati passport reaches 179 countries, "134 destinations offer visa-free travel and 45 offered eVisa or visa on arrival at the airport". We count **156**. That page then claims first place globally and credits Arton Capital's private index for it: even the one government publishing a headline number is quoting a commercial index rather than measuring anything, which is why the indexes disagree.
+A destination counts only if you can turn up without applying for anything first, either visa-free or with a visa issued on arrival. Our dataset covers 195 countries, so each passport is scored against the other 194. eVisas and electronic travel authorisations don't count, because both need approval before you board. The [methodology page](/methodology) explains where the underlying data comes from and how it's checked.
 
-The UK's own framing supports the exclusion. The Home Office says "An ETA is not a visa, it is a digital permission to travel", in [the release](https://www.gov.uk/government/news/uk-to-extend-electronic-travel-to-european-visitors) extending the scheme to Europeans from 2 April 2025. It still costs **£20**, lasts two years or until the passport expires if that is sooner, and 24.8 million were issued between the scheme's launch in October 2023 and the end of 2025, per the [ETA factsheet](https://homeofficemedia.blog.gov.uk/electronic-travel-authorisation-eta-factsheet-april-2026/). Europe's [ETIAS](https://eur-lex.europa.eu/eli/reg/2018/1240/oj/eng) works the same way, at [€20](https://eur-lex.europa.eu/eli/reg_del/2025/1411/oj/eng) for three years, and we exclude it too. Our guide to [visa on arrival versus eVisa versus ETA](/guides/visa-on-arrival-vs-evisa-vs-eta) sets out the difference.
+That rule is why our numbers look low. They run 20 to 30 below the figures you'll see on citizenship-by-investment sites. The UAE government's [fact sheet](https://u.ae/en/about-the-uae/fact-sheet) says an Emirati passport reaches 179 countries, 45 of them by eVisa or visa on arrival. We count 156. The same page credits a private commercial index for its claim to first place, so even a government's headline figure turns out to be borrowed rather than measured.
 
-One case shows what the rule does to a count. Since 10 April 2025 Brazil requires an electronic visa of Australian, Canadian and US nationals at **US$80.90**, per the [Brazilian foreign ministry](https://www.gov.br/mre/pt-br/consulado-miami/information-about-visas-in-english/electronic-visitor-visa-e-visa), so Brazil does not count as accessible on a US passport. On a British one it does.
+Leaving out travel authorisations isn't pedantry. The Home Office itself says "An ETA is not a visa, it is a digital permission to travel", in [the announcement](https://www.gov.uk/government/news/uk-to-extend-electronic-travel-to-european-visitors) extending it to European visitors from 2 April 2025. You still have to apply for one before you travel, and it costs £20. Europe's [ETIAS](/travel-authorization/etias) works the same way, at €20 for three years, and we exclude it too.
 
-## If your passport is weak, overlap does not matter
+Since 10 April 2025 Brazil has required Australian, Canadian and US nationals to buy an [electronic visa](https://www.gov.br/mre/pt-br/consulado-miami/information-about-visas-in-english/electronic-visitor-visa-e-visa) costing US$80.90, so Brazil counts on a British passport and not on an American one.
 
-Take the strongest document you can get. A Pakistani passport reaches 25 destinations; add an Emirati one and you reach 156, a gain of **131**. Nigeria (42) gains 123 from the UAE and 121 from South Korea. India (50) gains 108 from the UAE and 102 from Ireland.
 
-There is barely any overlap to lose at that end, so raw strength wins. The complications are legal. India does not permit dual citizenship: [section 9 of the Citizenship Act 1955](https://www.mha.gov.in/sites/default/files/2025-01/CitizenshipAct1955_02012025_0.pdf) ends Indian citizenship on voluntary acquisition of another country's citizenship (Article 9 of the Constitution already denied citizenship under its founding provisions to anyone who had voluntarily acquired a foreign one), and the Ministry of External Affairs is blunt that ["OCI is not to be misconstrued as dual citizenship"](https://www.mea.gov.in/overseas-citizenship-of-india-scheme.htm). So treat those rows as arithmetic. For an adult there is no lawful route to holding both; section 4(1A) lets a child who is Indian by descent keep a second citizenship only until six months after reaching full age.
+![Two golden limestone sea stacks standing in turquoise surf below eroded coastal cliffs, under a tall cumulus sky on the Southern Ocean coast.](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Princetown_%28AU%29%2C_Port_Campbell_National_Park%2C_Twelve_Apostles_--_2019_--_0969.jpg/1920px-Princetown_%28AU%29%2C_Port_Campbell_National_Park%2C_Twelve_Apostles_--_2019_--_0969.jpg#1920x1280)
 
-## If your passport is already strong, a second strong passport is close to worthless
+*The Twelve Apostles, on Australia's Southern Ocean coast — a reminder that a high ranking is not the same as an open border. In our data Australia lets exactly one nationality arrive without arranging entry first: New Zealanders. Photo: [Dietmar Rabich](https://commons.wikimedia.org/wiki/User:XRay) / [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Princetown_(AU),_Port_Campbell_National_Park,_Twelve_Apostles_--_2019_--_0969.jpg).*
+
+## If your passport is weak, pick the strongest second one
+
+At the bottom of the table there's so little overlap left to lose that raw strength wins. A Pakistani passport reaches 25 destinations; an Emirati one reaches 156, so the gain is 131 and overlap never enters into it.
+
+A Nigerian passport (42 destinations) gains 123 from the UAE and 121 from South Korea. An Indian one (50) gains 108 from the UAE and 102 from Ireland.
+
+India doesn't allow dual citizenship, though, so treat those two figures as arithmetic rather than advice. Under [section 9 of the Citizenship Act 1955](https://www.mha.gov.in/sites/default/files/2025-01/CitizenshipAct1955_02012025_0.pdf), Indian citizenship ends when you voluntarily acquire another, and the Ministry of External Affairs is firm that OCI status is not dual citizenship either. For an adult there is no lawful way to hold both. The narrow exception is a child who is Indian by descent, who may keep a second citizenship only until six months after reaching full age.
+
+## Two strong passports barely add anything
 
 Germany reaches 149 destinations. Ireland reaches 150. Hold both and you reach 151.
 
-The gain is **2**, and both lie outside the Union: the United Kingdom and Uganda. Inside Europe the overlap is total as a matter of law, since Directive 2004/38/EC states that "No entry visa or equivalent formality may be imposed on Union citizens" ([Article 5(1)](https://eur-lex.europa.eu/eli/dir/2004/38/oj/eng)).
+The two extra destinations are the United Kingdom and Uganda, and neither is in the EU. Inside the Union the overlap is total by law, because [EU free movement rules](https://eur-lex.europa.eu/eli/dir/2004/38/oj/eng) forbid member states from imposing an entry visa or any equivalent formality on Union citizens.
 
-Irish citizens are the one European nationality exempt from the UK's ETA: "British and Irish citizens do not need an ETA, including dual citizens," per the [ETA factsheet](https://homeofficemedia.blog.gov.uk/electronic-travel-authorisation-eta-factsheet-april-2026/). Every other EU, EEA and Swiss national [needs one](https://www.gov.uk/guidance/visiting-the-uk-as-an-eu-eea-or-swiss-citizen). That exemption predates the scheme by decades: under the [Common Travel Area](https://www.gov.uk/government/publications/common-travel-area-guidance/common-travel-area-guidance), an Irish citizen needs no permission at all to enter the UK.
+The UK is on the list because Irish citizens, dual citizens included, are the one European nationality exempt from the [UK's ETA](/travel-authorization/uk-eta), while every other EU, EEA and Swiss national needs one. An Irish citizen has needed no permission at all to enter the UK since long before anyone thought of an ETA — that is the Common Travel Area, and it is decades older than the scheme. Uganda is there for a duller reason: Ireland appears on the Ugandan immigration directorate's visa-exempt list of 37 countries, and Germany doesn't.
 
-Uganda counts because Ireland appears on the Ugandan immigration directorate's [visa-exempt list](https://immigration.go.ug/faqs/visa-exempt) of 37 countries and Germany does not. The Foreign Ministry backs it up: the Ugandan embassy in Bujumbura's [visa-exempt list](https://bujumbura.mofa.go.ug/basic-page/visa-exempt-countries), dated 28 February 2025, also names Ireland and not Germany, though the two lists do not match name for name.
+Across the Atlantic, a US passport holder who adds a British one gains five destinations: Belarus, Brazil, China, Vietnam and Venezuela, though Venezuela sits in our data without a published instrument behind it. Belarus gives 30 days to 38 European states, the UK among them. Vietnam's 45-day exemption covers Britain, Germany, Japan and South Korea but not the US, and China's visa waiver now covers the UK and Canada.
 
-American plus British adds **5**: Belarus, Brazil, China, Venezuela and Vietnam. Belarus grants 30 days to [38 European states](https://mfa.gov.by/en/visa/freemove/europe/) including the UK, not the US; Vietnam's 45-day exemption [covers Britain, Germany, Japan and South Korea](https://vnembassy-jp.org/en/vietnam-extends-visa-exemption-policy), not the US; China added the UK and Canada [from 17 February 2026](https://gb.china-embassy.gov.cn/eng/visa/notice/202602/t20260216_11860580.htm). Venezuela we cannot source at all. The access is in our data; the instrument behind it is not.
+So if travel is the only reason you want a second passport and you already hold a strong one, the arithmetic is unkind. There may be good reasons to want Irish citizenship on top of German. Getting through more borders isn't one of them.
 
-## The inversion: Benin beats Ireland seven to one
+## Why a West African passport can beat an Irish one
 
-For that same German passport:
+Ireland's two is the floor. Set five other candidates against that same German passport and what each one opens on its own turns out to say very little about what it adds.
 
 | Second passport | Its own access | Destinations it adds |
 |---|---|---|
-| Ireland | 150 | 2 |
 | United Arab Emirates | 156 | 15 |
 | Benin | 57 | 14 |
 | Burkina Faso | 53 | 14 |
 | Senegal | 53 | 14 |
 | Tunisia | 62 | 13 |
 
-A Beninese passport opens 57 destinations on its own, just over a third of what an Irish one opens, and adds seven times as much: Central African Republic, Chad, Cuba, Ghana, Guinea, Guinea-Bissau, Ivory Coast, Kenya, Liberia, Mali, Niger, Nigeria, Republic of the Congo, Togo.
+Benin's passport opens just over a third as many destinations as Ireland's, yet adds seven times as many. Seven are ECOWAS neighbours (Ghana, Guinea, Guinea-Bissau, Ivory Coast, Liberia, Nigeria and Togo), plus Mali and Niger, plus Kenya, plus four more we carry from our own data without a published instrument: Central African Republic, Chad, Cuba and Republic of the Congo.
 
-Seven of those 14 rest on one legal instrument, and two more on a separate declaration by the states that left it. Under [Article 3(2) of ECOWAS Protocol A/P.1/5/79](https://ecowas.int/wp-content/uploads/2024/08/PROTOCOL-RELATING-TO-FREE-MOVEMENT-OF-PERSONS.pdf), a Community citizen visiting another member state for up to ninety days "shall enter the territory of that Member State through the official entry point free of visa requirements": that covers Ghana, Guinea, Guinea-Bissau, Ivory Coast, Liberia, Nigeria and Togo. Article 3(1) still demands a valid travel document and health certificate, and Article 4 keeps each state's right to refuse an inadmissible person. Free movement, not an open border. Mali and Niger left ECOWAS on 29 January 2025 and are no longer bound by the Protocol; a Beninese traveller enters them under the Sahel states' own declaration of 14 December 2024, published in Niger's state daily [Le Sahel](https://www.lesahel.org/declaration-du-college-des-chefs-detat-de-la-confederation-des-etats-du-sahel-aes-sur-la-libre-circulation-le-droit-de-residence-et-detablissement-des-ressortissants-de-la-cedeao/), which declares their confederation "un espace sans visa" for ECOWAS nationals, subject to national law. Kenya comes from a separate instrument, below. The remaining four, Central African Republic, Chad, Cuba and Republic of the Congo, we carry on our own data and have not traced to a published instrument.
+Those first seven come from one legal instrument. Under the [ECOWAS Protocol A/P.1/5/79](https://ecowas.int/wp-content/uploads/2024/08/PROTOCOL-RELATING-TO-FREE-MOVEMENT-OF-PERSONS.pdf), a citizen of one member state can visit another for up to 90 days without a visa. That's free movement rather than an open border: you still need a valid travel document and a health certificate, and each state keeps the right to refuse someone it considers inadmissible.
 
-Kenya splits the two groups cleanly. [Legal Notice No. 93 of 30 May 2025](https://documents.kenyahighcom.org.uk/L.%20%20N.-%2093%20kenyan%20citizenship%20and%20immigration%20act%20.pdf) exempts nationals of **28 named African countries**, Benin, Burkina Faso, Senegal, Tunisia and Nigeria among them, from the eTA requirement for stays up to 60 days. Germans, Britons and Americans must apply. The Schedule names exempt categories positively, so Somalia and Libya are absent rather than excluded.
+Mali and Niger left ECOWAS on 29 January 2025 and are no longer bound by the Protocol. A Beninese traveller still gets in, under the Sahel states' own declaration of 14 December 2024, which makes their confederation a visa-free space for ECOWAS nationals, subject to national law.
 
-The asymmetry is written into law at both ends. Regulation (EU) 2018/1806 sets out which third countries enter Schengen without a visa: [Annex II](https://eur-lex.europa.eu/eli/reg/2018/1806/oj/eng) includes the UAE and Brazil, while Tunisia and Benin sit in Annex I. A Beninese passport holder must apply to visit Germany. A German passport holder must apply to visit Kenya. Strength is directional. The full matrix is in our [reciprocity data](/reciprocity).
+A traveller from any of 28 named African countries, Benin, Burkina Faso, Senegal, Tunisia and Nigeria among them, is exempt from Kenya's eTA for stays of up to 60 days. That comes from [Legal Notice No. 93 of 30 May 2025](https://documents.kenyahighcom.org.uk/L.%20%20N.-%2093%20kenyan%20citizenship%20and%20immigration%20act%20.pdf). Germans, Britons and Americans have to apply.
 
-Two gaps. Burkina Faso, Mali and Niger [left ECOWAS on 29 January 2025](https://www.ecowas.int/burkina-faso-mali-and-nigers-withdrawal-from-ecowas-is-now-a-reality/), and ECOWAS said their citizens keep movement and residence rights "until further notice", which makes that row the least stable in the table. And Benin's visa-free entry for Africans is on a government page after all: a September 2020 notice on [gouv.bj](https://www.gouv.bj/article/851/diplomatie---liste-pays-dont-ressortissants-sont-exemptes-visa-entree-benin-sans-exigence-reciprocite/) says nationals of all 53 African countries may enter for 90 days, but it governs who can enter Benin, not what a Beninese passport opens, so it does not change this table.
+A Beninese or Tunisian traveller must apply to visit Germany; an Emirati or Brazilian one simply turns up. EU visa rules put them on opposite lists. So the Beninese passport holder applies to visit Germany and the German passport holder applies to visit Kenya, which is what people miss when they talk about strength as a single number. It has a direction, and our [reciprocity data](/reciprocity) shows it pair by pair.
 
-## Why the UAE tops every combination
+Burkina Faso left ECOWAS on the same day as Mali and Niger, and ECOWAS said citizens of all three would keep their movement and residence rights "until further notice". That makes its row the least stable of the five.
 
-The Emirati passport is the only one in our data both near-universal at 156 and able to reach destinations most strong Western passports cannot: Russia, Iran, India, Pakistan, Sudan, Syria, Yemen. For a US passport holder it adds China as well. Germany gains 15 from it, Japan 16, the UK 17, the United States 19, Brazil 22.
+## Why the UAE passport tops every combination
 
-China shows the mechanism. Its unilateral waiver covers the 50 countries named on the National Immigration Administration's [list of unilateral visa-exemption countries](https://en.nia.gov.cn/n147418/n147463/c183390/content.html), 35 in Europe, 7 in Asia, 6 in the Americas and 2 in Oceania, for stays of up to 30 days. China's diplomatic missions give the same total: the [embassy in Sweden's FAQ](https://se.china-embassy.gov.cn/lstz/202511/t20251110_11750027.htm), updated 25 May 2026, names the same 50 countries. Germany, Ireland, Japan, South Korea and Brazil are on it, and the UK and Canada joined from 17 February 2026. The United States is absent. The UAE gets in through a different door: a bilateral mutual visa exemption in force since 16 January 2018, in the same administration's [table of mutual exemptions](https://en.nia.gov.cn/n147418/n147463/c181470/content.html). Access is granted as policy, country by country.
+The Emirati passport is the only one in our data that is both near-universal, at 156 destinations, and able to reach places most strong Western passports can't: Russia, Iran, India, Pakistan, Sudan, Syria and Yemen — and, for an American, China too. Only the Indian and Chinese entries trace to a published rule; the rest we carry from our own data. A German passport gains 15 destinations from it, a Japanese one 16, a British one 17, an American one 19 and a Brazilian one 22.
 
-India needs a caveat. It grants visa on arrival to exactly three nationalities, Japan, South Korea and the UAE, and the Emirati entitlement applies "only for such UAE nationals who had earlier obtained e-Visa or regular/paper visa for India", per the [Bureau of Immigration](https://indianvisaonline.gov.in/visa/visa-on-arrival.html). Rs 2,000, 60 days, six airports. So an Emirati passport gets you into India on arrival on the second visit, not the first. For Russia, Iran, Pakistan, Sudan, Syria and Yemen the access is in our data but we have not traced it to a published instrument.
+China's unilateral waiver covers the 50 countries on the National Immigration Administration's [visa-exemption list](https://en.nia.gov.cn/n147418/n147463/c183390/content.html), for stays of up to 30 days. Germany, Ireland, Japan, South Korea and Brazil are on it, and the UK and Canada joined from 17 February 2026. The United States isn't. The UAE gets in through a different door altogether, a mutual visa exemption with China that has been in force since 16 January 2018.
 
-## What this measures, and what it does not
+India grants visa on arrival to only three nationalities, Japan, South Korea and the UAE, and the Emirati version has a catch. According to India's [Bureau of Immigration](https://indianvisaonline.gov.in/visa/visa-on-arrival.html) it applies only to people who have previously held an e-Visa or a regular paper visa for India. It costs Rs 2,000 and is available at six airports. In practice, an Emirati passport gets you into India on arrival on your second visit, not your first.
 
-Travel access. Nothing else. A passport that adds 14 destinations tells you nothing about the right to live or work anywhere, and nothing about the tax, military-service or renunciation consequences that usually decide whether a second nationality is sensible at all.
 
-US citizens are taxed by the IRS on [worldwide income](https://www.irs.gov/individuals/international-taxpayers/us-citizens-and-resident-aliens-abroad) wherever they live. US law also requires a US citizen, with limited exceptions, to use a US passport to enter or leave the United States ([22 CFR 53.1](https://www.govinfo.gov/content/pkg/CFR-2024-title22-vol1/xml/CFR-2024-title22-vol1-sec53-1.xml)), so a second passport is inert at a US border in both directions: you leave and re-enter on the US one, and the other only starts working once you are outside. Germany stopped requiring its own citizens to obtain a retention permit before acquiring a foreign nationality when the [Gesetz zur Modernisierung des Staatsangehörigkeitsrechts (StARModG)](https://www.auswaertiges-amt.de/de/staatsangehoerigkeitsrecht/2088844) came into force on 27 June 2024, repealing the section 25 StAG loss rule; whether the second country tolerates it is a separate question under its own law.
+![White multi-tiered keep of Himeji Castle rising above stone ramparts and a tiled plaster wall, the wall's stone base mirrored in the moat below, with autumn maples on both sides](https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Himeji_Castle%2C_November_2016_-02.jpg/1920px-Himeji_Castle%2C_November_2016_-02.jpg#1920x997)
 
-None of this is legal advice, and we do not rank citizenship-by-investment programmes. Our guide on [which passport to use at which border](/guides/which-passport-to-use-dual-citizenship) covers the practical side, and [our dual citizenship tool](/dual-citizenship) computes the marginal gain for up to three passports against this dataset.
+*Himeji Castle, completed in 1609. A headline country count hides the thing that matters: whether the destinations a pairing adds are places you would ever go. Photo: [Martin Falbisoner](https://commons.wikimedia.org/wiki/User:Martin_Falbisoner) / [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Himeji_Castle,_November_2016_-02.jpg).*
+
+## What a second passport doesn't change
+
+All of this measures travel access and nothing more. It tells you nothing about the right to live or work anywhere, or about the tax, military-service and renunciation consequences that usually decide whether a second nationality makes sense.
+
+US citizens are taxed on their [worldwide income](https://www.irs.gov/individuals/international-taxpayers/us-citizens-and-resident-aliens-abroad) wherever they live, and US law requires them, with limited exceptions, to use a US passport to leave and enter the United States. A second passport does nothing for you at a US border; it only starts working once you're outside.
+
+Germany runs the other way. It stopped requiring its citizens to get a retention permit before taking a foreign nationality when its reformed nationality law came into force on 27 June 2024. Whether the other country accepts dual nationality is a matter for its own law.
+
+None of this is legal advice, and we don't rank citizenship-by-investment programmes. If you're weighing up a particular pair, run it through our [dual citizenship tool](/dual-citizenship), which works out the marginal gain for up to three passports against the same data. Once you hold two, the guide to [which passport to use at which border](/guides/which-passport-to-use-dual-citizenship) covers the practical side.
 
 ## Common questions
 
 ### What is the best second passport for visa-free travel?
 
-The United Arab Emirates, on our count: 156 of 194 destinations, and it produced the largest gain for every first passport we tested. It opens Russia, India and Pakistan, which the strong Western passports do not, and China, which a US passport does not.
+On our count, the United Arab Emirates. It reaches 156 of 194 destinations and gave the largest gain for every first passport we tested, mainly because it opens places such as Russia, India and Pakistan that the strong Western passports don't.
 
-### Which second passport adds the most countries to my current passport?
+### How do you work out combined visa-free access with two passports?
 
-That depends on the one you hold, and the answer often inverts the published rankings. A German passport gains 14 destinations from Benin, Burkina Faso or Senegal, 13 from Tunisia, and only 2 from Ireland.
+Take the union of the two lists, not the sum. Across all 194 destinations, count the ones the second passport reaches and the first doesn't, and that difference is the marginal gain. It's why two strong passports usually add so little to each other.
 
-### How do you calculate combined visa-free access with two passports?
+### Is a second EU passport worth having for travel if I already hold one?
 
-Take the union of the two, not the sum: across all 194 destinations, count the ones the second passport reaches and the first does not. That difference is the marginal gain.
-
-### Does a second EU passport add anything if I already have one?
-
-Barely. Directive 2004/38/EC bars member states from imposing an entry visa on Union citizens, so two EU passports overlap completely inside the Union, and German plus Irish adds two destinations, both outside it.
+Barely. No member state can require an entry visa from an EU citizen, so two EU passports cover exactly the same ground inside the Union. An Irish passport adds only the UK and Uganda to a German one.
 
 ### Do Irish citizens need a UK ETA?
 
-No. British and Irish citizens are exempt, including dual citizens, under the Common Travel Area. Other EU, EEA and Swiss nationals visiting without a visa have needed one since 2 April 2025, unless they hold status under the EU Settlement Scheme. It now costs £20 and lasts two years or until the passport expires, whichever is sooner; it was £10 when the scheme opened to European travellers in March 2025, and went up to £16 before the rise to £20.
-
-### Is an ETA the same as a visa?
-
-No, and the UK government says so: "An ETA is not a visa, it is a digital permission to travel." It is still an application approved before you travel, which is why our count excludes it.
-
-### Do you need a visa to travel within ECOWAS?
-
-Not between member states: Protocol A/P.1/5/79 gives a Community citizen visa-free entry to any other member state for up to 90 days, on a valid travel document and health certificate. A state may still refuse an inadmissible person.
-
-### Do US citizens need a visa for China?
-
-Yes. China's unilateral waiver now covers 50 countries and the United States is not among them; the UK and Canada were added from 17 February 2026.
-
-### Do US citizens need a visa for Brazil?
-
-Since 10 April 2025, yes: an electronic visa at US$80.90, reimposed on Australian, Canadian and US nationals. Because it must be obtained before travel, Brazil does not count as accessible on a US passport in our data.`,
+No, and that includes Irish dual citizens. Other EU, EEA and Swiss nationals visiting without a visa have needed one since 2 April 2025, unless they hold status under the EU Settlement Scheme. It costs £20 and lasts two years, or until the passport expires if that's sooner.`,
+    faq: [
+      {
+        q: "What is the best second passport for visa-free travel?",
+        a: "On our count, the United Arab Emirates. It reaches 156 of 194 destinations and gave the largest gain for every first passport we tested, mainly because it opens places such as Russia, India and Pakistan that the strong Western passports don't.",
+      },
+      {
+        q: "How do you work out combined visa-free access with two passports?",
+        a: "Take the union of the two lists, not the sum. Across all 194 destinations, count the ones the second passport reaches and the first doesn't, and that difference is the marginal gain. It's why two strong passports usually add so little to each other.",
+      },
+      {
+        q: "Is a second EU passport worth having for travel if I already hold one?",
+        a: "Barely. No member state can require an entry visa from an EU citizen, so two EU passports cover exactly the same ground inside the Union. An Irish passport adds only the UK and Uganda to a German one.",
+      },
+      {
+        q: "Do Irish citizens need a UK ETA?",
+        a: "No, and that includes Irish dual citizens. Other EU, EEA and Swiss nationals visiting without a visa have needed one since 2 April 2025, unless they hold status under the EU Settlement Scheme. It costs £20 and lasts two years, or until the passport expires if that's sooner.",
+      },
+    ],
   },
-];
-
+]
 const BY_SLUG = new Map(STATIC_POSTS.map((p) => [p.slug, p]));
 
 export function staticPostBySlug(slug: string): StaticPost | undefined {
@@ -1082,4 +1111,30 @@ export function staticPostBySlug(slug: string): StaticPost | undefined {
 /** Newest first, matching the ORDER BY created_at DESC the database queries use. */
 export function staticPostsNewestFirst(): StaticPost[] {
   return [...STATIC_POSTS].sort((a, b) => b.created_at.localeCompare(a.created_at));
+}
+
+/**
+ * A repo post in the same shape as a blog_posts database row, plus the photo
+ * fields database rows don't have. Used by the public API and the server-
+ * rendered page so both describe a post identically.
+ */
+export function staticPostAsRow(p: StaticPost) {
+  return {
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt,
+    metaDescription: p.metaDescription ?? null,
+    content: p.content,
+    author: p.author,
+    tags: p.tags,
+    created_at: p.created_at,
+    updated_at: p.updated_at,
+    faq: p.faq ?? null,
+    cover_url: p.cover?.src ?? null,
+    cover_alt: p.cover?.alt ?? null,
+    cover_width: p.cover?.width ?? null,
+    cover_height: p.cover?.height ?? null,
+    cover_caption: p.cover?.caption ?? null,
+    cover_credit: p.cover?.credit ?? null,
+  };
 }

@@ -23,7 +23,20 @@ export function miniMarkdown(md: string): string {
   const inline = (raw: string): string => {
     let s = esc(raw);
     // images first (so the link rule doesn't eat them): ![alt](https://url)
-    s = s.replace(/!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/g, '<img src="$2" alt="$1" loading="lazy" style="max-width:100%">');
+    //
+    // An optional "#WxH" fragment on the URL carries the photo's real pixel
+    // size, e.g. ![alt](https://…/foo.jpg#1280x854). Without width/height the
+    // browser cannot reserve the right box and the article reflows as each
+    // photo arrives. Markdown has no syntax for dimensions and raw HTML is
+    // escaped by the client renderer (deliberately — see lib/markdown.ts), so
+    // the fragment is the one channel both renderers can read. It is stripped
+    // from the emitted src; Commons URLs never use fragments themselves.
+    // lib/markdown.ts parses the same hint, so both versions of a post agree.
+    s = s.replace(
+      /!\[([^\]]*)\]\((https?:\/\/[^)\s#]+)(?:#(\d{2,5})x(\d{2,5}))?\)/g,
+      (_m, alt: string, src: string, w?: string, h?: string) =>
+        `<img src="${src}" alt="${alt}"${w && h ? ` width="${w}" height="${h}"` : ""} loading="lazy" decoding="async" style="max-width:100%;height:auto;border-radius:12px">`,
+    );
     s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|\/[^)\s]*)\)/g, '<a href="$2" rel="noopener">$1</a>');
     s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
     s = s.replace(/(^|\W)\*([^*\n]+)\*(?=\W|$)/g, "$1<em>$2</em>");
@@ -132,6 +145,19 @@ export interface BlogPostRow {
    * shortcut to a rich result.
    */
   faq?: { q: string; a: string }[] | null;
+  /** Alt text for the cover; falls back to the title. */
+  cover_alt?: string | null;
+  cover_width?: number | null;
+  cover_height?: number | null;
+  cover_caption?: string | null;
+  cover_credit?: { author: string; authorUrl?: string; license: string; licenseUrl: string; sourceUrl: string } | null;
+}
+
+/** "Photo: Author / CC BY-SA 4.0, via Wikimedia Commons", each part linked where a link exists. */
+export function photoCreditHtml(c: NonNullable<BlogPostRow["cover_credit"]>): string {
+  const who = c.authorUrl ? `<a href="${esc(c.authorUrl)}" rel="noopener">${esc(c.author)}</a>` : esc(c.author);
+  const host = /commons\.wikimedia\.org/.test(c.sourceUrl) ? "Wikimedia Commons" : "source";
+  return `Photo: ${who} / <a href="${esc(c.licenseUrl)}" rel="noopener license">${esc(c.license)}</a>, via <a href="${esc(c.sourceUrl)}" rel="noopener">${host}</a>`;
 }
 
 function isoDate(v: string | Date | null | undefined): string | null {
@@ -160,6 +186,8 @@ export function renderBlogPostShell(post: BlogPostRow): string | null {
   const published = isoDate(post.created_at);
   const modified = isoDate(post.updated_at) ?? published;
   const cover = post.cover_url && /^https?:\/\//.test(post.cover_url) ? post.cover_url : null;
+  const coverAlt = post.cover_alt || post.title;
+  const dims = post.cover_width && post.cover_height ? ` width="${post.cover_width}" height="${post.cover_height}"` : "";
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -169,7 +197,16 @@ export function renderBlogPostShell(post: BlogPostRow): string | null {
     url: canonical,
     ...(published ? { datePublished: published } : {}),
     ...(modified ? { dateModified: modified } : {}),
-    ...(cover ? { image: cover } : {}),
+    ...(cover
+      ? {
+          image: {
+            "@type": "ImageObject",
+            url: cover,
+            ...(post.cover_width && post.cover_height ? { width: post.cover_width, height: post.cover_height } : {}),
+            ...(post.cover_credit ? { creditText: post.cover_credit.author, license: post.cover_credit.licenseUrl, acquireLicensePage: post.cover_credit.sourceUrl } : {}),
+          },
+        }
+      : {}),
     author: { "@type": "Organization", name: post.author || "isvisarequired.com" },
     publisher: { "@type": "Organization", name: "isvisarequired.com", url: SITE },
     isPartOf: { "@type": "WebSite", name: "isvisarequired.com", url: SITE },
@@ -199,7 +236,7 @@ export function renderBlogPostShell(post: BlogPostRow): string | null {
     <nav style="font-size:13px;color:#64748b"><a href="/" style="color:#64748b">Home</a> › <a href="/blog" style="color:#64748b">Blog</a></nav>
     <h1>${esc(post.title)}</h1>
     ${published ? `<p style="color:#64748b;font-size:14px">${esc(post.author || "isvisarequired.com")} · ${esc(published)}</p>` : ""}
-    ${cover ? `<img src="${esc(cover)}" alt="${esc(post.title)}" loading="lazy" style="max-width:100%;border-radius:12px">` : ""}
+    ${cover ? `<figure style="margin:20px 0 28px"><img src="${esc(cover)}" alt="${esc(coverAlt)}"${dims} fetchpriority="high" decoding="async" style="width:100%;height:auto;max-height:440px;object-fit:cover;border-radius:14px;display:block"><figcaption style="font-size:12px;color:#64748b;margin-top:8px;line-height:1.5">${post.cover_caption ? `${esc(post.cover_caption)} · ` : ""}${post.cover_credit ? photoCreditHtml(post.cover_credit) : ""}</figcaption></figure>` : ""}
     ${miniMarkdown(post.content)}
     <p style="margin-top:28px"><a href="/">Check your visa requirements instantly →</a></p>
   </article>`;
@@ -209,18 +246,37 @@ export function renderBlogPostShell(post: BlogPostRow): string | null {
   // and wrong here: two FAQPage blocks on one URL is not two chances at a rich
   // result, it is a reason for Google to trust neither. When the post brings its
   // own — always more relevant to the query that found it — the shell's goes.
-  if (faqLd) {
-    html = html.replace(
-      /<script type="application\/ld\+json">([\s\S]*?)<\/script>\s*/gi,
-      (match, body: string) => (/"@type"\s*:\s*"FAQPage"/.test(body) ? "" : match),
-    );
-  }
+  //
+  // This runs unconditionally, not only when the post has its own FAQ. A post
+  // without one used to inherit the homepage's questions ("How do I check if I
+  // need a visa?" and seven others), none of which appear anywhere on the post.
+  // Structured data that isn't on the page is a manual-action offence, so the
+  // shell's block has to go whether or not we have something to put in its place.
+  html = html.replace(
+    /<script type="application\/ld\+json">([\s\S]*?)<\/script>\s*/gi,
+    (match, body: string) => (/"@type"\s*:\s*"FAQPage"/.test(body) ? "" : match),
+  );
   html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${esc(title)}</title>`);
   html = html.replace(/<meta\s+name="description"\s+content="[\s\S]*?"\s*\/?>/i, `<meta name="description" content="${esc(description)}" />`);
   html = html.replace(/<link\s+rel="canonical"\s+href="[\s\S]*?"\s*\/?>/i, `<link rel="canonical" href="${esc(canonical)}" />`);
+  // The shell ships the homepage's Open Graph and Twitter tags. Appending a
+  // post's own tags after them left two of each, and Facebook, LinkedIn, Slack
+  // and X take the first — so every post shared as the generic homepage card.
+  // Strip the page-specific ones and write this post's set in their place;
+  // og:site_name, og:locale and twitter:site/creator are site-wide and stay.
+  html = html.replace(/\s*<meta\s+property="og:(?:type|url|title|description|image(?::[a-z_]+)?)"[^>]*>/gi, "");
+  html = html.replace(/\s*<meta\s+name="twitter:(?:card|title|description|image(?::[a-z_]+)?)"[^>]*>/gi, "");
+  const shareImage = cover ?? `${SITE}/opengraph.jpg`;
+  const shareAlt = cover ? coverAlt : "Is Visa Required? – Free Visa Checker";
+  const shareDims = cover
+    ? post.cover_width && post.cover_height
+      ? `<meta property="og:image:width" content="${post.cover_width}"><meta property="og:image:height" content="${post.cover_height}">`
+      : ""
+    : `<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">`;
   html = html.replace(
     "</head>",
-    `<meta property="og:type" content="article"><meta property="og:title" content="${esc(post.title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:url" content="${esc(canonical)}">${cover ? `<meta property="og:image" content="${esc(cover)}">` : ""}
+    `<meta property="og:type" content="article"><meta property="og:title" content="${esc(post.title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:url" content="${esc(canonical)}"><meta property="og:image" content="${esc(shareImage)}"><meta property="og:image:alt" content="${esc(shareAlt)}">${shareDims}${published ? `<meta property="article:published_time" content="${published}">` : ""}${modified ? `<meta property="article:modified_time" content="${modified}">` : ""}
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(post.title)}"><meta name="twitter:description" content="${esc(description)}"><meta name="twitter:image" content="${esc(shareImage)}"><meta name="twitter:image:alt" content="${esc(shareAlt)}">
 <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>${faqLd ? `\n<script type="application/ld+json">${JSON.stringify(faqLd)}</script>` : ""}
 </head>`,

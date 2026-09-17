@@ -7,7 +7,7 @@ import { getAuth } from "@clerk/express";
 import { logger } from "../lib/logger";
 import { requireAdmin, isAdminUser } from "../middleware/requireAdmin";
 import { writeLimiter } from "../middleware/rateLimiter";
-import { staticPostBySlug, staticPostsNewestFirst } from "../content/posts";
+import { staticPostAsRow, staticPostBySlug, staticPostsNewestFirst } from "../content/posts";
 
 const router: IRouter = Router();
 
@@ -234,11 +234,14 @@ router.put("/admin/settings", writeLimiter, requireAdmin, async (req: Request, r
 // Repo-authored posts (src/content/posts.ts) are merged with database posts.
 // A database row always wins on a slug collision so /admin/blog can override one.
 function staticListRows(): Record<string, unknown>[] {
-  return staticPostsNewestFirst().map((p) => ({
-    id: p.slug, title: p.title, slug: p.slug, excerpt: p.excerpt,
-    cover_url: null, tags: p.tags, author: p.author,
-    created_at: p.created_at, updated_at: p.updated_at,
-  }));
+  return staticPostsNewestFirst().map((p) => {
+    const row = staticPostAsRow(p);
+    return {
+      id: p.slug, title: row.title, slug: row.slug, excerpt: row.excerpt,
+      cover_url: row.cover_url, cover_alt: row.cover_alt, tags: row.tags, author: row.author,
+      created_at: row.created_at, updated_at: row.updated_at,
+    };
+  });
 }
 
 function mergeBySlug(dbRows: Record<string, unknown>[], staticRows: Record<string, unknown>[]) {
@@ -270,7 +273,7 @@ router.get("/blog/posts/:slug", async (req: Request, res: Response): Promise<voi
   const fallback = staticPostBySlug(slug);
   const sendStatic = () => {
     res.setHeader("Cache-Control", "public, max-age=120, stale-while-revalidate=600");
-    res.json({ post: { ...fallback, id: fallback!.slug, cover_url: null, published: true } });
+    res.json({ post: { ...staticPostAsRow(fallback!), id: fallback!.slug, published: true } });
   };
   if (!isDatabaseConfigured()) {
     if (fallback) { sendStatic(); return; }

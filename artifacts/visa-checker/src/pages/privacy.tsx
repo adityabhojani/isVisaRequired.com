@@ -229,8 +229,8 @@ export default function PrivacyPage() {
                 ],
                 [
                   <><Strong>Wikimedia (Wikipedia)</Strong> — <Ext href="https://foundation.wikimedia.org/wiki/Policy:Privacy_policy">privacy policy</Ext></>,
-                  "Destination pages and \"things to do\" sections, to show photos of attractions.",
-                  "IP address, user agent and which attractions' photos are requested. Wikimedia may set its own cookie.",
+                  "Destination pages and \"things to do\" sections, and the photos in our blog posts.",
+                  "IP address, user agent and which photos are requested. Wikimedia may set its own cookie.",
                 ],
                 [
                   <Strong>Our database host</Strong>,

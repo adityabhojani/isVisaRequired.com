@@ -37,10 +37,22 @@ const safeMarked = new Marked({
       if (!url) return text;
       return `<a href="${escapeHtml(url).replace(/"/g, "&quot;")}"${title ? ` title="${escapeHtml(title).replace(/"/g, "&quot;")}"` : ""} rel="noopener">${text}</a>`;
     },
+    // An optional "#WxH" fragment on the URL carries the photo's real pixel
+    // size, e.g. ![alt](https://…/foo.jpg#1280x854). Without width/height the
+    // browser cannot reserve the right box and the article reflows as each
+    // photo arrives. Markdown has no syntax for dimensions, and raw HTML is
+    // escaped above by design, so the fragment is the one channel both
+    // renderers can read. It is stripped from the emitted src; the Wikimedia
+    // Commons URLs these posts use never carry fragments themselves.
+    // miniMarkdown on the server parses the same hint, so the crawled and
+    // hydrated versions of a post agree image for image.
     image({ href, title, text }) {
       const url = safeUrl(href);
       if (!url) return escapeHtml(text);
-      return `<img src="${escapeHtml(url).replace(/"/g, "&quot;")}" alt="${escapeHtml(text).replace(/"/g, "&quot;")}"${title ? ` title="${escapeHtml(title).replace(/"/g, "&quot;")}"` : ""} loading="lazy">`;
+      const dims = url.match(/^(.*)#(\d{2,5})x(\d{2,5})$/);
+      const src = dims ? (dims[1] as string) : url;
+      const size = dims ? ` width="${dims[2]}" height="${dims[3]}"` : "";
+      return `<img src="${escapeHtml(src).replace(/"/g, "&quot;")}" alt="${escapeHtml(text).replace(/"/g, "&quot;")}"${size}${title ? ` title="${escapeHtml(title).replace(/"/g, "&quot;")}"` : ""} loading="lazy">`;
     },
   },
 });

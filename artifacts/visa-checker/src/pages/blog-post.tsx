@@ -14,6 +14,11 @@ interface BlogPost {
   excerpt: string;
   content: string;
   cover_url: string | null;
+  cover_alt?: string | null;
+  cover_width?: number | null;
+  cover_height?: number | null;
+  cover_caption?: string | null;
+  cover_credit?: { author: string; authorUrl?: string; license: string; licenseUrl: string; sourceUrl: string } | null;
   tags: string[];
   author: string;
   created_at: string;
@@ -144,11 +149,37 @@ export default function BlogPostPage() {
 
         {/* Cover */}
         {post.cover_url && (
-          <img
-            src={post.cover_url}
-            alt={post.title}
-            className="w-full h-72 object-cover rounded-2xl mb-8 shadow-sm"
-          />
+          <figure className="mb-8">
+            <img
+              src={post.cover_url}
+              alt={post.cover_alt || post.title}
+              width={post.cover_width ?? undefined}
+              height={post.cover_height ?? undefined}
+              fetchPriority="high"
+              decoding="async"
+              className="w-full h-64 md:h-[26rem] object-cover rounded-2xl shadow-sm bg-muted"
+            />
+            {(post.cover_caption || post.cover_credit) && (
+              <figcaption className="mt-2.5 text-xs text-muted-foreground leading-relaxed">
+                {post.cover_caption && <span>{post.cover_caption}</span>}
+                {post.cover_caption && post.cover_credit && <span> · </span>}
+                {post.cover_credit && (
+                  <span>
+                    Photo:{" "}
+                    {post.cover_credit.authorUrl ? (
+                      <a href={post.cover_credit.authorUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">{post.cover_credit.author}</a>
+                    ) : (
+                      post.cover_credit.author
+                    )}{" "}
+                    /{" "}
+                    <a href={post.cover_credit.licenseUrl} target="_blank" rel="noopener noreferrer license" className="underline underline-offset-2 hover:text-foreground">{post.cover_credit.license}</a>
+                    , via{" "}
+                    <a href={post.cover_credit.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">Wikimedia Commons</a>
+                  </span>
+                )}
+              </figcaption>
+            )}
+          </figure>
         )}
 
         {/* Tags */}
@@ -189,7 +220,8 @@ export default function BlogPostPage() {
             prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground
             prose-code:text-primary prose-code:bg-primary/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
             prose-pre:bg-[hsl(222_47%_11%)] prose-pre:text-white/90
-            prose-img:rounded-xl
+            prose-img:rounded-xl prose-img:w-full prose-img:mb-2
+            [&_p:has(>img)+p>em]:text-xs [&_p:has(>img)+p>em]:text-muted-foreground [&_p:has(>img)+p>em]:not-italic
             prose-strong:text-foreground
             prose-ul:text-foreground/85 prose-ol:text-foreground/85
             prose-hr:border-border"
