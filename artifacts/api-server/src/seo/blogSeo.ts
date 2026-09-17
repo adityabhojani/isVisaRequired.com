@@ -32,12 +32,35 @@ export function miniMarkdown(md: string): string {
     // the fragment is the one channel both renderers can read. It is stripped
     // from the emitted src; Commons URLs never use fragments themselves.
     // lib/markdown.ts parses the same hint, so both versions of a post agree.
+    //
+    // The whole destination is captured first and the hint picked off it
+    // afterwards, exactly as the client does. Matching the hint inside the URL
+    // pattern instead would make a MALFORMED hint ("#1280x") fail the image
+    // rule, drop through to the link rule below, and render an <a> on the
+    // server against an <img> on the client — the same silent server/client
+    // divergence that shipped the truncated credit links.
     s = s.replace(
-      /!\[([^\]]*)\]\((https?:\/\/[^)\s#]+)(?:#(\d{2,5})x(\d{2,5}))?\)/g,
-      (_m, alt: string, src: string, w?: string, h?: string) =>
-        `<img src="${src}" alt="${alt}"${w && h ? ` width="${w}" height="${h}"` : ""} loading="lazy" decoding="async" style="max-width:100%;height:auto;border-radius:12px">`,
+      /!\[([^\]]*)\]\((https?:\/\/(?:[^()\s]|\([^()\s]*\))+)\)/g,
+      (_m, alt: string, url: string) => {
+        const hint = url.match(/^(.*)#(\d{2,5})x(\d{2,5})$/);
+        const src = hint ? hint[1] : url;
+        const size = hint ? ` width="${hint[2]}" height="${hint[3]}"` : "";
+        return `<img src="${src}" alt="${alt}"${size} loading="lazy" decoding="async" style="max-width:100%;height:auto;border-radius:12px">`;
+      },
     );
-    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+|\/[^)\s]*)\)/g, '<a href="$2" rel="noopener">$1</a>');
+    // The destination allows ONE level of balanced parentheses, because
+    // Wikimedia Commons file pages routinely contain them —
+    // File:Princetown_(AU),_..._Twelve_Apostles_--_2019_--_0969.jpg. A plain
+    // [^)]+ stops at the first ")", which silently cut five photo-credit links
+    // down to a 404 and spilled the rest of each URL onto the page as visible
+    // text. It failed only server-side, because marked (the client renderer)
+    // already handles balanced parentheses — so the bug was invisible in the
+    // browser and showed only to crawlers and no-JS readers. Keep the two in
+    // step: anything accepted here must parse the same way in marked.
+    s = s.replace(
+      /\[([^\]]+)\]\(((?:https?:\/\/|\/)(?:[^()\s]|\([^()\s]*\))*)\)/g,
+      '<a href="$2" rel="noopener">$1</a>',
+    );
     s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
     s = s.replace(/(^|\W)\*([^*\n]+)\*(?=\W|$)/g, "$1<em>$2</em>");
     s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
