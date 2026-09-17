@@ -4,6 +4,7 @@
 // visitor of the public /blog/:slug page. We escape raw-HTML tokens instead —
 // posts are written in plain Markdown, so nothing legitimate is lost.
 import { Marked } from "marked";
+import { commonsSrcSet, ARTICLE_IMAGE_SIZES } from "@workspace/travel-data";
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -52,7 +53,12 @@ const safeMarked = new Marked({
       const dims = url.match(/^(.*)#(\d{2,5})x(\d{2,5})$/);
       const src = dims ? (dims[1] as string) : url;
       const size = dims ? ` width="${dims[2]}" height="${dims[3]}"` : "";
-      return `<img src="${escapeHtml(src).replace(/"/g, "&quot;")}" alt="${escapeHtml(text).replace(/"/g, "&quot;")}"${size}${title ? ` title="${escapeHtml(title).replace(/"/g, "&quot;")}"` : ""} loading="lazy">`;
+      // Commons only serves a fixed set of widths, and without a srcset the
+      // browser takes the 1920px file onto a phone rendering it at 375px.
+      // miniMarkdown builds the same attribute from the same helper.
+      const set = dims ? commonsSrcSet(src, Number(dims[2])) : null;
+      const responsive = set ? ` srcset="${escapeHtml(set).replace(/"/g, "&quot;")}" sizes="${ARTICLE_IMAGE_SIZES}"` : "";
+      return `<img src="${escapeHtml(src).replace(/"/g, "&quot;")}" alt="${escapeHtml(text).replace(/"/g, "&quot;")}"${size}${responsive}${title ? ` title="${escapeHtml(title).replace(/"/g, "&quot;")}"` : ""} loading="lazy">`;
     },
   },
 });

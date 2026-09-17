@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { commonsSrcSet, CARD_IMAGE_SIZES } from "@workspace/travel-data";
 import { Header, PageHero } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useSEO } from "@/hooks/useSEO";
@@ -12,6 +13,8 @@ interface BlogPost {
   excerpt: string;
   cover_url: string | null;
   cover_alt?: string | null;
+  cover_width?: number | null;
+  cover_height?: number | null;
   tags: string[];
   author: string;
   created_at: string;
@@ -83,7 +86,7 @@ export default function BlogPage() {
               >
                 <div className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
                   {posts[0].cover_url ? (
-                    <img src={posts[0].cover_url} alt={posts[0].cover_alt || posts[0].title} fetchPriority="high" decoding="async" className="w-full h-64 object-cover" />
+                    <img src={posts[0].cover_url} srcSet={(posts[0].cover_width ? commonsSrcSet(posts[0].cover_url, posts[0].cover_width) : null) ?? undefined} sizes={CARD_IMAGE_SIZES} alt={posts[0].cover_alt || posts[0].title} fetchPriority="high" decoding="async" className="w-full h-64 object-cover" />
                   ) : (
                     <div className="w-full h-64 bg-secondary/60 flex items-center justify-center">
                       <div className="text-6xl">✈️</div>
@@ -117,7 +120,7 @@ export default function BlogPage() {
                   <a key={post.id} href={`/blog/${post.slug}`} className="group block">
                     <div className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-md transition-all hover:-translate-y-0.5">
                       {post.cover_url ? (
-                        <img src={post.cover_url} alt={post.cover_alt || post.title} loading="lazy" decoding="async" className="w-full h-44 object-cover" />
+                        <img src={post.cover_url} srcSet={(post.cover_width ? commonsSrcSet(post.cover_url, post.cover_width) : null) ?? undefined} sizes={CARD_IMAGE_SIZES} alt={post.cover_alt || post.title} loading="lazy" decoding="async" className="w-full h-44 object-cover" />
                       ) : (
                         <div className="w-full h-44 bg-secondary flex items-center justify-center">
                           <span className="text-4xl">🌍</span>

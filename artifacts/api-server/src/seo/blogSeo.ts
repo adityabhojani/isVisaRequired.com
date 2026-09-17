@@ -5,6 +5,7 @@
 // (everything is HTML-escaped before our own tags are added), so post content
 // can never inject script.
 import { loadShell, SITE } from "./appShell";
+import { commonsSrcSet, ARTICLE_IMAGE_SIZES } from "@workspace/travel-data";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -45,7 +46,10 @@ export function miniMarkdown(md: string): string {
         const hint = url.match(/^(.*)#(\d{2,5})x(\d{2,5})$/);
         const src = hint ? hint[1] : url;
         const size = hint ? ` width="${hint[2]}" height="${hint[3]}"` : "";
-        return `<img src="${src}" alt="${alt}"${size} loading="lazy" decoding="async" style="max-width:100%;height:auto;border-radius:12px">`;
+        // Commons serves the 1920px file otherwise, onto a phone showing it at 375px.
+        const set = hint ? commonsSrcSet(src!, Number(hint[2])) : null;
+        const responsive = set ? ` srcset="${set}" sizes="${ARTICLE_IMAGE_SIZES}"` : "";
+        return `<img src="${src}" alt="${alt}"${size}${responsive} loading="lazy" decoding="async" style="max-width:100%;height:auto;border-radius:12px">`;
       },
     );
     // The destination allows ONE level of balanced parentheses, because
@@ -211,6 +215,9 @@ export function renderBlogPostShell(post: BlogPostRow): string | null {
   const cover = post.cover_url && /^https?:\/\//.test(post.cover_url) ? post.cover_url : null;
   const coverAlt = post.cover_alt || post.title;
   const dims = post.cover_width && post.cover_height ? ` width="${post.cover_width}" height="${post.cover_height}"` : "";
+  // Without srcset the browser takes the 1920px cover onto a 375px phone.
+  const coverSet = cover && post.cover_width ? commonsSrcSet(cover, post.cover_width) : null;
+  const coverResponsive = coverSet ? ` srcset="${esc(coverSet)}" sizes="${ARTICLE_IMAGE_SIZES}"` : "";
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -259,7 +266,7 @@ export function renderBlogPostShell(post: BlogPostRow): string | null {
     <nav style="font-size:13px;color:#64748b"><a href="/" style="color:#64748b">Home</a> › <a href="/blog" style="color:#64748b">Blog</a></nav>
     <h1>${esc(post.title)}</h1>
     ${published ? `<p style="color:#64748b;font-size:14px">${esc(post.author || "isvisarequired.com")} · ${esc(published)}</p>` : ""}
-    ${cover ? `<figure style="margin:20px 0 28px"><img src="${esc(cover)}" alt="${esc(coverAlt)}"${dims} fetchpriority="high" decoding="async" style="width:100%;height:auto;max-height:440px;object-fit:cover;border-radius:14px;display:block"><figcaption style="font-size:12px;color:#64748b;margin-top:8px;line-height:1.5">${post.cover_caption ? `${esc(post.cover_caption)} · ` : ""}${post.cover_credit ? photoCreditHtml(post.cover_credit) : ""}</figcaption></figure>` : ""}
+    ${cover ? `<figure style="margin:20px 0 28px"><img src="${esc(cover)}" alt="${esc(coverAlt)}"${dims}${coverResponsive} fetchpriority="high" decoding="async" style="width:100%;height:auto;max-height:440px;object-fit:cover;border-radius:14px;display:block"><figcaption style="font-size:12px;color:#64748b;margin-top:8px;line-height:1.5">${post.cover_caption ? `${esc(post.cover_caption)} · ` : ""}${post.cover_credit ? photoCreditHtml(post.cover_credit) : ""}</figcaption></figure>` : ""}
     ${miniMarkdown(post.content)}
     <p style="margin-top:28px"><a href="/">Check your visa requirements instantly →</a></p>
   </article>`;

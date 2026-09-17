@@ -238,7 +238,11 @@ function staticListRows(): Record<string, unknown>[] {
     const row = staticPostAsRow(p);
     return {
       id: p.slug, title: row.title, slug: row.slug, excerpt: row.excerpt,
-      cover_url: row.cover_url, cover_alt: row.cover_alt, tags: row.tags, author: row.author,
+      cover_url: row.cover_url, cover_alt: row.cover_alt,
+      // Cards need the real size to build a srcset and reserve the right box;
+      // without it the index pulls eight 1920px covers onto a phone.
+      cover_width: row.cover_width, cover_height: row.cover_height,
+      tags: row.tags, author: row.author,
       created_at: row.created_at, updated_at: row.updated_at,
     };
   });

@@ -1,4 +1,5 @@
 import { useParams } from "wouter";
+import { commonsSrcSet, ARTICLE_IMAGE_SIZES } from "@workspace/travel-data";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -152,6 +153,15 @@ export default function BlogPostPage() {
           <figure className="mb-8">
             <img
               src={post.cover_url}
+              srcSet={
+                (post.cover_width ? commonsSrcSet(post.cover_url, post.cover_width) : null) ??
+                undefined
+              }
+              sizes={
+                post.cover_width && commonsSrcSet(post.cover_url, post.cover_width)
+                  ? ARTICLE_IMAGE_SIZES
+                  : undefined
+              }
               alt={post.cover_alt || post.title}
               width={post.cover_width ?? undefined}
               height={post.cover_height ?? undefined}
