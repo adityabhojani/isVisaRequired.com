@@ -34,6 +34,7 @@ import { trackEvent } from "@/lib/analytics";
 const WorldMap = lazy(() => import("@/components/WorldMap"));
 
 import { styleForResult, reqConfig, requirementOrder } from "@/lib/requirement";
+import { START_PASSPORTS } from "@/components/PassportQuickStart";
 
 function CountryCombobox({ value, onChange, countries, placeholder, label, isLoading, excludeCode, open: openProp, onOpenChange }: {
   value: string; onChange: (code: string) => void; countries: Country[];
@@ -158,16 +159,18 @@ const filterOptions: { value: FilterOption; label: string }[] = [
   ...requirementOrder.map((value) => ({ value, label: reqConfig[value].label })),
 ];
 
-function ResultCard({ result, passport, isExpanded, onToggle }: {
+function ResultCard({ result, passport, isExpanded, onToggle, soleResult = false }: {
   result: VisaResult;
   passport: string;
   isExpanded: boolean;
   onToggle: () => void;
+  /** The only result: its verdict and hint are already the headline above. */
+  soleResult?: boolean;
 }) {
   // ETA-aware: a UK ETA or US ESTA is stored as e_visa but shown as what it is.
   const config = styleForResult(result.requirement, result.notes, result.maxStay);
   const Icon = config.icon;
-  const stay = result.maxStay === "unlimited" ? "No stay limit" : result.maxStay ? `Stay up to ${result.maxStay}` : config.hint;
+  const stay = result.maxStay === "unlimited" ? "No stay limit" : result.maxStay ? `Stay up to ${result.maxStay}` : soleResult ? "Documents, steps and the official link" : config.hint;
 
   return (
     <div>
@@ -197,8 +200,9 @@ function ResultCard({ result, passport, isExpanded, onToggle }: {
             passport={passport}
             destinationCode={result.destinationCountry.code}
             destinationName={result.destinationCountry.name}
-                        requirement={result.requirement}
+            requirement={result.requirement}
             maxStay={result.maxStay}
+            notes={result.notes}
           />
         </div>
       )}
@@ -291,20 +295,7 @@ const SOCIAL_PROOF_MIN = 50;
 // Passports that have an editorial roundup guide behind them (guidesData.ts).
 // Deliberately titled "Start with a passport", not "most popular" — we have no
 // traffic data to substantiate a popularity claim.
-const START_PASSPORTS = [
-  { code: "IN", name: "India", flag: "\u{1F1EE}\u{1F1F3}" },
-  { code: "NG", name: "Nigeria", flag: "\u{1F1F3}\u{1F1EC}" },
-  { code: "PK", name: "Pakistan", flag: "\u{1F1F5}\u{1F1F0}" },
-  { code: "PH", name: "Philippines", flag: "\u{1F1F5}\u{1F1ED}" },
-  { code: "BD", name: "Bangladesh", flag: "\u{1F1E7}\u{1F1E9}" },
-  { code: "KE", name: "Kenya", flag: "\u{1F1F0}\u{1F1EA}" },
-  { code: "VN", name: "Vietnam", flag: "\u{1F1FB}\u{1F1F3}" },
-  { code: "ID", name: "Indonesia", flag: "\u{1F1EE}\u{1F1E9}" },
-  { code: "EG", name: "Egypt", flag: "\u{1F1EA}\u{1F1EC}" },
-  { code: "CN", name: "China", flag: "\u{1F1E8}\u{1F1F3}" },
-  { code: "TR", name: "T\u00FCrkiye", flag: "\u{1F1F9}\u{1F1F7}" },
-  { code: "ZA", name: "South Africa", flag: "\u{1F1FF}\u{1F1E6}" },
-];
+// START_PASSPORTS lives in components/PassportQuickStart (shared with /discover and /stats).
 
 // Static link panels. Each entry states a route, never an outcome, so no visa
 // fact is asserted here and nothing can drift out of date.
@@ -739,6 +730,7 @@ export default function HomePage() {
                   passport={passport}
                   isExpanded={expandedCode === r.destinationCountry.code}
                   onToggle={() => setExpandedCode((prev) => prev === r.destinationCountry.code ? null : r.destinationCountry.code)}
+                  soleResult={results.length === 1}
                 />
               ))}
               {sortedFilteredResults.length === 0 && (

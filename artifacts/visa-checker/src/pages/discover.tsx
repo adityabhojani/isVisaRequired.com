@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Sparkles, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useSEO } from "@/hooks/useSEO";
 import { Footer } from "@/components/Footer";
 import { Header, PageHero } from "@/components/Header";
@@ -11,6 +11,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { reqConfig, styleForResult } from "@/lib/requirement";
+import { PassportQuickStart } from "@/components/PassportQuickStart";
 
 const REGIONS = ["All regions", "Europe", "Asia", "Americas", "Africa", "Middle East", "Oceania", "Caribbean"];
 
@@ -218,13 +219,7 @@ export default function DiscoverPage() {
         )}
 
         {!passport && (
-          <div className="text-center py-16 text-muted-foreground">
-            <div className="w-20 h-20 rounded-3xl bg-secondary flex items-center justify-center mx-auto mb-5">
-              <Sparkles className="h-10 w-10 text-primary/50" />
-            </div>
-            <p className="text-lg font-semibold text-foreground mb-1">Select your passport</p>
-            <p className="text-sm">Filter all 195 countries by visa type and region</p>
-          </div>
+          <PassportQuickStart onPick={setPassport} blurb="Then filter all 195 countries by visa type and region." />
         )}
       </main>
       <Footer />

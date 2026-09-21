@@ -14,6 +14,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { reqConfig } from "@/lib/requirement";
+import { PassportQuickStart } from "@/components/PassportQuickStart";
 
 const COLORS = ["#16a34a", "#d97706", "#2563eb", "#ea580c", "#dc2626"];
 const LABELS = ["Visa Free", "Visa on Arrival", "eVisa", "Visa Required", "No Admission"];
@@ -221,13 +222,7 @@ export default function StatsPage() {
         <AdSlot slotId="5621034987" size="responsive" className="mt-8" />
 
         {!passport && !stats && (
-          <div className="text-center py-16 text-muted-foreground">
-            <div className="w-20 h-20 rounded-3xl bg-amber-50 flex items-center justify-center mx-auto mb-5">
-              <Trophy className="h-10 w-10 text-amber-400" />
-            </div>
-            <p className="text-lg font-semibold text-foreground mb-1">Select your passport</p>
-            <p className="text-sm">See its global power rank and access breakdown</p>
-          </div>
+          <PassportQuickStart onPick={setPassport} blurb="See its global power rank and where it can go." />
         )}
       </main>
       <Footer />

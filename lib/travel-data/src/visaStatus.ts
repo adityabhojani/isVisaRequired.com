@@ -229,3 +229,31 @@ export function statusCssVars(): string {
     return `--status-${n}-solid:${s.solid};--status-${n}-ink:${s.ink};--status-${n}-tint:${s.tint};--status-${n}-line:${s.line};`;
   }).join("") + `--status-no-data:${NO_DATA_FILL};`;
 }
+
+// ── known vs unknown facts ───────────────────────────────────────────────────
+// The per-pair "facts" (stay, fee, processing) are mostly per-visa-type
+// templates, and many are "Varies — check…" placeholders. Both renderers apply
+// the same rule: a genuine value is shown as a fact; a placeholder is never
+// shown at fact weight, only named in one quiet sentence. It lives here so the
+// pair pages and the app's result panel can't disagree about what is known.
+
+/** True for a real value; false for empty or a "Varies…" placeholder. */
+export function isKnownFact(v: string | null | undefined): v is string {
+  return !!v && !/^\s*varies/i.test(v);
+}
+
+/**
+ * One honest sentence naming what the data doesn't hold, or "" if nothing is
+ * missing. `fields` in reading order, e.g. ["permitted stay", "fee"].
+ */
+export function unknownFactsSentence(fields: string[], kind: VerdictKind): string {
+  if (!fields.length) return "";
+  const list = fields.length === 1 ? fields[0] : `${fields.slice(0, -1).join(", ")} or ${fields[fields.length - 1]}`;
+  const verb = kind === "visa_free" || kind === "visa_on_arrival" ? "travel" : "apply";
+  return `Our data doesn't record the ${list} for this route — check the official page before you ${verb}.`;
+}
+
+/** Which verdicts involve an application, so processing time is worth naming. */
+export function needsApplication(kind: VerdictKind): boolean {
+  return kind === "e_visa" || kind === "eta" || kind === "visa_required";
+}

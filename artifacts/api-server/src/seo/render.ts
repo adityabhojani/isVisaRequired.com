@@ -14,7 +14,7 @@ import { getDefaultEntry } from "../data/visaData";
 import { getVisaDetail, getCountryTouristInfo } from "../data/countryDetails";
 import { officialLinks } from "../data/officialLinks";
 import { getEntryRules, hasSpecificRules } from "../data/entryRequirements";
-import { verdictKind, verdictStatus, statusIconSvg, type VerdictKind } from "@workspace/travel-data";
+import { verdictKind, verdictStatus, statusIconSvg, isKnownFact, unknownFactsSentence, needsApplication, type VerdictKind } from "@workspace/travel-data";
 
 // Canonical host (matches existing sitemap/robots). Keep in sync with robots.txt.
 export const SITE_ORIGIN = "https://www.isvisarequired.com";
@@ -104,10 +104,6 @@ interface FaqItem {
 // Where the words and colours come from: lib/travel-data/src/visaStatus.ts,
 // shared with the React app, so the two can no longer disagree.
 
-/** A value counts as a known fact only if it is not one of the template shrugs. */
-function isKnown(v: string | null | undefined): v is string {
-  return !!v && !/^\s*varies/i.test(v);
-}
 
 /** Hostname for the official-link button, so the reader sees where they're going. */
 function hostOf(url: string): string {
@@ -129,7 +125,7 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
   // passport, so everything below except entry.maxStay and a handful of fee
   // overrides is a per-visa-type template. Only genuine values become chips.
   const stayValue = entry.maxStay || detail.maxStay;
-  const stayKnown = isKnown(stayValue);
+  const stayKnown = isKnownFact(stayValue);
   const feeKnown = detail.feeUSD != null;
   const feeText = detail.feeUSD === 0 ? (requirement === "visa_free" ? "No visa fee" : "No fee") : feeKnown ? `Fee ≈ US$${detail.feeUSD}` : null;
 
@@ -145,10 +141,8 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
   const unknown: string[] = [];
   if (!blocked && kind !== "visa_free" && !stayKnown) unknown.push("permitted stay");
   if (!blocked && !feeKnown) unknown.push("fee");
-  if (!blocked && (kind === "e_visa" || kind === "eta" || kind === "visa_required")) unknown.push("processing time");
-  const unknownNote = unknown.length
-    ? `Our data doesn't record the ${unknown.length === 1 ? unknown[0] : `${unknown.slice(0, -1).join(", ")} or ${unknown[unknown.length - 1]}`} for this route — check the official page before you ${kind === "visa_free" || kind === "visa_on_arrival" ? "travel" : "apply"}.`
-    : "";
+  if (!blocked && needsApplication(kind)) unknown.push("processing time");
+  const unknownNote = blocked ? "" : unknownFactsSentence(unknown, kind);
 
   // Notes such as "ETA required (AUD 20)" or "NZeTA required" name the scheme;
   // the loader's generic "Electronic Travel Authorization required" adds nothing
@@ -220,7 +214,7 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
       { q: `How much does a ${to.name} visa cost for ${from.name} citizens?`,
         a: feeKnown ? `${feeText}. Fees change — confirm on the official page before applying.` : `Our data doesn't record the fee for this route. Fees change often — check ${to.name}'s official visa information before you apply.` },
     );
-    if (kind !== "visa_free" && isKnown(processing)) {
+    if (kind !== "visa_free" && isKnownFact(processing)) {
       faqs.push({ q: `How long does it take to get a ${to.name} visa?`, a: `Processing time: ${processing}.` });
     }
     faqs.push({ q: `How long must my passport be valid to enter ${to.name}?`,
