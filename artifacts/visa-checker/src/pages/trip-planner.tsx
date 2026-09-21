@@ -9,17 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import {
-  Route, Plus, Trash2, ChevronDown, CheckCircle2, Clock, Shield,
-  AlertCircle, XCircle, ArrowRight, MapPin, Plane, Save, Share2, Info, CalendarDays, Download,
+  Route, Plus, Trash2, ChevronDown, ArrowRight, MapPin, Plane, Save, Share2, CalendarDays, Download,
 } from "lucide-react";
-
-const reqConfig: Record<VisaRequirement, { label: string; color: string; bg: string; border: string; icon: typeof CheckCircle2 }> = {
-  visa_free:       { label: "Visa Free",       color: "text-green-700",  bg: "bg-green-50",  border: "border-green-200",  icon: CheckCircle2 },
-  visa_on_arrival: { label: "Visa on Arrival",  color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200",  icon: Clock },
-  e_visa:          { label: "eVisa",            color: "text-blue-700",   bg: "bg-blue-50",   border: "border-blue-200",   icon: Shield },
-  visa_required:   { label: "Visa Required",    color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200", icon: AlertCircle },
-  no_admission:    { label: "No Admission",     color: "text-red-700",    bg: "bg-red-50",    border: "border-red-200",    icon: XCircle },
-};
+import { reqConfig, styleForResult, type RequirementStyle } from "@/lib/requirement";
 
 interface TripStop {
   id: string;
@@ -31,6 +23,8 @@ interface LegVisa {
   from: string;
   to: string;
   req: VisaRequirement;
+  notes?: string | null;
+  maxStay?: string | null;
   country: { name: string; flag: string };
 }
 
@@ -79,8 +73,7 @@ function CountryPicker({ value, onChange, countries, placeholder }: {
   );
 }
 
-function VisaBadge({ req }: { req: VisaRequirement }) {
-  const cfg = reqConfig[req];
+function VisaBadge({ cfg }: { cfg: RequirementStyle }) {
   const Icon = cfg.icon;
   return (
     <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${cfg.color} ${cfg.bg} ${cfg.border}`}>
@@ -96,14 +89,13 @@ function loadSavedTrips(): { name: string; passport: string; stops: TripStop[] }
   try { return JSON.parse(localStorage.getItem(LS_KEY) ?? "[]"); } catch { return []; }
 }
 
-// Hex colors for the downloadable card (html2canvas can't parse Tailwind v4 oklch).
-const REQ_HEX: Record<VisaRequirement, { label: string; color: string }> = {
-  visa_free: { label: "Visa-free", color: "#10b981" },
-  visa_on_arrival: { label: "Visa on arrival", color: "#f59e0b" },
-  e_visa: { label: "eVisa", color: "#0DB5E8" },
-  visa_required: { label: "Visa required", color: "#ef4444" },
-  no_admission: { label: "Not permitted", color: "#6b7280" },
-};
+// Status styles used by the per-stop callouts, the summary and the all-clear box.
+const REQUIRED = reqConfig.visa_required;
+const NO_ENTRY = reqConfig.no_admission;
+const FREE = reqConfig.visa_free;
+const RequiredIcon = REQUIRED.icon;
+const NoEntryIcon = NO_ENTRY.icon;
+const FreeIcon = FREE.icon;
 
 export default function TripPlannerPage() {
   useSEO({
@@ -132,8 +124,8 @@ export default function TripPlannerPage() {
   );
 
   const visaMap = useMemo(() => {
-    const m: Record<string, VisaRequirement> = {};
-    (rawResults as VisaResult[]).forEach((r) => { m[r.destinationCountry.code] = r.requirement; });
+    const m: Record<string, VisaResult> = {};
+    (rawResults as VisaResult[]).forEach((r) => { m[r.destinationCountry.code] = r; });
     return m;
   }, [rawResults]);
 
@@ -142,11 +134,14 @@ export default function TripPlannerPage() {
     for (let i = 0; i < stops.length; i++) {
       const stop = stops[i];
       if (!stop.countryCode) continue;
-      const req = visaMap[stop.countryCode];
-      if (!req) continue;
+      const entry = visaMap[stop.countryCode];
+      if (!entry?.requirement) continue;
       const country = countries.find((c) => c.code === stop.countryCode);
       if (!country) continue;
-      result.push({ from: passport, to: stop.countryCode, req, country });
+      result.push({
+        from: passport, to: stop.countryCode, req: entry.requirement,
+        notes: entry.notes, maxStay: entry.maxStay, country,
+      });
     }
     return result;
   }, [stops, visaMap, passport, countries]);
@@ -300,8 +295,7 @@ export default function TripPlannerPage() {
             <div className="space-y-2">
               {stops.map((stop, idx) => {
                 const legVisa = legVisas.find((l) => l.to === stop.countryCode);
-                const cfg = legVisa ? reqConfig[legVisa.req] : null;
-                const Icon = cfg?.icon;
+                const cfg = legVisa ? styleForResult(legVisa.req, legVisa.notes, legVisa.maxStay) : null;
                 return (
                   <div key={stop.id}>
                     {/* Connector */}
@@ -313,7 +307,7 @@ export default function TripPlannerPage() {
                       </div>
                     )}
 
-                    <div className={`bg-card rounded-2xl border shadow-sm p-4 transition-colors ${cfg ? `${cfg.border}` : "border-border/70"}`}>
+                    <div className={`bg-card rounded-2xl border shadow-sm p-4 transition-colors ${cfg ? cfg.border : "border-border/70"}`}>
                       <div className="flex items-center gap-3 flex-wrap">
                         {/* Stop number */}
                         <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center flex-shrink-0">
@@ -345,7 +339,7 @@ export default function TripPlannerPage() {
                         </div>
 
                         {/* Visa badge */}
-                        {cfg && Icon && <VisaBadge req={legVisa!.req} />}
+                        {cfg && <VisaBadge cfg={cfg} />}
 
                         {/* Remove */}
                         {stops.length > 1 && (
@@ -358,9 +352,9 @@ export default function TripPlannerPage() {
 
                       {/* Notes for visa req */}
                       {legVisa && legVisa.req === "visa_required" && (
-                        <div className="mt-3 flex items-start gap-2 bg-orange-50 border border-orange-100 rounded-xl px-3 py-2">
-                          <Info className="h-3.5 w-3.5 text-orange-600 flex-shrink-0 mt-0.5" />
-                          <p className="text-xs text-orange-700">
+                        <div className={`mt-3 flex items-start gap-2 border rounded-xl px-3 py-2 ${REQUIRED.bg} ${REQUIRED.border}`}>
+                          <RequiredIcon className={`h-3.5 w-3.5 flex-shrink-0 mt-0.5 ${REQUIRED.color}`} aria-hidden="true" />
+                          <p className={`text-xs ${REQUIRED.color}`}>
                             {passportCountry?.name} passport holders need to apply for a visa in advance for{" "}
                             <a href={`/destination/${stop.countryCode}`} className="underline font-medium">
                               {legVisa.country.name}
@@ -369,9 +363,9 @@ export default function TripPlannerPage() {
                         </div>
                       )}
                       {legVisa && legVisa.req === "no_admission" && (
-                        <div className="mt-3 flex items-start gap-2 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
-                          <XCircle className="h-3.5 w-3.5 text-red-600 flex-shrink-0 mt-0.5" />
-                          <p className="text-xs text-red-700">
+                        <div className={`mt-3 flex items-start gap-2 border rounded-xl px-3 py-2 ${NO_ENTRY.bg} ${NO_ENTRY.border}`}>
+                          <NoEntryIcon className={`h-3.5 w-3.5 flex-shrink-0 mt-0.5 ${NO_ENTRY.color}`} aria-hidden="true" />
+                          <p className={`text-xs ${NO_ENTRY.color}`}>
                             Entry not permitted for {passportCountry?.name} passport holders.
                           </p>
                         </div>
@@ -431,19 +425,25 @@ export default function TripPlannerPage() {
             <div className="bg-card rounded-2xl border border-border/70 shadow-sm p-4">
               <h3 className="text-sm font-semibold text-foreground mb-3">Trip Summary</h3>
               <div className="grid grid-cols-2 gap-2 mb-4">
-                {[
+                {([
                   { label: "Destinations", value: stops.filter(s => s.countryCode).length, color: "text-primary" },
                   { label: "Total Days", value: totalDays, color: "text-foreground" },
-                  { label: "Visas Needed", value: visasNeeded, color: visasNeeded > 0 ? "text-orange-600" : "text-green-600" },
-                  { label: "eVisas", value: evisas, color: evisas > 0 ? "text-blue-600" : "text-foreground" },
-                  { label: "Blockers", value: blockers, color: blockers > 0 ? "text-red-600" : "text-green-600" },
-                  { label: "Visa-Free", value: legVisas.filter(l => l.req === "visa_free").length, color: "text-green-600" },
-                ].map(({ label, value, color }) => (
-                  <div key={label} className="bg-secondary/30 rounded-xl p-2.5 text-center">
-                    <p className={`text-xl font-bold ${color}`}>{value}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
-                  </div>
-                ))}
+                  { label: REQUIRED.short, value: visasNeeded, color: visasNeeded > 0 ? REQUIRED.color : "text-foreground", status: REQUIRED },
+                  { label: reqConfig.e_visa.short, value: evisas, color: evisas > 0 ? reqConfig.e_visa.color : "text-foreground", status: reqConfig.e_visa },
+                  { label: NO_ENTRY.short, value: blockers, color: blockers > 0 ? NO_ENTRY.color : "text-foreground", status: NO_ENTRY },
+                  { label: FREE.short, value: legVisas.filter(l => l.req === "visa_free").length, color: FREE.color, status: FREE },
+                ] as { label: string; value: number; color: string; status?: RequirementStyle }[]).map(({ label, value, color, status }) => {
+                  const StatusIcon = status?.icon;
+                  return (
+                    <div key={label} className="bg-secondary/30 rounded-xl p-2.5 text-center">
+                      <p className={`text-xl font-bold ${color}`}>{value}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 flex items-center justify-center gap-1">
+                        {status && StatusIcon && <StatusIcon className={`h-3 w-3 flex-shrink-0 ${status.color}`} aria-hidden="true" />}
+                        {label}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Checklist */}
@@ -452,14 +452,17 @@ export default function TripPlannerPage() {
                   <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2">Action Required</p>
                   <div className="space-y-2">
                     {legVisas.filter(l => l.req !== "visa_free").map((l) => {
-                      const cfg = reqConfig[l.req];
+                      const cfg = styleForResult(l.req, l.notes, l.maxStay);
                       const Icon = cfg.icon;
                       return (
                         <div key={l.to} className={`flex items-center gap-2 p-2 rounded-xl border ${cfg.bg} ${cfg.border}`}>
                           <span className="text-lg flex-shrink-0">{l.country.flag}</span>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-semibold text-foreground truncate">{l.country.name}</p>
-                            <span className={`text-xs ${cfg.color} font-medium`}>{cfg.label}</span>
+                            <span className={`inline-flex items-center gap-1 text-xs ${cfg.color} font-medium`}>
+                              <Icon className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
+                              {cfg.label}
+                            </span>
                           </div>
                           <a href={`/destination/${l.to}`}
                             className="text-xs text-primary hover:underline flex-shrink-0">
@@ -473,10 +476,10 @@ export default function TripPlannerPage() {
               )}
 
               {legVisas.length > 0 && legVisas.every(l => l.req === "visa_free") && (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-center">
-                  <CheckCircle2 className="h-6 w-6 text-green-600 mx-auto mb-1" />
-                  <p className="text-sm font-semibold text-green-700">All visa-free!</p>
-                  <p className="text-xs text-green-600 mt-0.5">No visa applications needed for this trip.</p>
+                <div className={`border rounded-xl p-3 text-center ${FREE.bg} ${FREE.border}`}>
+                  <FreeIcon className={`h-6 w-6 mx-auto mb-1 ${FREE.color}`} aria-hidden="true" />
+                  <p className={`text-sm font-semibold ${FREE.color}`}>All visa-free!</p>
+                  <p className={`text-xs mt-0.5 ${FREE.color}`}>No visa applications needed for this trip.</p>
                 </div>
               )}
             </div>
@@ -520,11 +523,16 @@ export default function TripPlannerPage() {
           </div>
           <div>
             {legVisas.map((l) => {
-              const cfg = REQ_HEX[l.req];
+              // Hex, not classes: html2canvas can't parse Tailwind v4 oklch. Ink on tint, like the on-page badge.
+              const cfg = styleForResult(l.req, l.notes, l.maxStay);
+              const Icon = cfg.icon;
               return (
                 <div key={l.to} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 0", borderTop: "1px solid #e2e8f0" }}>
                   <div style={{ fontSize: 15, fontWeight: 600 }}>{l.country.flag} {l.country.name}</div>
-                  <div style={{ background: cfg.color, color: "#ffffff", fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 999 }}>{cfg.label}</div>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: cfg.tint, color: cfg.ink, border: `1px solid ${cfg.line}`, fontSize: 12, fontWeight: 700, padding: "2px 9px", borderRadius: 999 }}>
+                    <Icon size={12} color={cfg.ink} strokeWidth={2.5} aria-hidden="true" />
+                    {cfg.label}
+                  </div>
                 </div>
               );
             })}

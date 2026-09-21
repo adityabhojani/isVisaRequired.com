@@ -1,4 +1,5 @@
 // Shared layout + helpers for the rich passport & destination hub pages.
+import { VISA_STATUS, VISA_STATUS_ORDER, statusIconSvg, type VisaRequirement } from "@workspace/travel-data";
 import { FONT_LINKS, BASE_STYLE, renderHeader, renderFooter } from "./shell";
 import { SITE_ORIGIN, DATA_LAST_UPDATED } from "./render";
 
@@ -8,26 +9,48 @@ export function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-export const REQ_LABEL: Record<string, string> = {
-  visa_free: "Visa-free",
-  visa_on_arrival: "Visa on arrival",
-  e_visa: "eVisa",
-  visa_required: "Visa required",
-  no_admission: "Entry not permitted",
-};
-export const REQ_COLOR: Record<string, string> = {
-  visa_free: "#10b981",
-  visa_on_arrival: "#f59e0b",
-  e_visa: "#0DB5E8",
-  visa_required: "#ef4444",
-  no_admission: "#6b7280",
-};
+// Status presentation. This file used to export its own label and colour
+// maps — bright hexes under 11px white text (as low as 2.15:1), with
+// visa_required red and no_admission grey where the app said orange and red.
+// Everything now comes from the shared record in @workspace/travel-data: the
+// word and icon from VISA_STATUS, the colours from the --status-* custom
+// properties that BASE_STYLE (seo/shell.ts) puts on every page. No status
+// colour is written here.
 
-const STYLE = `:root{--navy:#0A2FA1;--accent:#0DB5E8;--bg:#F7F9FC;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0}
+/** Status badge: icon + the shared label, ink on tint. */
+export function statusBadge(req: VisaRequirement): string {
+  return `<span class="badge s-${req}">${statusIconSvg(req, 16)}<span>${esc(VISA_STATUS[req].label)}</span></span>`;
+}
+
+/** A stat card whose number is a count of one status: the number in its ink, the badge beneath. */
+export function statusStat(req: VisaRequirement, count: number): string {
+  return `<div class="stat status s-${req}"><div class="n">${count}</div><div class="k">${statusBadge(req)}</div></div>`;
+}
+
+/**
+ * The h2 above one status group. The page's own heading words carry the
+ * status; the icon tile and the count take its colours. `id` stays the
+ * requirement key so existing #visa_free-style anchors keep working.
+ */
+export function statusHeading(req: VisaRequirement, heading: string, count: number): string {
+  return `<h2 id="${req}" class="sh s-${req}"><span class="sicon">${statusIconSvg(req, 16)}</span>${esc(heading)} <span class="sn">(${count})</span></h2>`;
+}
+
+// One scope class per status. It only points four local properties at the
+// shared tokens, so the components below read var(--s-ink) etc. Built from the
+// shared order so a status can't be left out.
+const STATUS_SCOPES = VISA_STATUS_ORDER.map((k) => {
+  const v = k.replace(/_/g, "-");
+  return `.s-${k}{--s-ink:var(--status-${v}-ink);--s-tint:var(--status-${v}-tint);--s-line:var(--status-${v}-line)}`;
+}).join("");
+
+// No :root block here: BASE_STYLE (appended below) supplies every variable
+// this uses. The old copy also declared a sky-blue --accent that exists
+// nowhere in the shared token set.
+const STYLE = `
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
 a{color:var(--navy)}.wrap{max-width:920px;margin:0 auto;padding:0 20px}
 header.site{background:#fff;border-bottom:1px solid var(--line)}header.site .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
-.logo{font-weight:800;color:var(--navy);text-decoration:none;font-size:18px}.logo span{color:var(--accent)}
 nav.crumbs{font-size:13px;color:var(--muted);padding:14px 0}nav.crumbs a{color:var(--muted);text-decoration:none}
 h1{font-size:29px;line-height:1.2;margin:6px 0 4px}h2{font-size:21px;margin:28px 0 10px}
 .updated{color:var(--muted);font-size:13px;margin-bottom:14px}.lead{font-size:18px;color:#334155}
@@ -39,7 +62,12 @@ table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
 th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
 td a{text-decoration:none;font-weight:600}
-.badge{display:inline-block;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
+${STATUS_SCOPES}
+.badge{display:inline-flex;align-items:center;gap:6px;max-width:100%;font-size:var(--type-meta);font-weight:600;line-height:1.3;padding:3px 10px;border-radius:var(--r-pill);color:var(--s-ink);background:var(--s-tint);border:1px solid var(--s-line)}
+.badge svg{flex:none}
+.stat.status .n{color:var(--s-ink)}.stat.status .k{margin-top:6px}
+.sh .sicon{display:inline-grid;place-items:center;width:28px;height:28px;margin-right:10px;vertical-align:middle;border-radius:var(--r-chip);color:var(--s-ink);background:var(--s-tint);border:1px solid var(--s-line)}
+.sh .sn{color:var(--s-ink)}
 .cols{column-width:220px;column-gap:24px}.cols a{display:block;padding:5px 0;text-decoration:none;font-size:14px}
 .note{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px 16px;margin:14px 0;font-size:14px;color:#9a3412}
 .faq{border-top:1px solid var(--line);padding:12px 0}.faq:first-of-type{border-top:0}.faq h3{margin:0 0 4px;font-size:16px}.faq p{margin:0;color:#334155}

@@ -10,15 +10,21 @@ interface PassportScore { code: string; name: string; flag: string; score: numbe
 // Colours only. The bands themselves (label, min, max, title, note) come from
 // /api/visa/all-rankings so this page and the crawlable /tier-list the server
 // renders can never disagree about which passport sits in which tier.
+// Rank is an ordered scale, so it gets ONE hue getting darker — not the status
+// colours. These tiers used to be amber, green, blue, violet, orange and red,
+// which on this site already mean "visa on arrival", "visa-free", "eVisa" and so
+// on: tier A read as "visa-free" and tier C as "eVisa". The badges were also
+// white on amber-400 at about 2:1. Every badge below passes WCAG AA; the text
+// flips to ink where white would not.
 const TIER_STYLE: Record<string, { bg: string; border: string; badge: string }> = {
-  S: { bg: "bg-amber-50", border: "border-amber-300", badge: "bg-amber-400 text-white" },
-  A: { bg: "bg-green-50", border: "border-green-300", badge: "bg-green-500 text-white" },
-  B: { bg: "bg-blue-50", border: "border-blue-300", badge: "bg-blue-500 text-white" },
-  C: { bg: "bg-violet-50", border: "border-violet-300", badge: "bg-violet-500 text-white" },
-  D: { bg: "bg-orange-50", border: "border-orange-300", badge: "bg-orange-500 text-white" },
-  E: { bg: "bg-red-50", border: "border-red-300", badge: "bg-red-500 text-white" },
+  S: { bg: "bg-card", border: "border-[#8FA0C8]", badge: "bg-[#0D1F4A] text-white" },
+  A: { bg: "bg-card", border: "border-[#A9B6D6]", badge: "bg-[#1D3A7C] text-white" },
+  B: { bg: "bg-card", border: "border-[#BFC8DE]", badge: "bg-[#3959A2] text-white" },
+  C: { bg: "bg-card", border: "border-border", badge: "bg-[#94A6D1] text-foreground" },
+  D: { bg: "bg-card", border: "border-border", badge: "bg-[#BFC8DE] text-foreground" },
+  E: { bg: "bg-card", border: "border-border", badge: "bg-[#DFE3EC] text-foreground" },
 };
-const FALLBACK_STYLE = { bg: "bg-muted", border: "border-border", badge: "bg-muted-foreground text-white" };
+const FALLBACK_STYLE = { bg: "bg-card", border: "border-border", badge: "bg-muted text-foreground" };
 
 interface Tier { label: string; min: number; max: number; title: string; note: string; }
 

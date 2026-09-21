@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { reqConfig } from "@/lib/requirement";
 
 const COLORS = ["#16a34a", "#d97706", "#2563eb", "#ea580c", "#dc2626"];
 const LABELS = ["Visa Free", "Visa on Arrival", "eVisa", "Visa Required", "No Admission"];
@@ -164,20 +165,27 @@ export default function StatsPage() {
 
             {/* Stats grid */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              {[
-                { label: "Visa Free",      value: stats.visaFree,       color: "text-green-600",  bg: "bg-green-50  border-green-100"  },
-                { label: "Visa on Arrival", value: stats.visaOnArrival, color: "text-amber-600",  bg: "bg-amber-50  border-amber-100"  },
-                { label: "eVisa",           value: stats.eVisa,         color: "text-blue-600",   bg: "bg-blue-50   border-blue-100"   },
-                { label: "Visa Required",   value: stats.visaRequired,  color: "text-orange-600", bg: "bg-orange-50 border-orange-100" },
-                { label: "No Admission",    value: stats.noAdmission,   color: "text-red-600",    bg: "bg-red-50    border-red-100"    },
-              ].map((stat) => (
-                <Card key={stat.label} className={`border ${stat.bg}`} data-testid={`stat-${stat.label.toLowerCase().replace(/ /g, "-")}`}>
-                  <CardContent className="p-4 text-center">
-                    <div className={`text-3xl font-bold ${stat.color}`}>{stat.value}</div>
-                    <div className="text-xs text-muted-foreground mt-1 leading-tight">{stat.label}</div>
-                  </CardContent>
-                </Card>
-              ))}
+              {([
+                ["visa_free", stats.visaFree],
+                ["visa_on_arrival", stats.visaOnArrival],
+                ["e_visa", stats.eVisa],
+                ["visa_required", stats.visaRequired],
+                ["no_admission", stats.noAdmission],
+              ] as const).map(([req, value]) => {
+                // Words, colours and icon from the shared status record — the
+                // same ones the pair pages and the checker use.
+                const cfg = reqConfig[req];
+                const Icon = cfg.icon;
+                return (
+                  <Card key={req} className={`border ${cfg.bg} ${cfg.border}`} data-testid={`stat-${cfg.label.toLowerCase().replace(/ /g, "-")}`}>
+                    <CardContent className="p-4 text-center">
+                      <Icon className={`mx-auto mb-1 h-5 w-5 ${cfg.color}`} aria-hidden="true" />
+                      <div className={`text-3xl font-bold tabular-nums ${cfg.color}`}>{value}</div>
+                      <div className={`text-sm font-medium mt-1 leading-tight ${cfg.color}`}>{cfg.label}</div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
 
             {/* Pie chart */}

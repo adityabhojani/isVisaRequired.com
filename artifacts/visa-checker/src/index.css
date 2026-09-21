@@ -1,6 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+/* Fonts load from a single <link> in index.html. An @import here used to be a
+   second, CHAINED request — it could not start until this stylesheet had
+   downloaded — for a different weight list than the page's own link. */
 @layer theme, base, clerk, components, utilities;
 @import "tailwindcss";
+/* Shared design tokens — GENERATED from lib/travel-data by `pnpm run tokens`.
+   The server-rendered pages append the identical string to their base style,
+   so both renderers read one definition of every colour, radius and type size. */
+@import "./tokens.generated.css";
 @import "tw-animate-css";
 @import '@clerk/themes/shadcn.css';
 @plugin "@tailwindcss/typography";
@@ -175,4 +181,39 @@
   }
   @media (hover: hover) { .hover-elevate:hover::after { opacity: 1; } }
   .active-elevate-2:active::after { background: var(--elevate-2); opacity: 1; }
+}
+
+/* Register the shared status tokens as Tailwind utilities. This block is
+   app-owned on purpose: lib/travel-data must ship hex, never class names —
+   Tailwind v4 skips node_modules, so classes written there would be silently
+   dropped from the production bundle. Use as: text-status-e-visa-ink,
+   bg-status-visa-free-tint, border-status-visa-required-line, fill-status-*-solid. */
+@theme inline {
+  --color-status-visa-free-solid: var(--status-visa-free-solid);
+  --color-status-visa-free-ink: var(--status-visa-free-ink);
+  --color-status-visa-free-tint: var(--status-visa-free-tint);
+  --color-status-visa-free-line: var(--status-visa-free-line);
+  --color-status-visa-on-arrival-solid: var(--status-visa-on-arrival-solid);
+  --color-status-visa-on-arrival-ink: var(--status-visa-on-arrival-ink);
+  --color-status-visa-on-arrival-tint: var(--status-visa-on-arrival-tint);
+  --color-status-visa-on-arrival-line: var(--status-visa-on-arrival-line);
+  --color-status-e-visa-solid: var(--status-e-visa-solid);
+  --color-status-e-visa-ink: var(--status-e-visa-ink);
+  --color-status-e-visa-tint: var(--status-e-visa-tint);
+  --color-status-e-visa-line: var(--status-e-visa-line);
+  --color-status-visa-required-solid: var(--status-visa-required-solid);
+  --color-status-visa-required-ink: var(--status-visa-required-ink);
+  --color-status-visa-required-tint: var(--status-visa-required-tint);
+  --color-status-visa-required-line: var(--status-visa-required-line);
+  --color-status-no-admission-solid: var(--status-no-admission-solid);
+  --color-status-no-admission-ink: var(--status-no-admission-ink);
+  --color-status-no-admission-tint: var(--status-no-admission-tint);
+  --color-status-no-admission-line: var(--status-no-admission-line);
+  --color-status-no-data: var(--status-no-data);
+  /* The answer word. Nothing else uses this size. */
+  --text-verdict: var(--type-verdict);
+  --text-verdict--line-height: 1.1;
+  --radius-chip: var(--r-chip);
+  --radius-card: var(--r-card);
+  --radius-hero: var(--r-hero);
 }

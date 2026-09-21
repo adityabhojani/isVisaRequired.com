@@ -45,7 +45,9 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Must equal FONT_HREF in lib/travel-data/src/designTokens.ts (the server pages use it too, so a
+         click from a search-landing page into the app is a cache hit). scripts/check-drift.mjs enforces it. -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
 
     <!-- Structured Data: WebSite + SearchAction -->
     <script type="application/ld+json">

@@ -8,33 +8,39 @@ import type { VisaResult, VisaRequirement } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { PassportPicker } from "@/components/PassportPicker";
 import { trackEvent } from "@/lib/analytics";
-
-const reqOrder: VisaRequirement[] = ["visa_free", "visa_on_arrival", "e_visa", "visa_required", "no_admission"];
-
-const reqConfig: Record<VisaRequirement, { label: string; color: string; bg: string; border: string }> = {
-  visa_free:       { label: "Visa Free",       color: "text-green-700",  bg: "bg-green-50",  border: "border-green-200" },
-  visa_on_arrival: { label: "Visa on Arrival",  color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200" },
-  e_visa:          { label: "eVisa",            color: "text-blue-700",   bg: "bg-blue-50",   border: "border-blue-200" },
-  visa_required:   { label: "Visa Required",    color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200" },
-  no_admission:    { label: "No Admission",     color: "text-red-700",    bg: "bg-red-50",    border: "border-red-200" },
-};
+import { reqConfig, requirementOrder, styleForResult, type RequirementStyle } from "@/lib/requirement";
 
 function compare(a: VisaRequirement, b: VisaRequirement): "A" | "B" | "tie" {
-  const ia = reqOrder.indexOf(a);
-  const ib = reqOrder.indexOf(b);
+  const ia = requirementOrder.indexOf(a);
+  const ib = requirementOrder.indexOf(b);
   if (ia < ib) return "A";
   if (ib < ia) return "B";
   return "tie";
 }
 
-function StatBox({ label, value, winner }: { label: string; value: number; winner: "A" | "B" | "tie" | "none" }) {
+function StatBox({ req, value, winner }: { req: VisaRequirement; value: number; winner: "A" | "B" | "tie" | "none" }) {
   const isWinner = winner !== "none" && winner !== "tie";
+  const cfg = reqConfig[req];
+  const Icon = cfg.icon;
   return (
     <div className={`text-center p-3 rounded-xl border ${isWinner ? "bg-primary/5 border-primary/30" : "bg-muted/40 border-border"}`}>
       <div className={`text-2xl font-bold ${isWinner ? "text-primary" : "text-foreground"}`}>{value}</div>
-      <div className="text-xs text-muted-foreground mt-0.5">{label}</div>
+      <div className="text-xs text-muted-foreground mt-0.5 inline-flex items-center justify-center gap-1">
+        <Icon className={`h-3 w-3 shrink-0 ${cfg.color}`} aria-hidden="true" />
+        {cfg.label}
+      </div>
       {isWinner && <div className="text-xs text-primary font-semibold mt-1">✓ Better</div>}
     </div>
+  );
+}
+
+function StatusWord({ style }: { style: RequirementStyle }) {
+  const Icon = style.icon;
+  return (
+    <span className={`inline-flex items-center gap-1 text-xs font-medium ${style.color}`}>
+      <Icon className="h-3 w-3 shrink-0" aria-hidden="true" />
+      {style.label}
+    </span>
   );
 }
 
@@ -88,9 +94,16 @@ export default function ComparePage() {
         const rb = mapB.get(ra.destinationCountry.code);
         if (!rb) return null;
         const winner = compare(ra.requirement, rb.requirement);
-        return { country: ra.destinationCountry, reqA: ra.requirement, reqB: rb.requirement, winner };
+        return {
+          country: ra.destinationCountry, reqA: ra.requirement, reqB: rb.requirement, winner,
+          styleA: styleForResult(ra.requirement, ra.notes, ra.maxStay),
+          styleB: styleForResult(rb.requirement, rb.notes, rb.maxStay),
+        };
       })
-      .filter(Boolean) as { country: VisaResult["destinationCountry"]; reqA: VisaRequirement; reqB: VisaRequirement; winner: "A" | "B" | "tie" }[];
+      .filter(Boolean) as {
+        country: VisaResult["destinationCountry"]; reqA: VisaRequirement; reqB: VisaRequirement; winner: "A" | "B" | "tie";
+        styleA: RequirementStyle; styleB: RequirementStyle;
+      }[];
   }, [resultsA, resultsB]);
 
   const aWins = comparison.filter((c) => c.winner === "A");
@@ -190,13 +203,13 @@ export default function ComparePage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  {(["visa_free", "visa_on_arrival", "e_visa", "visa_required", "no_admission"] as VisaRequirement[]).map((req) => {
+                  {requirementOrder.map((req) => {
                     const cntA = statsA[req] ?? 0;
                     const cntB = statsB[req] ?? 0;
                     const w = req === "visa_free" || req === "visa_on_arrival"
                       ? (cntA > cntB ? "A" : cntA < cntB ? "B" : "tie")
                       : (cntA < cntB ? "A" : cntA > cntB ? "B" : "tie");
-                    return <StatBox key={req} label={reqConfig[req].label} value={cntA} winner={w === "A" ? "A" : "none"} />;
+                    return <StatBox key={req} req={req} value={cntA} winner={w === "A" ? "A" : "none"} />;
                   })}
                 </div>
               </div>
@@ -212,13 +225,13 @@ export default function ComparePage() {
                   <span className="text-3xl">{countryB?.flag}</span>
                 </div>
                 <div className="space-y-2">
-                  {(["visa_free", "visa_on_arrival", "e_visa", "visa_required", "no_admission"] as VisaRequirement[]).map((req) => {
+                  {requirementOrder.map((req) => {
                     const cntA = statsA[req] ?? 0;
                     const cntB = statsB[req] ?? 0;
                     const w = req === "visa_free" || req === "visa_on_arrival"
                       ? (cntA > cntB ? "A" : cntA < cntB ? "B" : "tie")
                       : (cntA < cntB ? "A" : cntA > cntB ? "B" : "tie");
-                    return <StatBox key={req} label={reqConfig[req].label} value={cntB} winner={w === "B" ? "B" : "none"} />;
+                    return <StatBox key={req} req={req} value={cntB} winner={w === "B" ? "B" : "none"} />;
                   })}
                 </div>
               </div>
@@ -232,16 +245,16 @@ export default function ComparePage() {
                   <span>{countryA?.name} has better access in {aWins.length} countries</span>
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {aWins.map(({ country, reqA, reqB }) => (
+                  {aWins.map(({ country, styleA, styleB }) => (
                     <a key={country.code} href={`/?passport=${passportA}&destinations=${country.code}`}
-                      className="flex items-center gap-3 p-3 rounded-xl border border-green-100 bg-green-50/50 hover:bg-green-50 transition-colors text-left">
+                      className="flex items-center gap-3 p-3 rounded-xl border border-border/70 bg-card hover:bg-muted/50 transition-colors text-left">
                       <span className="text-2xl">{country.flag}</span>
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-semibold text-foreground truncate">{country.name}</div>
-                        <div className="flex gap-2 mt-0.5">
-                          <span className={`text-xs font-medium ${reqConfig[reqA].color}`}>{reqConfig[reqA].label}</span>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
+                          <StatusWord style={styleA} />
                           <span className="text-xs text-muted-foreground">vs</span>
-                          <span className={`text-xs font-medium ${reqConfig[reqB].color}`}>{reqConfig[reqB].label}</span>
+                          <StatusWord style={styleB} />
                         </div>
                       </div>
                     </a>
@@ -257,16 +270,16 @@ export default function ComparePage() {
                   <span>{countryB?.name} has better access in {bWins.length} countries</span>
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {bWins.map(({ country, reqA, reqB }) => (
+                  {bWins.map(({ country, styleA, styleB }) => (
                     <a key={country.code} href={`/?passport=${passportB}&destinations=${country.code}`}
-                      className="flex items-center gap-3 p-3 rounded-xl border border-blue-100 bg-blue-50/50 hover:bg-blue-50 transition-colors text-left">
+                      className="flex items-center gap-3 p-3 rounded-xl border border-border/70 bg-card hover:bg-muted/50 transition-colors text-left">
                       <span className="text-2xl">{country.flag}</span>
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-semibold text-foreground truncate">{country.name}</div>
-                        <div className="flex gap-2 mt-0.5">
-                          <span className={`text-xs font-medium ${reqConfig[reqB].color}`}>{reqConfig[reqB].label}</span>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
+                          <StatusWord style={styleB} />
                           <span className="text-xs text-muted-foreground">vs</span>
-                          <span className={`text-xs font-medium ${reqConfig[reqA].color}`}>{reqConfig[reqA].label}</span>
+                          <StatusWord style={styleA} />
                         </div>
                       </div>
                     </a>
@@ -282,12 +295,21 @@ export default function ComparePage() {
                   Equal access in {tied.length} countries
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  {tied.slice(0, 40).map(({ country, reqA }) => (
-                    <span key={country.code}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${reqConfig[reqA].color} ${reqConfig[reqA].bg} ${reqConfig[reqA].border}`}>
-                      {country.flag} {country.name}
-                    </span>
-                  ))}
+                  {tied.slice(0, 40).map(({ country, reqA, styleA, styleB }) => {
+                    // Tied on the stored requirement. Show the finer verdict (e.g. ETA)
+                    // only when both passports get it; otherwise the shared requirement.
+                    const s = styleA === styleB ? styleA : reqConfig[reqA];
+                    const Icon = s.icon;
+                    return (
+                      <span key={country.code}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${s.color} ${s.bg} ${s.border}`}>
+                        {country.flag} {country.name}
+                        <span aria-hidden="true" className="opacity-40">·</span>
+                        <Icon className="h-3 w-3 shrink-0" aria-hidden="true" />
+                        {s.short}
+                      </span>
+                    );
+                  })}
                   {tied.length > 40 && (
                     <span className="text-xs text-muted-foreground self-center">+ {tied.length - 40} more</span>
                   )}

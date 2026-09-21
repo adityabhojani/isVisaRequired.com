@@ -6,12 +6,13 @@ import type { CountryData } from "../data/countries";
 import { countries } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
 import { slugify, pairPath } from "./render";
-import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED, REQ_LABEL, REQ_COLOR } from "./hubLayout";
+import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED, statusHeading } from "./hubLayout";
+import type { VisaRequirement } from "@workspace/travel-data";
 import { GUIDES } from "../data/guidesData";
 import { guideLinksForHub } from "./guideLinks";
 
 const YEAR = "2026";
-const CATS: { key: string; heading: string; blurb: (n: string) => string }[] = [
+const CATS: { key: VisaRequirement; heading: string; blurb: (n: string) => string }[] = [
   { key: "visa_free", heading: "Visa-free destinations", blurb: (n) => `Countries ${n} passport holders can enter with no visa — just a valid passport.` },
   { key: "visa_on_arrival", heading: "Visa on arrival", blurb: (n) => `Countries where ${n} travellers get a visa at the border, no embassy visit needed.` },
   { key: "e_visa", heading: "eVisa / online authorisation", blurb: (n) => `Countries that require ${n} citizens to apply online before travel (eVisa or ETA).` },
@@ -67,7 +68,7 @@ export function renderPassportHub(from: CountryData): string {
     const rows = groups[cat.key].map(({ c, maxStay }) =>
       `<tr><td><a href="${pairPath(from, c)}">${esc(c.flag)} ${esc(c.name)}</a></td><td>${esc(maxStay || "—")}</td><td><a href="${destHub(c)}" style="color:#64748b;font-weight:500">${esc(c.name)} entry rules →</a></td></tr>`,
     ).join("");
-    return `<h2 id="${cat.key}">${esc(cat.heading)} <span style="color:${REQ_COLOR[cat.key]}">(${n(cat.key)})</span></h2>
+    return `${statusHeading(cat.key, cat.heading, n(cat.key))}
 <p style="color:#334155;margin:0 0 8px">${esc(cat.blurb(from.name))}</p>
 <div class="card" style="padding:0;overflow-x:auto"><table><thead><tr><th>Destination</th><th>Max stay</th><th>More</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }).join("");

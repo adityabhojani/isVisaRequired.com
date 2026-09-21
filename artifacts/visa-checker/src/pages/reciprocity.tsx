@@ -5,18 +5,11 @@ import { Footer } from "@/components/Footer";
 import { AdSlot } from "@/components/AdSlot";
 import { useListCountries, useCheckVisaAll, getCheckVisaAllQueryKey } from "@workspace/api-client-react";
 import type { VisaResult, VisaRequirement } from "@workspace/api-client-react";
-import { ArrowLeftRight, CheckCircle2, Clock, Shield, AlertCircle, XCircle, ChevronDown, Globe, Info } from "lucide-react";
+import { ArrowLeftRight, Handshake, ClipboardList, Ban, ChevronDown, Globe, Info, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-
-const reqConfig: Record<VisaRequirement, { label: string; color: string; bg: string; border: string; icon: typeof CheckCircle2 }> = {
-  visa_free:       { label: "Visa Free",       color: "text-green-700",  bg: "bg-green-50",  border: "border-green-200",  icon: CheckCircle2 },
-  visa_on_arrival: { label: "Visa on Arrival",  color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200",  icon: Clock },
-  e_visa:          { label: "eVisa",            color: "text-blue-700",   bg: "bg-blue-50",   border: "border-blue-200",   icon: Shield },
-  visa_required:   { label: "Visa Required",    color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200", icon: AlertCircle },
-  no_admission:    { label: "No Admission",     color: "text-red-700",    bg: "bg-red-50",    border: "border-red-200",    icon: XCircle },
-};
+import { styleForResult } from "@/lib/requirement";
 
 type ReciprocityStatus = "mutual_free" | "one_way_free" | "mutual_visa" | "asymmetric" | "no_admission";
 
@@ -31,12 +24,19 @@ function getReciprocityStatus(a: VisaRequirement | undefined, b: VisaRequirement
   return "asymmetric"; // b free, a not
 }
 
-const reciprocityLabels: Record<ReciprocityStatus, { label: string; color: string; bg: string; border: string; icon: string }> = {
-  mutual_free:    { label: "Mutual Visa-Free", color: "text-green-700", bg: "bg-green-50", border: "border-green-200", icon: "✅" },
-  one_way_free:   { label: "One-way Free",     color: "text-amber-700",   bg: "bg-amber-50",   border: "border-amber-300",   icon: "↔️" },
-  asymmetric:     { label: "One-way Free",     color: "text-amber-700",   bg: "bg-amber-50",   border: "border-amber-300",   icon: "↔️" },
-  mutual_visa:    { label: "Both Need Visa",   color: "text-orange-700",  bg: "bg-orange-50",  border: "border-orange-300",  icon: "📋" },
-  no_admission:   { label: "No Admission",     color: "text-red-700",     bg: "bg-red-50",     border: "border-red-300",     icon: "🚫" },
+// Reciprocity is a relationship between two passports, not a visa status, so it
+// stays OFF the status palette (green/teal/violet/brown/maroon belong to the five
+// visa statuses in @/lib/requirement). Navy and neutral surfaces only; the icon
+// and word carry the meaning. "Mutual Visa-Free" also covers pairs that both need
+// an eVisa or visa on arrival, so painting it visa-free green would mislead.
+// One-way uses the two-headed arrow (the old ↔️): "asymmetric" is B free into A,
+// so a one-directional A→B arrow would point the wrong way on that card.
+const reciprocityLabels: Record<ReciprocityStatus, { label: string; color: string; bg: string; border: string; icon: LucideIcon }> = {
+  mutual_free:    { label: "Mutual Visa-Free", color: "text-primary",    bg: "bg-primary/5",    border: "border-primary/25",    icon: Handshake },
+  one_way_free:   { label: "One-way Free",     color: "text-primary",    bg: "bg-secondary/50", border: "border-primary/15",    icon: ArrowLeftRight },
+  asymmetric:     { label: "One-way Free",     color: "text-primary",    bg: "bg-secondary/50", border: "border-primary/15",    icon: ArrowLeftRight },
+  mutual_visa:    { label: "Both Need Visa",   color: "text-foreground", bg: "bg-secondary/50", border: "border-border",        icon: ClipboardList },
+  no_admission:   { label: "No Admission",     color: "text-foreground", bg: "bg-card",         border: "border-foreground/25", icon: Ban },
 };
 
 function CountrySelect({ value, onChange, countries, placeholder, isLoading }: {
@@ -138,21 +138,25 @@ export default function ReciprocityPage() {
 
   const reciprocityStatus = getReciprocityStatus(aEntersB?.requirement, bEntersA?.requirement);
   const reciprocityInfo = reciprocityLabels[reciprocityStatus];
+  const ReciprocityIcon = reciprocityInfo.icon;
 
   // Build a comprehensive comparison table of all shared destinations
   const sharedComparison = useMemo(() => {
     if (!resultsA.length || !resultsB.length) return [];
 
-    const bMap = new Map<string, VisaRequirement>();
-    (resultsB as VisaResult[]).forEach((r) => bMap.set(r.destinationCountry.code, r.requirement));
+    const bMap = new Map<string, VisaResult>();
+    (resultsB as VisaResult[]).forEach((r) => bMap.set(r.destinationCountry.code, r));
 
     return (resultsA as VisaResult[]).map((rA) => {
-      const reqB = bMap.get(rA.destinationCountry.code);
+      const rB = bMap.get(rA.destinationCountry.code);
+      const reqB = rB?.requirement;
       const status = getReciprocityStatus(rA.requirement, reqB);
       return {
         country: rA.destinationCountry,
         reqA: rA.requirement,
         reqB,
+        resultA: rA,
+        resultB: rB,
         status,
       };
     }).filter((row) => row.reqB !== undefined);
@@ -250,11 +254,11 @@ export default function ReciprocityPage() {
                 <p className="font-semibold text-foreground mt-1">{countryA.name}</p>
                 <p className="text-xs text-muted-foreground">holders travelling to {countryB.name}</p>
                 {aEntersB && (() => {
-                  const cfg = reqConfig[aEntersB.requirement];
+                  const cfg = styleForResult(aEntersB.requirement, aEntersB.notes, aEntersB.maxStay);
                   const Icon = cfg.icon;
                   return (
                     <div className={`inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-full border text-sm font-semibold ${cfg.color} ${cfg.bg} ${cfg.border}`}>
-                      <Icon className="h-3.5 w-3.5" />
+                      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                       {cfg.label}
                     </div>
                   );
@@ -262,7 +266,7 @@ export default function ReciprocityPage() {
               </div>
 
               <div className="flex flex-col items-center gap-1">
-                <span className="text-3xl">{reciprocityInfo.icon}</span>
+                <ReciprocityIcon className={`h-8 w-8 ${reciprocityInfo.color}`} aria-hidden="true" />
                 <span className={`text-sm font-bold ${reciprocityInfo.color}`}>{reciprocityInfo.label}</span>
               </div>
 
@@ -271,11 +275,11 @@ export default function ReciprocityPage() {
                 <p className="font-semibold text-foreground mt-1">{countryB.name}</p>
                 <p className="text-xs text-muted-foreground">holders travelling to {countryA.name}</p>
                 {bEntersA && (() => {
-                  const cfg = reqConfig[bEntersA.requirement];
+                  const cfg = styleForResult(bEntersA.requirement, bEntersA.notes, bEntersA.maxStay);
                   const Icon = cfg.icon;
                   return (
                     <div className={`inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-full border text-sm font-semibold ${cfg.color} ${cfg.bg} ${cfg.border}`}>
-                      <Icon className="h-3.5 w-3.5" />
+                      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                       {cfg.label}
                     </div>
                   );
@@ -298,7 +302,7 @@ export default function ReciprocityPage() {
               </div>
             )}
             {reciprocityStatus === "mutual_visa" && (
-              <div className="flex items-start gap-2 text-sm text-orange-700">
+              <div className={`flex items-start gap-2 text-sm ${reciprocityInfo.color}`}>
                 <Info className="h-4 w-4 flex-shrink-0 mt-0.5" />
                 <p>
                   Both passports require a visa to visit each other's country.
@@ -345,37 +349,42 @@ export default function ReciprocityPage() {
               const group = groupedComparison[status];
               if (!group.length) return null;
               const info = reciprocityLabels[status];
+              const GroupIcon = info.icon;
               return (
                 <div key={status} className="mb-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-lg">{info.icon}</span>
+                    <GroupIcon className={`h-5 w-5 ${info.color}`} aria-hidden="true" />
                     <h3 className={`font-semibold ${info.color}`}>{info.label}</h3>
                     <span className="text-xs text-muted-foreground">({group.length} countries)</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {group.map((row) => {
-                      const cfgA = reqConfig[row.reqA];
-                      const cfgB = row.reqB ? reqConfig[row.reqB] : null;
+                      const cfgA = styleForResult(row.reqA, row.resultA.notes, row.resultA.maxStay);
+                      const cfgB = row.resultB ? styleForResult(row.resultB.requirement, row.resultB.notes, row.resultB.maxStay) : null;
                       const IconA = cfgA.icon;
                       const IconB = cfgB?.icon;
                       return (
                         <a key={row.country.code}
                           href={`/destination/${row.country.code}`}
-                          className={`flex items-center gap-3 p-3 rounded-xl border transition-colors hover:border-primary/40 ${info.border} ${info.bg}`}>
+                          className={`flex flex-wrap items-center gap-3 p-3 rounded-xl border transition-colors hover:border-primary/40 ${info.border} ${info.bg}`}>
                           <span className="text-2xl flex-shrink-0">{row.country.flag}</span>
-                          <div className="flex-1 min-w-0">
+                          {/* The chips now carry their word, so where the pair no longer fits
+                              beside the name they wrap under it instead of crushing it. */}
+                          <div className="flex-1 min-w-28">
                             <p className="text-sm font-semibold text-foreground truncate">{row.country.name}</p>
                           </div>
-                          <div className="flex items-center gap-1.5 flex-shrink-0">
-                            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-medium border ${cfgA.color} ${cfgA.border} bg-white/70`}>
-                              <IconA className="h-3 w-3" />
+                          <div className="flex items-center gap-1.5 flex-shrink-0 ml-auto">
+                            <div title={cfgA.label} className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-medium border ${cfgA.color} ${cfgA.bg} ${cfgA.border}`}>
+                              <IconA className="h-3 w-3" aria-hidden="true" />
                               <span className="hidden sm:inline">{countryA?.flag}</span>
+                              <span>{cfgA.short}</span>
                             </div>
                             <span className="text-muted-foreground text-xs">/</span>
                             {cfgB && IconB && (
-                              <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-medium border ${cfgB.color} ${cfgB.border} bg-white/70`}>
-                                <IconB className="h-3 w-3" />
+                              <div title={cfgB.label} className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-medium border ${cfgB.color} ${cfgB.bg} ${cfgB.border}`}>
+                                <IconB className="h-3 w-3" aria-hidden="true" />
                                 <span className="hidden sm:inline">{countryB?.flag}</span>
+                                <span>{cfgB.short}</span>
                               </div>
                             )}
                           </div>

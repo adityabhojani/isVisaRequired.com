@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { useParams } from "wouter";
-import { MapPin, DollarSign, MessageSquare, Users, Maximize2, CheckCircle2, Clock, Shield, AlertCircle, XCircle, ArrowRight, CalendarDays, Landmark, ShieldCheck, Wifi, Laptop, Heart, Sun, ThumbsUp, Share2, Copy, Check } from "lucide-react";
+import { MapPin, DollarSign, MessageSquare, Users, Maximize2, Clock, ArrowRight, CalendarDays, Landmark, ShieldCheck, Wifi, Laptop, Heart, Sun, ThumbsUp, Share2, Copy, Check } from "lucide-react";
 import { useSEO } from "@/hooks/useSEO";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { slugify } from "@/lib/slug";
+import { reqConfig, requirementOrder } from "@/lib/requirement";
 import { useListCountries, useCheckVisaAll, getCheckVisaAllQueryKey, useGetCountryTouristInfo, getGetCountryTouristInfoQueryKey } from "@workspace/api-client-react";
 import type { VisaResult, VisaRequirement } from "@workspace/api-client-react";
 import { countryMeta } from "@/data/countryMeta";
@@ -79,16 +80,6 @@ function ShareBar({ name, code }: { name: string; code: string }) {
   );
 }
 
-const reqConfig: Record<VisaRequirement, { label: string; color: string; bg: string; border: string; icon: typeof CheckCircle2 }> = {
-  visa_free:       { label: "Visa Free",       color: "text-green-700",  bg: "bg-green-50",  border: "border-green-200",  icon: CheckCircle2 },
-  visa_on_arrival: { label: "Visa on Arrival",  color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200",  icon: Clock },
-  e_visa:          { label: "eVisa",            color: "text-blue-700",   bg: "bg-blue-50",   border: "border-blue-200",   icon: Shield },
-  visa_required:   { label: "Visa Required",    color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200", icon: AlertCircle },
-  no_admission:    { label: "No Admission",     color: "text-red-700",    bg: "bg-red-50",    border: "border-red-200",    icon: XCircle },
-};
-
-const reqOrder: VisaRequirement[] = ["visa_free", "visa_on_arrival", "e_visa", "visa_required", "no_admission"];
-
 export default function DestinationPage() {
   const params = useParams<{ code: string }>();
   const code = (params.code ?? "").toUpperCase();
@@ -124,8 +115,6 @@ export default function DestinationPage() {
   const vfCount = grouped.visa_free?.length ?? 0;
   const voaCount = grouped.visa_on_arrival?.length ?? 0;
   const evCount = grouped.e_visa?.length ?? 0;
-  const vrCount = grouped.visa_required?.length ?? 0;
-  const naCount = grouped.no_admission?.length ?? 0;
   const accessible = vfCount + voaCount + evCount;
 
   const siteUrl = "https://www.isvisarequired.com";
@@ -289,23 +278,27 @@ export default function DestinationPage() {
                   ) : (
                     <>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
-                        {[
-                          { label: "Visa Free", count: vfCount, cls: "text-green-700 bg-green-50 border-green-200" },
-                          { label: "Visa on Arrival", count: voaCount, cls: "text-amber-700 bg-amber-50 border-amber-200" },
-                          { label: "eVisa", count: evCount, cls: "text-blue-700 bg-blue-50 border-blue-200" },
-                          { label: "Visa Required", count: vrCount, cls: "text-orange-700 bg-orange-50 border-orange-200" },
-                          { label: "No Admission", count: naCount, cls: "text-red-700 bg-red-50 border-red-200" },
-                          { label: "Total Accessible", count: accessible, cls: "text-primary bg-primary/5 border-primary/20" },
-                        ].map((s) => (
-                          <div key={s.label} className={`rounded-xl border p-3 ${s.cls}`}>
-                            <p className="text-2xl font-bold">{s.count}</p>
-                            <p className="text-xs mt-0.5">{s.label}</p>
-                          </div>
-                        ))}
+                        {requirementOrder.map((req) => {
+                          const cfg = reqConfig[req];
+                          const Icon = cfg.icon;
+                          return (
+                            <div key={req} className={`rounded-xl border p-3 ${cfg.color} ${cfg.bg} ${cfg.border}`}>
+                              <p className="text-2xl font-bold">{grouped[req]?.length ?? 0}</p>
+                              <p className="text-xs mt-0.5 flex items-center gap-1">
+                                <Icon className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
+                                {cfg.label}
+                              </p>
+                            </div>
+                          );
+                        })}
+                        <div className="rounded-xl border p-3 text-primary bg-primary/5 border-primary/20">
+                          <p className="text-2xl font-bold">{accessible}</p>
+                          <p className="text-xs mt-0.5">Total Accessible</p>
+                        </div>
                       </div>
 
                       {/* Destination lists by requirement */}
-                      {reqOrder.map((req) => {
+                      {requirementOrder.map((req) => {
                         const list = grouped[req];
                         if (!list || list.length === 0) return null;
                         const cfg = reqConfig[req];
@@ -313,9 +306,9 @@ export default function DestinationPage() {
                         return (
                           <div key={req} className={`rounded-xl border ${cfg.border} ${cfg.bg} p-3 mb-3 shadow-sm`}>
                             <div className="flex items-center gap-2 mb-2">
-                              <Icon className={`h-4 w-4 ${cfg.color}`} />
+                              <Icon className={`h-4 w-4 ${cfg.color}`} aria-hidden="true" />
                               <span className={`text-sm font-semibold ${cfg.color}`}>{cfg.label}</span>
-                              <span className="text-xs text-muted-foreground">({list.length} countries)</span>
+                              <span className={`text-sm ${cfg.color}`}>({list.length} countries)</span>
                             </div>
                             <div className="flex flex-wrap gap-1">
                               {list.slice(0, 30).map((r) => (

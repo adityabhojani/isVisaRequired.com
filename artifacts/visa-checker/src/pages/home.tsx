@@ -33,7 +33,7 @@ import { trackEvent } from "@/lib/analytics";
 
 const WorldMap = lazy(() => import("@/components/WorldMap"));
 
-import { reqConfig, requirementOrder } from "@/lib/requirement";
+import { styleForResult, reqConfig, requirementOrder } from "@/lib/requirement";
 
 function CountryCombobox({ value, onChange, countries, placeholder, label, isLoading, excludeCode, open: openProp, onOpenChange }: {
   value: string; onChange: (code: string) => void; countries: Country[];
@@ -151,13 +151,11 @@ function MultiCountrySelect({ selected, onAdd, onRemove, countries, isLoading, p
 type SortOption = "status" | "alpha";
 type FilterOption = VisaRequirement | "all";
 
+// Labels come from the shared status record, so a filter chip and the badge it
+// filters for always use the same word.
 const filterOptions: { value: FilterOption; label: string }[] = [
   { value: "all", label: "All" },
-  { value: "visa_free", label: "Visa Free" },
-  { value: "visa_on_arrival", label: "Visa on Arrival" },
-  { value: "e_visa", label: "eVisa" },
-  { value: "visa_required", label: "Visa Required" },
-  { value: "no_admission", label: "No Admission" },
+  ...requirementOrder.map((value) => ({ value, label: reqConfig[value].label })),
 ];
 
 function ResultCard({ result, passport, isExpanded, onToggle }: {
@@ -166,7 +164,8 @@ function ResultCard({ result, passport, isExpanded, onToggle }: {
   isExpanded: boolean;
   onToggle: () => void;
 }) {
-  const config = reqConfig[result.requirement];
+  // ETA-aware: a UK ETA or US ESTA is stored as e_visa but shown as what it is.
+  const config = styleForResult(result.requirement, result.notes, result.maxStay);
   const Icon = config.icon;
   const stay = result.maxStay === "unlimited" ? "No stay limit" : result.maxStay ? `Stay up to ${result.maxStay}` : config.hint;
 
@@ -181,11 +180,11 @@ function ResultCard({ result, passport, isExpanded, onToggle }: {
         <span className="text-2xl sm:text-3xl flex-shrink-0 leading-none" aria-hidden="true">{result.destinationCountry.flag}</span>
         <div className="flex-1 min-w-0">
           <div className="font-semibold text-foreground text-base leading-tight">{result.destinationCountry.name}</div>
-          <div className="text-[13px] text-muted-foreground mt-0.5 leading-snug tabular-nums">{stay}</div>
+          <div className="text-sm text-muted-foreground mt-0.5 leading-snug tabular-nums">{stay}</div>
         </div>
         <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
-          <div className={`inline-flex shrink-0 items-center gap-1.5 h-7 px-2.5 rounded-full text-[13px] font-semibold leading-none ${config.color} ${config.bg} border ${config.border}`}>
-            <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          <div className={`inline-flex shrink-0 items-center gap-1.5 h-8 px-3 rounded-full text-sm font-semibold leading-none ${config.color} ${config.bg} border ${config.border}`}>
+            <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
             <span className="sm:hidden">{config.short}</span><span className="hidden sm:inline">{config.label}</span>
           </div>
           <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground/70 transition-transform duration-200 group-aria-expanded:rotate-180" aria-hidden="true" />
@@ -309,16 +308,16 @@ const START_PASSPORTS = [
 
 // Static link panels. Each entry states a route, never an outcome, so no visa
 // fact is asserted here and nothing can drift out of date.
-const EXPLORE_PANELS: { heading: string; links: { href: string; label: string }[] }[] = [
+const EXPLORE_PANELS: { heading: string; links: { href: string; label: string; from?: string; to?: string }[] }[] = [
   {
     heading: "Popular checks",
     links: [
-      { href: "/visa-requirements/united-states/japan", label: "United States → Japan" },
-      { href: "/visa-requirements/india/thailand", label: "India → Thailand" },
-      { href: "/visa-requirements/united-kingdom/united-states", label: "United Kingdom → United States" },
-      { href: "/visa-requirements/germany/united-states", label: "Germany → United States" },
-      { href: "/visa-requirements/nigeria/united-kingdom", label: "Nigeria → United Kingdom" },
-      { href: "/visa-requirements/china/singapore", label: "China → Singapore" },
+      { href: "/visa-requirements/united-states/japan", label: "United States → Japan", from: "🇺🇸", to: "🇯🇵" },
+      { href: "/visa-requirements/india/thailand", label: "India → Thailand", from: "🇮🇳", to: "🇹🇭" },
+      { href: "/visa-requirements/united-kingdom/united-states", label: "United Kingdom → United States", from: "🇬🇧", to: "🇺🇸" },
+      { href: "/visa-requirements/germany/united-states", label: "Germany → United States", from: "🇩🇪", to: "🇺🇸" },
+      { href: "/visa-requirements/nigeria/united-kingdom", label: "Nigeria → United Kingdom", from: "🇳🇬", to: "🇬🇧" },
+      { href: "/visa-requirements/china/singapore", label: "China → Singapore", from: "🇨🇳", to: "🇸🇬" },
     ],
   },
   {
@@ -366,6 +365,11 @@ export default function HomePage() {
   const [passport, setPassport] = useState(initialParams.passport);
   const [destinations, setDestinations] = useState<string[]>(initialParams.destinations);
   const [results, setResults] = useState<VisaResult[] | null>(null);
+  // Once the reader has seen an answer the hero stays compact for the rest of
+  // the visit. Editing destinations clears `results`; if the hero re-expanded
+  // then, it would shove the search card down while it is being used.
+  const [heroCompact, setHeroCompact] = useState(false);
+  useEffect(() => { if (results) setHeroCompact(true); }, [results]);
   const resultsRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!results?.length) return;
@@ -589,8 +593,11 @@ export default function HomePage() {
 
       {/* Hero strip */}
       <div className="relative bg-hero">
-        <div className="max-w-5xl mx-auto px-4 pt-6 pb-16 md:pt-12 md:pb-24 text-center">
-          <h1 className="font-serif text-[2.5rem] md:text-[3.25rem] font-semibold text-white mb-3 leading-[1.06] tracking-[-0.022em] text-balance">
+        {/* Once there is an answer the hero steps back: the question is the one
+            the reader already asked, and at 375px it used to hold the answer
+            below the fold. */}
+        <div className={`max-w-5xl mx-auto px-4 text-center transition-[padding] duration-200 ${heroCompact ? "pt-4 pb-14 md:pt-6 md:pb-16" : "pt-6 pb-16 md:pt-12 md:pb-24"}`}>
+          <h1 className={`font-serif font-semibold text-white leading-[1.06] tracking-[-0.022em] text-balance ${heroCompact ? "text-[1.75rem] md:text-[2.25rem] mb-1" : "text-[2.5rem] md:text-[3.25rem] mb-3"}`}>
             Do you need a visa?
           </h1>
           {/* Fixed min-height so the async subscriber count cannot add a wrap
@@ -919,8 +926,10 @@ export default function HomePage() {
                 </h2>
                 <div className="flex flex-col gap-2">
                   {panel.links.map((l) => (
-                    <a key={l.href} href={l.href} className="-mx-2 flex items-center rounded-lg px-2 py-2.5 min-h-11 text-sm text-muted-foreground hover:bg-secondary/70 hover:text-foreground active:bg-secondary transition-colors">
-                      {l.label}
+                    <a key={l.href} href={l.href} className="group -mx-2 flex items-center gap-2 rounded-lg px-2 py-2.5 min-h-11 text-sm text-muted-foreground hover:bg-secondary/70 hover:text-foreground active:bg-secondary transition-colors">
+                      {l.from && <span aria-hidden="true" className="flex-none text-base leading-none">{l.from}{"\u2009"}{l.to}</span>}
+                      <span className="min-w-0 flex-1">{l.label}</span>
+                      <span aria-hidden="true" className="flex-none text-muted-foreground/0 transition-colors group-hover:text-muted-foreground">→</span>
                     </a>
                   ))}
                 </div>

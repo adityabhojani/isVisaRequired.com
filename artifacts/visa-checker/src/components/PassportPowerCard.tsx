@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Download, Share2, Check, X } from "lucide-react";
+import { reqConfig } from "@/lib/requirement";
 
 interface Props {
   flag: string;
@@ -74,7 +75,7 @@ export function PassportPowerCard({ flag, country, code, rank, total, visaFree, 
         </div>
 
         {/* Card preview — this is what gets captured */}
-        <div ref={cardRef} className="mx-4 mb-4 rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #1d4ed8 100%)" }}>
+        <div ref={cardRef} className="mx-4 mb-4 rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, hsl(222 47% 15%) 0%, hsl(222 89% 27%) 55%, hsl(222 89% 34%) 100%)" }}>
           <div className="p-6 text-white">
             {/* Header */}
             <div className="flex items-start justify-between mb-5">
@@ -106,20 +107,25 @@ export function PassportPowerCard({ flag, country, code, rank, total, visaFree, 
               <p className="text-blue-200 text-xs mt-1">{accessPct}% of the world</p>
             </div>
 
-            {/* Breakdown */}
+            {/* Breakdown — words, icons and hues from the shared status record. The
+                pale "line" shade of each status keeps its hue on this dark card
+                (5.8–8.0:1); the dark solids used on white would vanish here. */}
             <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="bg-green-400/20 rounded-xl p-2.5">
-                <p className="text-xl font-bold text-green-300">{visaFree}</p>
-                <p className="text-green-200 text-xs">Visa Free</p>
-              </div>
-              <div className="bg-amber-400/20 rounded-xl p-2.5">
-                <p className="text-xl font-bold text-amber-300">{visaOnArrival}</p>
-                <p className="text-amber-200 text-xs">On Arrival</p>
-              </div>
-              <div className="bg-blue-400/20 rounded-xl p-2.5">
-                <p className="text-xl font-bold text-blue-300">{eVisa}</p>
-                <p className="text-blue-200 text-xs">eVisa</p>
-              </div>
+              {([
+                ["visa_free", visaFree],
+                ["visa_on_arrival", visaOnArrival],
+                ["e_visa", eVisa],
+              ] as const).map(([req, n]) => {
+                const cfg = reqConfig[req];
+                const Icon = cfg.icon;
+                return (
+                  <div key={req} className="bg-white/10 rounded-xl p-2.5">
+                    <Icon className="mx-auto h-4 w-4" style={{ color: cfg.line }} aria-hidden="true" />
+                    <p className="text-xl font-bold tabular-nums" style={{ color: cfg.line }}>{n}</p>
+                    <p className="text-sm text-white">{cfg.short}</p>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Footer */}

@@ -11,7 +11,8 @@ import { countries } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
 import { getEntryRules } from "../data/entryRequirements";
 import { slugify, pairPath } from "./render";
-import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED, REQ_COLOR } from "./hubLayout";
+import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED, statusHeading } from "./hubLayout";
+import type { VisaRequirement } from "@workspace/travel-data";
 import { WELCOMING_PATH } from "./report";
 import { opennessRankOf } from "./welcoming";
 
@@ -44,10 +45,10 @@ export function renderDestinationHub(to: CountryData): string {
   ].map((s) => `<div class="stat"><div class="n">${s.n}</div><div class="k">${esc(s.k)}</div></div>`).join("");
 
   // Nationality lists (link each to the pair page from THAT passport to here)
-  const listBlock = (key: string, heading: string, blurb: string) => {
+  const listBlock = (key: VisaRequirement, heading: string, blurb: string) => {
     if (!n(key)) return "";
     const items = groups[key].map((c) => `<a href="${pairPath(c, to)}">${esc(c.flag)} ${esc(c.name)}</a>`).join("");
-    return `<h2 id="${key}">${esc(heading)} <span style="color:${REQ_COLOR[key]}">(${n(key)})</span></h2>
+    return `${statusHeading(key, heading, n(key))}
 <p style="color:#334155;margin:0 0 8px">${esc(blurb)}</p><div class="card cols">${items}</div>`;
   };
 

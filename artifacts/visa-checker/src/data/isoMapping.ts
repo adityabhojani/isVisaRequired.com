@@ -32,8 +32,24 @@ export const numericToAlpha2: Record<string, string> = {
   "804": "UA", "784": "AE", "826": "GB", "840": "US", "858": "UY", "860": "UZ",
   "548": "VU", "862": "VE", "704": "VN", "887": "YE", "894": "ZM", "716": "ZW",
   "275": "PS",
+  // Missing until 2026-09: South Korea and Armenia rendered as blank shapes.
+  "410": "KR",
+  "51": "AM",
 };
 
 export const alpha2ToNumeric: Record<string, string> = Object.fromEntries(
   Object.entries(numericToAlpha2).map(([num, alpha2]) => [alpha2, num])
 );
+
+/**
+ * The world-atlas file zero-pads its numeric ids ("032" Argentina, "076"
+ * Brazil, "036" Australia) and this table does not ("32"). Compare them as
+ * numbers. Both maps — the homepage WorldMap and the /map page — go through
+ * this one function; the /map page once carried its own 134-entry table that
+ * also compared the raw strings, which left 60 of the atlas's 177 shapes grey.
+ */
+export function alpha2FromAtlasId(id: unknown): string | undefined {
+  if (id == null || id === "") return undefined;
+  const n = Number(id);
+  return Number.isFinite(n) ? numericToAlpha2[String(n)] : undefined;
+}

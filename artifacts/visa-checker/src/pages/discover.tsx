@@ -10,23 +10,12 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-
-const reqConfig: Record<VisaRequirement, { label: string; color: string; bg: string; border: string; emoji: string }> = {
-  visa_free:       { label: "Visa Free",       color: "text-green-700",  bg: "bg-green-50",  border: "border-green-200",  emoji: "✅" },
-  visa_on_arrival: { label: "Visa on Arrival",  color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200",  emoji: "🟡" },
-  e_visa:          { label: "eVisa",            color: "text-blue-700",   bg: "bg-blue-50",   border: "border-blue-200",   emoji: "🔵" },
-  visa_required:   { label: "Visa Required",    color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200", emoji: "❌" },
-  no_admission:    { label: "No Admission",     color: "text-red-700",    bg: "bg-red-50",    border: "border-red-200",    emoji: "🚫" },
-};
+import { reqConfig, styleForResult } from "@/lib/requirement";
 
 const REGIONS = ["All regions", "Europe", "Asia", "Americas", "Africa", "Middle East", "Oceania", "Caribbean"];
 
-const QUICK_FILTERS = [
-  { label: "🏝️ Visa-Free Only",    req: "visa_free" as VisaRequirement },
-  { label: "🟡 Easy Entry",         req: "visa_on_arrival" as VisaRequirement },
-  { label: "🔵 eVisa Available",    req: "e_visa" as VisaRequirement },
-  { label: "❌ Need Full Visa",     req: "visa_required" as VisaRequirement },
-];
+// Statuses offered as quick filters; words, colours and icons come from reqConfig.
+const QUICK_FILTERS: VisaRequirement[] = ["visa_free", "visa_on_arrival", "e_visa", "visa_required"];
 
 export default function DiscoverPage() {
   const [passport, setPassport] = useState(() => new URLSearchParams(window.location.search).get("passport") ?? "");
@@ -137,16 +126,21 @@ export default function DiscoverPage() {
                       }`}>
                       All ({results.length})
                     </button>
-                    {QUICK_FILTERS.map(({ label, req }) => (
-                      <button key={req} onClick={() => setReqFilter(req === reqFilter ? "all" : req)}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
-                          reqFilter === req
-                            ? `${reqConfig[req].color} ${reqConfig[req].bg} ${reqConfig[req].border}`
-                            : "bg-muted border-border text-muted-foreground hover:border-border"
-                        }`}>
-                        {label} {counts[req] ? `(${counts[req]})` : ""}
-                      </button>
-                    ))}
+                    {QUICK_FILTERS.map((req) => {
+                      const cfg = reqConfig[req];
+                      const Icon = cfg.icon;
+                      return (
+                        <button key={req} onClick={() => setReqFilter(req === reqFilter ? "all" : req)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+                            reqFilter === req
+                              ? `${cfg.color} ${cfg.bg} ${cfg.border}`
+                              : "bg-muted border-border text-muted-foreground hover:border-border"
+                          }`}>
+                          <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                          {cfg.label} {counts[req] ? `(${counts[req]})` : ""}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -191,7 +185,8 @@ export default function DiscoverPage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {filtered.map((r) => {
-                const cfg = reqConfig[r.requirement];
+                const cfg = styleForResult(r.requirement, r.notes, r.maxStay);
+                const Icon = cfg.icon;
                 return (
                   <a
                     key={r.destinationCountry.code}
@@ -203,7 +198,10 @@ export default function DiscoverPage() {
                       <div className="text-sm font-semibold text-foreground truncate">{r.destinationCountry.name}</div>
                       {r.maxStay && <div className="text-xs text-muted-foreground">{r.maxStay}</div>}
                     </div>
-                    <span className={`text-sm flex-shrink-0`}>{cfg.emoji}</span>
+                    <span className={`inline-flex items-center gap-1 text-xs font-semibold flex-shrink-0 ${cfg.color}`}>
+                      <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                      {cfg.short}
+                    </span>
                   </a>
                 );
               })}

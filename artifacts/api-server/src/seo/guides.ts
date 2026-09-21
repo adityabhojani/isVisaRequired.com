@@ -4,7 +4,7 @@ import type { CountryData } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
 import { GUIDES, type Guide, type PassportRoundup, type Article } from "../data/guidesData";
 import { slugify, pairPath } from "./render";
-import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED, REQ_COLOR } from "./hubLayout";
+import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED, statusStat } from "./hubLayout";
 
 const YEAR = "2026";
 
@@ -125,9 +125,9 @@ function renderRoundup(g: PassportRoundup): string {
 <div class="updated">${vf} visa-free · ${voa} visa on arrival · ${ev} eVisa</div>
 <p class="lead">${esc(g.intro)}</p>
 <div class="stats">
-  <div class="stat"><div class="n" style="color:${REQ_COLOR.visa_free}">${vf}</div><div class="k">Visa-free</div></div>
-  <div class="stat"><div class="n" style="color:${REQ_COLOR.visa_on_arrival}">${voa}</div><div class="k">Visa on arrival</div></div>
-  <div class="stat"><div class="n" style="color:${REQ_COLOR.e_visa}">${ev}</div><div class="k">eVisa online</div></div>
+  ${statusStat("visa_free", vf)}
+  ${statusStat("visa_on_arrival", voa)}
+  ${statusStat("e_visa", ev)}
   <div class="stat"><div class="n">${noVisa}</div><div class="k">No advance visa</div></div>
 </div>
 <p><a class="cta" href="/visa-requirements/${slugify(from.name)}">See the full ${esc(g.adjective)} passport hub (all destinations) →</a></p>

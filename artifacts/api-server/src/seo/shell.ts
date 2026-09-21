@@ -11,24 +11,31 @@
 // Everything here mirrors artifacts/visa-checker/src/index.css: the same
 // navy, the same cool near-white ground, Inter + Playfair Display, and the
 // same navy-tinted shadow scale (rgb 15 23 41 is --foreground's hue).
-import { FOOTER_GROUPS, FOOTER_LINKS, FOOTER_TAGLINE, FOOTER_DISCLAIMER } from "@workspace/travel-data";
+import {
+  FOOTER_GROUPS, FOOTER_LINKS, FOOTER_TAGLINE, FOOTER_DISCLAIMER,
+  TOKENS_CSS, FONT_HREF,
+} from "@workspace/travel-data";
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+// One font list for the whole site. The app's index.css @imports the same
+// FONT_HREF, so a click from a search-landing page into the app is a cache hit
+// rather than a second download of different weights.
 export const FONT_LINKS =
   `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>` +
-  `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap">`;
+  `<link rel="stylesheet" href="${FONT_HREF}">`;
 
 // Appended AFTER each renderer's own <style> so shared chrome wins on shared
 // selectors (header, footer, h1, .card, .cta) while page-specific classes are
 // untouched. Kept dependency-free: no JS, no images, ~3KB.
+//
+// Every colour, radius, shadow and type size comes from TOKENS_CSS — the same
+// string the app compiles into tokens.generated.css. This file, and every
+// renderer that appends to it, holds no literal colour values of its own.
 export const BASE_STYLE = `
-:root{--navy:hsl(222 89% 30%);--navy-2:hsl(222 89% 25%);--field:hsl(222 89% 27%);--field-deep:hsl(222 47% 15%);
---bg:hsl(210 40% 98%);--ink:hsl(222 47% 11%);--muted:hsl(215 16% 47%);--line:hsl(214 32% 91%);--secondary:hsl(210 40% 94%);
---sh-xs:0 1px 3px 0 rgb(15 23 41/.06);--sh-sm:0 2px 4px -1px rgb(15 23 41/.06),0 1px 2px -1px rgb(15 23 41/.05);
---sh-md:0 8px 16px -4px rgb(15 23 41/.08),0 2px 6px -2px rgb(15 23 41/.05);--sh-xl:0 28px 48px -12px rgb(15 23 41/.16),0 10px 18px -8px rgb(15 23 41/.08)}
+${TOKENS_CSS}
 html{-webkit-text-size-adjust:100%}body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
 a{color:var(--navy)}
 .wrap{max-width:920px;margin:0 auto;padding:0 20px}
@@ -38,14 +45,25 @@ header.site .wrap{display:flex;align-items:center;justify-content:space-between;
 .brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
 .brand .mark{width:32px;height:32px;border-radius:999px;background:var(--navy);display:grid;place-items:center;flex:none}
 .brand .mark svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.brand .word{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:18px;letter-spacing:-.01em}
+.brand .word{font-family:"Playfair Display",Georgia,serif;font-weight:600;font-size:18px;letter-spacing:-.01em}
 .brand .tld{color:var(--muted);font-size:13px}
-nav.top{display:flex;align-items:center;gap:4px}
+nav.top{display:flex;align-items:center;gap:4px;order:2}
 nav.top a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;padding:6px 10px;border-radius:8px}
 nav.top a:hover{color:var(--ink);background:var(--secondary)}
-nav.top a.btn{color:#fff;background:var(--navy);font-weight:600;padding:8px 14px;box-shadow:0 8px 16px -6px rgb(10 47 161/.35)}
-nav.top a.btn:hover{background:var(--navy-2)}
-@media(max-width:720px){nav.top a:not(.btn){display:none}}
+.brand{order:1;margin-right:auto}
+a.hdr-cta{order:3;flex:none;display:inline-flex;align-items:center;color:#fff;background:var(--navy);text-decoration:none;font-size:14px;font-weight:600;padding:8px 14px;border-radius:8px;box-shadow:0 8px 16px -6px rgb(10 47 161/.35)}
+a.hdr-cta:hover{background:var(--navy-2)}
+/* On a phone the nav used to hide every link but "Check visa", leaving the
+   search-landing pages with no visible way to explore. The links now take a
+   second row of their own that scrolls sideways; the fade says it scrolls.
+   It must be justify-content:flex-start — with flex-end, overflow spills off
+   the START of the row, where it can never be scrolled back into view. */
+@media(max-width:720px){
+header.site .wrap{flex-wrap:wrap;height:auto;padding-top:10px;row-gap:2px}
+nav.top{order:4;flex:1 0 100%;justify-content:flex-start;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -20px;padding:2px 14px 8px;mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+nav.top::-webkit-scrollbar{display:none}
+nav.top a{flex:none;white-space:nowrap;padding:8px 10px}
+}
 nav.crumbs{font-size:13px;color:var(--muted);padding:16px 0 8px}nav.crumbs a{color:var(--muted);text-decoration:none}nav.crumbs a:hover{color:var(--ink)}
 h1{font-family:"Playfair Display",Georgia,serif;font-weight:600;font-size:clamp(28px,4.2vw,40px);line-height:1.1;letter-spacing:-.018em;margin:8px 0 6px}
 h2{font-size:20px;font-weight:600;letter-spacing:-.01em;margin:26px 0 10px}
@@ -92,7 +110,7 @@ const NAV: [string, string][] = [
 
 export function renderHeader(): string {
   const links = NAV.map(([h, l]) => `<a href="${h}">${l}</a>`).join("");
-  return `<header class="site"><div class="wrap"><a class="brand" href="/" aria-label="isvisarequired.com home"><span class="mark">${GLOBE}</span><span class="word">isvisarequired</span><span class="tld">.com</span></a><nav class="top" aria-label="Primary">${links}<a class="btn" href="/">Check visa →</a></nav></div></header>`;
+  return `<header class="site"><div class="wrap"><a class="brand" href="/" aria-label="isvisarequired.com home"><span class="mark">${GLOBE}</span><span class="word">isvisarequired</span><span class="tld">.com</span></a><nav class="top" aria-label="Primary">${links}</nav><a class="hdr-cta" href="/">Check visa →</a></div></header>`;
 }
 
 export function renderFooter(): string {

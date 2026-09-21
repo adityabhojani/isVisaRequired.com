@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { useLocation } from "wouter";
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
 import { useSEO } from "@/hooks/useSEO";
 import { Header } from "@/components/Header";
@@ -9,54 +10,40 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { ChevronDown, Globe, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { reqConfig, requirementOrder, styleForResult, NO_DATA_FILL } from "@/lib/requirement";
+import { alpha2FromAtlasId } from "@/data/isoMapping";
+import { StatusPatternDefs, statusFill, noDataFill, Swatch } from "@/components/mapPatterns";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 // ISO 3166-1 numeric → alpha-2 mapping (world-atlas uses numeric codes)
-const NUM_TO_A2: Record<string, string> = {
-  "4":"AF","8":"AL","12":"DZ","24":"AO","32":"AR","36":"AU","40":"AT","50":"BD",
-  "56":"BE","64":"BT","68":"BO","70":"BA","72":"BW","76":"BR","100":"BG","104":"MM",
-  "116":"KH","124":"CA","140":"CF","144":"LK","148":"TD","152":"CL","156":"CN",
-  "170":"CO","188":"CR","191":"HR","192":"CU","196":"CY","203":"CZ","208":"DK",
-  "218":"EC","222":"SV","231":"ET","233":"EE","246":"FI","250":"FR","266":"GA",
-  "276":"DE","288":"GH","300":"GR","320":"GT","324":"GN","332":"HT","340":"HN",
-  "348":"HU","356":"IN","360":"ID","364":"IR","368":"IQ","372":"IE","376":"IL",
-  "380":"IT","388":"JM","392":"JP","400":"JO","404":"KE","408":"KP","410":"KR",
-  "414":"KW","418":"LA","422":"LB","428":"LV","430":"LR","434":"LY","440":"LT",
-  "442":"LU","450":"MG","458":"MY","466":"ML","484":"MX","496":"MN","498":"MD",
-  "499":"ME","504":"MA","508":"MZ","516":"NA","524":"NP","528":"NL","554":"NZ",
-  "558":"NI","566":"NG","578":"NO","586":"PK","591":"PA","598":"PG","600":"PY",
-  "604":"PE","608":"PH","616":"PL","620":"PT","634":"QA","642":"RO","643":"RU",
-  "682":"SA","686":"SN","694":"SL","703":"SK","704":"VN","705":"SI","706":"SO",
-  "710":"ZA","716":"ZW","724":"ES","728":"SS","729":"SD","740":"SR","752":"SE",
-  "756":"CH","760":"SY","762":"TJ","764":"TH","780":"TT","788":"TN","792":"TR",
-  "800":"UG","804":"UA","784":"AE","826":"GB","834":"TZ","840":"US","858":"UY",
-  "860":"UZ","862":"VE","887":"YE","894":"ZM","031":"AZ","051":"AM","096":"BN",
-  "262":"DJ","807":"MK","670":"VC","662":"LC","659":"KN","688":"RS",
-};
+// Country lookup: alpha2FromAtlasId in @/data/isoMapping (shared with WorldMap).
 
-const reqColors: Record<VisaRequirement, string> = {
-  visa_free:       "#16a34a",
-  visa_on_arrival: "#d97706",
-  e_visa:          "#2563eb",
-  visa_required:   "#ea580c",
-  no_admission:    "#dc2626",
-};
 
-const reqLabels: Record<VisaRequirement, string> = {
-  visa_free:       "Visa Free",
-  visa_on_arrival: "Visa on Arrival",
-  e_visa:          "eVisa Available",
-  visa_required:   "Visa Required",
-  no_admission:    "No Admission",
-};
+// Status colours and words come from @/lib/requirement. The fills below are
+// NOT statuses: the passport's own country (brand navy, as in WorldMap), the
+// pale neutral for a shape this page can't match to a country code (or before
+// any results have arrived), and the opacity used to push filtered-out
+// countries back without greying them — grey (NO_DATA_FILL) means "no rule in
+// the dataset" and nothing else.
+const PASSPORT_FILL = "hsl(222 89% 30%)";
+const UNMAPPED_FILL = "#e2e8f0";
+const FILTERED_OUT_OPACITY = 0.15;
 
-const reqOrder: VisaRequirement[] = ["visa_free", "visa_on_arrival", "e_visa", "visa_required", "no_admission"];
+// Status textures, fills and the legend swatch are shared with the homepage map
+// (components/mapPatterns.tsx). This page scopes its <pattern> ids with a
+// prefix so they never collide with WorldMap's.
+const PATTERN_PREFIX = "map-page-";
+
+interface CountryFill {
+  fill: string;
+  /** true when the country has a status but the active filter excludes it */
+  dimmed: boolean;
+}
 
 interface TooltipState {
   name: string;
   code: string;
-  req: VisaRequirement | null;
   x: number;
   y: number;
 }
@@ -73,6 +60,7 @@ export default function MapPage() {
   const [center, setCenter] = useState<[number, number]>([0, 20]);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const [activeFilter, setActiveFilter] = useState<VisaRequirement | "all">("all");
+  const [, setLocation] = useLocation();
 
   const { data: countries = [] } = useListCountries();
   const passportCountry = countries.find((c) => c.code === passport);
@@ -88,30 +76,47 @@ export default function MapPage() {
     return m;
   }, [rawResults]);
 
+  // The full entry per destination, so a single pair's word can use its notes
+  // and maxStay (styleForResult labels a UK ETA / US ESTA correctly).
+  const resultByCode = useMemo(() => {
+    const m: Record<string, VisaResult> = {};
+    (rawResults as VisaResult[]).forEach((r) => { m[r.destinationCountry.code] = r; });
+    return m;
+  }, [rawResults]);
+
+  // Until results arrive nothing is "no data" yet — it just hasn't loaded.
+  const hasData = (rawResults as VisaResult[]).length > 0;
+
+  const pairStyle = useCallback((code: string) => {
+    const r = resultByCode[code];
+    return r && reqConfig[r.requirement] ? styleForResult(r.requirement, r.notes, r.maxStay) : null;
+  }, [resultByCode]);
+
   const counts = useMemo(() => {
     const c: Partial<Record<VisaRequirement, number>> = {};
     (rawResults as VisaResult[]).forEach((r) => { c[r.requirement] = (c[r.requirement] ?? 0) + 1; });
     return c;
   }, [rawResults]);
 
-  const getCountryColor = useCallback((numericCode: string | number) => {
-    const code = NUM_TO_A2[String(numericCode)];
-    if (!code) return "#e2e8f0";
+  const getCountryColor = useCallback((numericCode: string | number): CountryFill => {
+    const code = alpha2FromAtlasId(numericCode);
+    if (!code) return { fill: UNMAPPED_FILL, dimmed: false };
+    if (code === passport) return { fill: PASSPORT_FILL, dimmed: false };
     const req = visaMap[code];
-    if (!req) return "#e2e8f0";
-    if (activeFilter !== "all" && req !== activeFilter) return "#e2e8f0";
-    return reqColors[req];
-  }, [visaMap, activeFilter]);
+    if (!req || !reqConfig[req]) return { fill: hasData ? noDataFill(PATTERN_PREFIX) : UNMAPPED_FILL, dimmed: false };
+    return { fill: statusFill(req, PATTERN_PREFIX), dimmed: activeFilter !== "all" && req !== activeFilter };
+  }, [visaMap, activeFilter, passport, hasData]);
 
   const handleMouseEnter = useCallback((geo: { id?: string; properties: { name: string } }, evt: React.MouseEvent) => {
-    const code = NUM_TO_A2[String(geo.id ?? "")] ?? "";
-    const req = code ? (visaMap[code] ?? null) : null;
-    setTooltip({ name: geo.properties.name, code, req, x: evt.clientX, y: evt.clientY });
-  }, [visaMap]);
+    const code = alpha2FromAtlasId(geo.id) ?? "";
+    setTooltip({ name: geo.properties.name, code, x: evt.clientX, y: evt.clientY });
+  }, []);
 
   const handleMouseMove = useCallback((evt: React.MouseEvent) => {
     setTooltip((prev) => prev ? { ...prev, x: evt.clientX, y: evt.clientY } : null);
   }, []);
+
+  const tipStyle = tooltip?.code ? pairStyle(tooltip.code) : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -175,23 +180,39 @@ export default function MapPage() {
         <div className="flex flex-wrap gap-2 mb-4">
           <button
             onClick={() => setActiveFilter("all")}
+            aria-pressed={activeFilter === "all"}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
               activeFilter === "all" ? "bg-foreground text-background border-foreground" : "bg-muted border-border text-muted-foreground hover:border-foreground/30"
             }`}>
             All countries
           </button>
-          {reqOrder.map((req) => (
-            <button key={req}
-              onClick={() => setActiveFilter(activeFilter === req ? "all" : req)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
-                activeFilter === req ? "text-white border-transparent" : "bg-muted border-border text-muted-foreground hover:border-foreground/30"
-              }`}
-              style={activeFilter === req ? { backgroundColor: reqColors[req], borderColor: reqColors[req] } : {}}>
-              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: reqColors[req] }} />
-              {reqLabels[req]}
-              {counts[req] ? <span className="opacity-70">({counts[req]})</span> : null}
-            </button>
-          ))}
+          {requirementOrder.map((req) => {
+            const cfg = reqConfig[req];
+            const Icon = cfg.icon;
+            const active = activeFilter === req;
+            return (
+              <button key={req}
+                onClick={() => setActiveFilter(active ? "all" : req)}
+                aria-pressed={active}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+                  active ? `${cfg.dot} text-white border-transparent` : "bg-muted border-border text-muted-foreground hover:border-foreground/30"
+                }`}>
+                <Swatch fill={statusFill(req, PATTERN_PREFIX)} onSolid={active} />
+                <Icon className="h-3.5 w-3.5 flex-shrink-0" style={active ? undefined : { color: cfg.solid }} aria-hidden="true" />
+                {cfg.label}
+                {/* Full white on the solid chip: white at 70% drops below 4.5:1 on the lighter solids. */}
+                {counts[req] ? <span className={active ? undefined : "opacity-70"}>({counts[req]})</span> : null}
+              </button>
+            );
+          })}
+          <span className="flex items-center gap-1.5 px-1 py-1.5 text-xs text-muted-foreground">
+            <Swatch fill={PASSPORT_FILL} />
+            Your passport
+          </span>
+          <span className="flex items-center gap-1.5 px-1 py-1.5 text-xs text-muted-foreground">
+            <Swatch fill={noDataFill(PATTERN_PREFIX)} />
+            No data
+          </span>
         </div>
 
         {/* Map */}
@@ -213,14 +234,23 @@ export default function MapPage() {
             projectionConfig={{ scale: 147, center: center }}
             style={{ width: "100%", height: "100%" }}
           >
+            <defs>
+              <StatusPatternDefs prefix={PATTERN_PREFIX} />
+            </defs>
             <ZoomableGroup zoom={zoom} center={center} onMoveEnd={({ zoom: z, coordinates }) => {
               setZoom(z); setCenter(coordinates as [number, number]);
             }}>
               <Geographies geography={GEO_URL}>
                 {({ geographies }: { geographies: { rsmKey: string; id?: string; properties: { name: string } }[] }) =>
                   geographies.map((geo) => {
-                    const alpha2 = NUM_TO_A2[String(geo.id ?? "")];
-                    const fill = getCountryColor(String(geo.id ?? ""));
+                    const alpha2 = alpha2FromAtlasId(geo.id);
+                    const { fill, dimmed } = getCountryColor(String(geo.id ?? ""));
+                    const fillOpacity = dimmed ? FILTERED_OUT_OPACITY : 1;
+                    // The word for screen readers (paths are focusable); sighted
+                    // readers get it from the tooltip, so no <title> double-tooltip.
+                    const word = !alpha2 ? null
+                      : alpha2 === passport ? "Your passport"
+                      : pairStyle(alpha2)?.label ?? (hasData ? "No data" : null);
                     return (
                       <Geography
                         key={geo.rsmKey}
@@ -228,15 +258,22 @@ export default function MapPage() {
                         fill={fill}
                         stroke="#fff"
                         strokeWidth={0.4}
+                        aria-label={word ? `${geo.properties.name}: ${word}` : geo.properties.name}
                         style={{
-                          default: { outline: "none", transition: "fill 0.15s" },
-                          hover: { outline: "none", fill: fill === "#e2e8f0" ? "#cbd5e1" : fill, opacity: 0.85, cursor: alpha2 ? "pointer" : "default" },
-                          pressed: { outline: "none" },
+                          default: { outline: "none", transition: "fill 0.15s, fill-opacity 0.15s", fillOpacity },
+                          hover: { outline: "none", fill, fillOpacity: dimmed ? FILTERED_OUT_OPACITY * 2 : 1, opacity: 0.85, cursor: alpha2 ? "pointer" : "default" },
+                          // Pressed also covers a drag-to-pan that starts on a country:
+                          // keep a filtered-out country dimmed for the whole drag.
+                          pressed: { outline: "none", fillOpacity },
                         }}
                         onMouseEnter={(evt: React.MouseEvent) => handleMouseEnter(geo, evt)}
                         onMouseLeave={() => setTooltip(null)}
                         onClick={() => {
-                          if (alpha2) window.location.href = `/destination/${alpha2}`;
+                          if (!alpha2) return;
+                          setLocation(`/destination/${alpha2}`);
+                          // The old full page load landed at the top; client-side
+                          // navigation keeps the map's scroll offset unless reset.
+                          window.scrollTo(0, 0);
                         }}
                       />
                     );
@@ -268,13 +305,16 @@ export default function MapPage() {
               className="fixed z-50 pointer-events-none bg-popover border border-border rounded-xl shadow-md px-3 py-2 text-sm"
               style={{ left: tooltip.x + 12, top: tooltip.y - 40 }}>
               <p className="font-semibold text-foreground">{tooltip.name}</p>
-              {tooltip.req ? (
-                <p className="text-xs mt-0.5 font-medium" style={{ color: reqColors[tooltip.req] }}>
-                  {reqLabels[tooltip.req]}
+              {tooltip.code && tooltip.code === passport ? (
+                <p className="text-xs text-muted-foreground mt-0.5">Your passport</p>
+              ) : tipStyle ? (
+                <p className={`flex items-center gap-1 text-xs mt-0.5 font-medium ${tipStyle.color}`}>
+                  <tipStyle.icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+                  {tipStyle.label}
                 </p>
-              ) : (
+              ) : tooltip.code && hasData ? (
                 <p className="text-xs text-muted-foreground mt-0.5">No data</p>
-              )}
+              ) : null}
               {tooltip.code && <p className="text-xs text-muted-foreground">Click to view profile</p>}
             </div>
           )}
@@ -283,13 +323,17 @@ export default function MapPage() {
         {/* Stats row */}
         {passport && !isLoading && (
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-5">
-            {reqOrder.map((req) => (
-              <div key={req} className="rounded-xl border border-border/70 bg-card p-3 shadow-sm text-center">
-                <div className="w-3 h-3 rounded-full mx-auto mb-1.5" style={{ backgroundColor: reqColors[req] }} />
-                <p className="text-xl font-bold text-foreground">{counts[req] ?? 0}</p>
-                <p className="text-xs text-muted-foreground leading-tight mt-0.5">{reqLabels[req]}</p>
-              </div>
-            ))}
+            {requirementOrder.map((req) => {
+              const cfg = reqConfig[req];
+              const Icon = cfg.icon;
+              return (
+                <div key={req} className="rounded-xl border border-border/70 bg-card p-3 shadow-sm text-center">
+                  <Icon className="h-4 w-4 mx-auto mb-1.5" style={{ color: cfg.solid }} aria-hidden="true" />
+                  <p className="text-xl font-bold text-foreground">{counts[req] ?? 0}</p>
+                  <p className="text-xs text-muted-foreground leading-tight mt-0.5">{cfg.label}</p>
+                </div>
+              );
+            })}
           </div>
         )}
 

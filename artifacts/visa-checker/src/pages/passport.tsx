@@ -1,15 +1,14 @@
 import { useMemo, useState, useEffect } from "react";
 import { useParams } from "wouter";
-import { Globe, CheckCircle2, AlertCircle, Clock, XCircle, Shield, ArrowRight, CreditCard, Share2, Copy, Check } from "lucide-react";
+import { Globe, ArrowRight, CreditCard, Share2, Copy, Check } from "lucide-react";
 import { Header } from "@/components/Header";
 import { PassportPowerCard } from "@/components/PassportPowerCard";
 import { useSEO } from "@/hooks/useSEO";
 import { Footer } from "@/components/Footer";
 import { slugify } from "@/lib/slug";
+import { reqConfig, requirementOrder, styleForResult } from "@/lib/requirement";
 import { useListCountries, useCheckVisaAll, getCheckVisaAllQueryKey } from "@workspace/api-client-react";
 import type { VisaResult, VisaRequirement } from "@workspace/api-client-react";
-
-const reqOrder: VisaRequirement[] = ["visa_free", "visa_on_arrival", "e_visa", "visa_required", "no_admission"];
 
 function PassportShareBar({ code, name, vfCount }: { code: string; name: string; vfCount: number }) {
   const [copied, setCopied] = useState(false);
@@ -52,16 +51,6 @@ function PassportShareBar({ code, name, vfCount }: { code: string; name: string;
   );
 }
 
-const reqConfig: Record<VisaRequirement, {
-  label: string; color: string; bg: string; border: string; icon: typeof CheckCircle2; description: string;
-}> = {
-  visa_free:       { label: "Visa Free",       color: "text-green-700",  bg: "bg-green-50",  border: "border-green-200",  icon: CheckCircle2, description: "No visa needed — just show your passport at the border." },
-  visa_on_arrival: { label: "Visa on Arrival",  color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200",  icon: Clock,        description: "Get a visa stamp when you arrive at the airport." },
-  e_visa:          { label: "eVisa",            color: "text-blue-700",   bg: "bg-blue-50",   border: "border-blue-200",   icon: Shield,       description: "Apply online before travelling — no embassy visit needed." },
-  visa_required:   { label: "Visa Required",    color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200", icon: AlertCircle,  description: "Apply for a visa at the embassy or consulate in advance." },
-  no_admission:    { label: "No Admission",     color: "text-red-700",    bg: "bg-red-50",    border: "border-red-200",    icon: XCircle,      description: "Entry is not permitted for this passport." },
-};
-
 export default function PassportPage() {
   const params = useParams<{ code: string }>();
   const code = (params.code ?? "").toUpperCase();
@@ -84,7 +73,7 @@ export default function PassportPage() {
       if (!map[r.requirement]) map[r.requirement] = [];
       map[r.requirement]!.push(r);
     });
-    reqOrder.forEach((req) => {
+    requirementOrder.forEach((req) => {
       if (map[req]) map[req]!.sort((a, b) => a.destinationCountry.name.localeCompare(b.destinationCountry.name));
     });
     return map;
@@ -165,19 +154,15 @@ export default function PassportPage() {
             {/* Stats row */}
             {!isLoading && results.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-10">
-                {[
-                  { req: "visa_free" as VisaRequirement, count: vfCount },
-                  { req: "visa_on_arrival" as VisaRequirement, count: voaCount },
-                  { req: "e_visa" as VisaRequirement, count: evCount },
-                  { req: "visa_required" as VisaRequirement, count: vrCount },
-                  { req: "no_admission" as VisaRequirement, count: naCount },
-                ].map(({ req, count }) => {
+                {requirementOrder.map((req) => {
+                  // Counts bucket by stored requirement (ETAs sit in eVisa), so reqConfig, not styleForResult.
+                  const count = grouped[req]?.length ?? 0;
                   const cfg = reqConfig[req];
                   const Icon = cfg.icon;
                   return (
                     <a key={req} href={`#${req}`}
                       className={`flex flex-col items-center p-4 rounded-2xl border text-center ${cfg.bg} ${cfg.border} hover:shadow-sm transition-shadow`}>
-                      <Icon className={`h-5 w-5 ${cfg.color} mb-1`} />
+                      <Icon className={`h-5 w-5 ${cfg.color} mb-1`} aria-hidden="true" />
                       <div className={`text-2xl font-bold ${cfg.color}`}>{count}</div>
                       <div className={`text-xs font-medium ${cfg.color} mt-0.5`}>{cfg.label}</div>
                     </a>
@@ -195,7 +180,7 @@ export default function PassportPage() {
             )}
 
             {/* Grouped sections */}
-            {!isLoading && reqOrder.map((req) => {
+            {!isLoading && requirementOrder.map((req) => {
               const group = grouped[req];
               if (!group || group.length === 0) return null;
               const cfg = reqConfig[req];
@@ -203,14 +188,19 @@ export default function PassportPage() {
               return (
                 <section key={req} id={req} className="mb-10 scroll-mt-20">
                   <div className={`flex items-center gap-2 px-4 py-3 rounded-t-xl border-x border-t ${cfg.bg} ${cfg.border}`}>
-                    <Icon className={`h-4 w-4 ${cfg.color}`} />
+                    <Icon className={`h-4 w-4 ${cfg.color}`} aria-hidden="true" />
                     <h2 className={`font-bold text-base ${cfg.color}`}>{cfg.label}</h2>
-                    <span className={`text-xs font-medium ml-1 ${cfg.color} opacity-70`}>({group.length} countries)</span>
+                    <span className={`text-xs font-medium ml-1 ${cfg.color}`}>({group.length} countries)</span>
                   </div>
-                  <p className={`text-xs px-4 py-2 border-x ${cfg.bg} ${cfg.border} text-muted-foreground`}>{cfg.description}</p>
+                  <p className={`text-xs px-4 py-2 border-x ${cfg.bg} ${cfg.border} text-foreground`}>{cfg.hint}</p>
                   <div className={`border-x border-b rounded-b-xl ${cfg.border} overflow-hidden`}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                      {group.map((r, i) => (
+                      {group.map((r, i) => {
+                        // Grouped by stored requirement; a UK ETA / US ESTA inside the eVisa or
+                        // visa-free group gets its own word + icon so it isn't read as that group.
+                        const shown = styleForResult(r.requirement, r.notes, r.maxStay);
+                        const ShownIcon = shown.icon;
+                        return (
                         <a
                           key={r.destinationCountry.code}
                           href={`/?passport=${code}&destinations=${r.destinationCountry.code}`}
@@ -223,8 +213,15 @@ export default function PassportPage() {
                             <div className="text-sm font-medium text-foreground truncate">{r.destinationCountry.name}</div>
                             {r.maxStay && <div className="text-xs text-muted-foreground">{r.maxStay}</div>}
                           </div>
+                          {shown !== cfg && (
+                            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border text-xs font-semibold flex-shrink-0 ${shown.color} ${shown.bg} ${shown.border}`}>
+                              <ShownIcon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                              {shown.short}
+                            </span>
+                          )}
                         </a>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </section>

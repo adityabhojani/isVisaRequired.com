@@ -4,24 +4,14 @@ import { Footer } from "@/components/Footer";
 import { Header, PageHero } from "@/components/Header";
 import { useGetPopularDestinations, useListCountries, useCheckVisaMultiple, getGetPopularDestinationsQueryKey } from "@workspace/api-client-react";
 import type { Country, VisaResult } from "@workspace/api-client-react";
-import { Globe, ChevronDown, CheckCircle2, AlertCircle, Clock, XCircle, Shield } from "lucide-react";
+import { Globe, ChevronDown } from "lucide-react";
 import { AdSlot } from "@/components/AdSlot";
 import { Button } from "@/components/ui/button";
 import {
   Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import type { VisaRequirement } from "@workspace/api-client-react";
-
-const requirementConfig: Record<VisaRequirement, {
-  label: string; color: string; bg: string; border: string; icon: typeof CheckCircle2;
-}> = {
-  visa_free:       { label: "Visa Free",      color: "text-green-700",  bg: "bg-green-50",  border: "border-green-200",  icon: CheckCircle2 },
-  visa_on_arrival: { label: "Visa on Arrival", color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200",  icon: Clock },
-  e_visa:          { label: "eVisa",           color: "text-blue-700",   bg: "bg-blue-50",   border: "border-blue-200",   icon: Shield },
-  visa_required:   { label: "Visa Required",   color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200", icon: AlertCircle },
-  no_admission:    { label: "No Admission",    color: "text-red-700",    bg: "bg-red-50",    border: "border-red-200",    icon: XCircle },
-};
+import { styleForResult } from "@/lib/requirement";
 
 export default function PopularPage() {
   useSEO({
@@ -75,7 +65,7 @@ export default function PopularPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header activeHref="/discover" />
+      <Header activeHref="/popular" />
 
       <main className="max-w-5xl mx-auto px-4 py-10">
         <PageHero
@@ -136,7 +126,7 @@ export default function PopularPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {popularDests.map((dest) => {
               const result = results[dest.code];
-              const config = result ? requirementConfig[result.requirement] : null;
+              const config = result ? styleForResult(result.requirement, result.notes, result.maxStay) : null;
               const Icon = config?.icon;
 
               return (

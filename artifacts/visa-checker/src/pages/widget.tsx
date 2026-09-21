@@ -1,17 +1,8 @@
 import { useState, useEffect } from "react";
-import { CheckCircle2, AlertCircle, Clock, XCircle, Shield, Globe } from "lucide-react";
+import { Globe } from "lucide-react";
 import { useListCountries, useCheckVisaMultiple } from "@workspace/api-client-react";
-import type { VisaResult, VisaRequirement } from "@workspace/api-client-react";
-
-const reqConfig: Record<VisaRequirement, {
-  label: string; color: string; bg: string; border: string; icon: typeof CheckCircle2;
-}> = {
-  visa_free:       { label: "Visa Free",       color: "text-green-700",  bg: "bg-green-50",  border: "border-green-200",  icon: CheckCircle2 },
-  visa_on_arrival: { label: "Visa on Arrival",  color: "text-amber-700",  bg: "bg-amber-50",  border: "border-amber-200",  icon: Clock },
-  e_visa:          { label: "eVisa",            color: "text-blue-700",   bg: "bg-blue-50",   border: "border-blue-200",   icon: Shield },
-  visa_required:   { label: "Visa Required",    color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200", icon: AlertCircle },
-  no_admission:    { label: "No Admission",     color: "text-red-700",    bg: "bg-red-50",    border: "border-red-200",    icon: XCircle },
-};
+import type { VisaResult } from "@workspace/api-client-react";
+import { styleForResult } from "@/lib/requirement";
 
 export default function WidgetPage() {
   const params = new URLSearchParams(window.location.search);
@@ -33,7 +24,9 @@ export default function WidgetPage() {
   const passport = countries.find((c) => c.code === passportCode);
   const destination = countries.find((c) => c.code === destinationCode);
 
-  const cfg = result ? reqConfig[result.requirement] : null;
+  // styleForResult, not reqConfig: a single pair with its notes, so a UK ETA /
+  // US ESTA stored as e_visa is shown as "Travel authorisation".
+  const cfg = result ? styleForResult(result.requirement, result.notes, result.maxStay) : null;
   const Icon = cfg?.icon;
 
   return (

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { CheckCircle2, AlertCircle, XCircle, ChevronDown, ExternalLink } from "lucide-react";
+import { CheckCircle2, AlertCircle, ChevronDown, ExternalLink } from "lucide-react";
 import { useGetDestinationInfo, getGetDestinationInfoQueryKey } from "@workspace/api-client-react";
 import type { VisaRequirement } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
+import { reqConfig } from "@/lib/requirement";
 import { AttractionCard } from "./AttractionCard";
 
 const QUICK_FACTS = [
@@ -14,6 +15,8 @@ const QUICK_FACTS = [
 
 const EYEBROW = "text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground";
 const LINK = "text-primary underline underline-offset-2 hover:text-[hsl(222_89%_25%)]";
+// The no-entry panel wears the shared no_admission record: word, icon, ink on tint, solid rail.
+const NO_ENTRY = reqConfig.no_admission;
 
 interface DestinationDetailExpandedProps {
   passport: string;
@@ -58,7 +61,11 @@ export function DestinationDetailExpanded({
 
   const { visaDetail, touristInfo } = info ?? {};
   const needsAction = requirement === "e_visa" || requirement === "visa_on_arrival" || requirement === "visa_required";
-  const portalLabel = ({ e_visa: "Apply on the official eVisa portal", visa_on_arrival: "Official entry requirements", visa_required: "Official visa portal" } as Partial<Record<VisaRequirement, string>>)[requirement];
+  // Never "Apply on…": only some of these links are application forms (Japan's,
+  // for one, is a ministry information page), and a UK ETA or US ESTA isn't an
+  // eVisa at all. Say what the link is, and show where it goes.
+  const portalHost = (() => { try { return new URL(info?.officialLinks?.visaPortal ?? "").hostname.replace(/^www\./, ""); } catch { return ""; } })();
+  const portalLabel = requirement === "visa_on_arrival" ? "Official entry requirements" : "Official visa information";
   const stayValue = maxStay ?? visaDetail?.maxStay;
 
   return (
@@ -67,7 +74,7 @@ export function DestinationDetailExpanded({
       {info?.officialLinks && needsAction && (
         <Button asChild className="h-11 w-full sm:w-auto rounded-xl px-5 text-sm font-semibold shadow-none">
           <a href={info.officialLinks.visaPortal} target="_blank" rel="noopener noreferrer" title={info.officialLinks.visaPortal}>
-            <ExternalLink className="h-4 w-4" aria-hidden="true" />{portalLabel}<span className="sr-only"> (opens in a new tab)</span>
+            <ExternalLink className="h-4 w-4" aria-hidden="true" />{portalLabel}{portalHost && <span className="font-normal opacity-80">· {portalHost}</span>}<span className="sr-only"> (opens in a new tab)</span>
           </a>
         </Button>
       )}
@@ -81,7 +88,7 @@ export function DestinationDetailExpanded({
               <dt className={EYEBROW}>Fee</dt>
               <dd className="mt-0.5 text-sm font-semibold text-foreground tabular-nums">
                 {visaDetail.feeUSD === 0
-                  ? <span className="inline-flex items-center gap-1 text-green-700"><CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />Free</span>
+                  ? <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />Free</span>
                   : visaDetail.feeUSD != null
                     ? <>${visaDetail.feeUSD} <span className="font-normal text-muted-foreground">USD, approx.</span></>
                     : <span className="font-medium text-muted-foreground">Varies</span>}
@@ -124,8 +131,8 @@ export function DestinationDetailExpanded({
           </div>
 
           {visaDetail.notes && (
-            <p className="flex items-start gap-2 border-l-2 border-amber-400 pl-3 text-sm text-amber-800">
-              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" /><span>{visaDetail.notes}</span>
+            <p className="flex items-start gap-2 border-l-2 border-muted-foreground/40 pl-3 text-sm text-foreground">
+              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-muted-foreground" aria-hidden="true" /><span>{visaDetail.notes}</span>
             </p>
           )}
 
@@ -140,16 +147,16 @@ export function DestinationDetailExpanded({
       )}
 
       {requirement === "no_admission" && visaDetail && (
-        <div className="rounded-xl border-l-2 border-red-500 bg-red-50/60 px-4 py-3.5">
-          <h4 className="inline-flex items-center gap-2 text-sm font-semibold text-red-800"><XCircle className="h-4 w-4" aria-hidden="true" />Entry not permitted</h4>
-          {visaDetail.notes && <p className="mt-1.5 text-sm text-red-800/90 leading-relaxed">{visaDetail.notes}</p>}
+        <div className={`rounded-xl border-l-2 ${NO_ENTRY.bg} px-4 py-3.5`} style={{ borderLeftColor: NO_ENTRY.solid }}>
+          <h4 className={`inline-flex items-center gap-2 text-sm font-semibold ${NO_ENTRY.color}`}><NO_ENTRY.icon className="h-4 w-4" aria-hidden="true" />{NO_ENTRY.label}</h4>
+          {visaDetail.notes && <p className={`mt-1.5 text-sm leading-relaxed ${NO_ENTRY.color}`}>{visaDetail.notes}</p>}
           {visaDetail.process.length > 0 && (
-            <ul className="mt-2 space-y-1 text-sm text-red-800/90">
-              {visaDetail.process.map((step, i) => <li key={i} className="flex gap-2.5"><span aria-hidden="true" className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-red-400" />{step}</li>)}
+            <ul className={`mt-2 space-y-1 text-sm ${NO_ENTRY.color}`}>
+              {visaDetail.process.map((step, i) => <li key={i} className="flex gap-2.5"><span aria-hidden="true" className={`mt-[9px] h-1 w-1 shrink-0 rounded-full ${NO_ENTRY.dot}`} />{step}</li>)}
             </ul>
           )}
           {info?.officialLinks && (
-            <a href={info.officialLinks.embassyFinder} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-red-800 underline underline-offset-2">
+            <a href={info.officialLinks.embassyFinder} target="_blank" rel="noopener noreferrer" className={`mt-3 inline-flex items-center gap-1.5 text-sm font-medium underline underline-offset-2 ${NO_ENTRY.color}`}>
               <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />Check {destinationName}'s foreign ministry
             </a>
           )}
