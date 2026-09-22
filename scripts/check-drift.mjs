@@ -47,6 +47,7 @@ export * from ${JSON.stringify(join(root, "lib/travel-data/src/index.ts"))};
 export { renderPairPage } from ${JSON.stringify(join(root, "artifacts/api-server/src/seo/render.ts"))};
 export { countries } from ${JSON.stringify(join(root, "artifacts/api-server/src/data/countries.ts"))};
 export { getDefaultEntry } from ${JSON.stringify(join(root, "artifacts/api-server/src/data/visaData.ts"))};
+export { CONTENT_SOURCES, CONTENT_UPDATED, CONTENT_FINGERPRINT } from ${JSON.stringify(join(root, "artifacts/api-server/src/seo/freshness.ts"))};
 `);
 await build({ entryPoints: [entry], bundle: true, platform: "node", format: "esm", outfile: out, logLevel: "error" });
 const M = await import(pathToFileURL(out).href);
@@ -70,7 +71,9 @@ const M = await import(pathToFileURL(out).href);
   // is ordinary prose ("eVisa/ETA destinations") and would flag every guide.
   const STATUS = /\b(visa_free|visa_on_arrival|e_visa|visa_required|no_admission)\b|[.{]\s*(?:visaFree|visaOnArrival|eVisa|visaRequired|noAdmission)\b|\b(?:visaFree|visaOnArrival|eVisa|visaRequired|noAdmission)\s*:|["'](?:Visa[ -][Ff]ree|Visa on [Aa]rrival|Visa [Rr]equired|No [Aa]dmission|Entry not permitted)["']/;
   const COLOUR = /#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b|\b(?:text|bg|border|fill|stroke|ring|from|to)-(?:red|orange|amber|yellow|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|rose|pink|lime)-\d{2,3}\b/;
-  const roots = ["artifacts/visa-checker/src", "artifacts/api-server/src"];
+  // The phone app too: it kept its own palette until 2026-09-22 and drifted amber
+  // where the site had gone teal.
+  const roots = ["artifacts/visa-checker/src", "artifacts/api-server/src", "artifacts/visa-app"];
   const offenders = [];
   const walk = (d) => {
     for (const name of readdirSync(d)) {
@@ -85,6 +88,25 @@ const M = await import(pathToFileURL(out).href);
   roots.forEach((r) => walk(join(root, r)));
   if (offenders.length) fail(`Visa-status colours declared outside lib/travel-data (import from @/lib/requirement or @workspace/travel-data instead):\n  ${offenders.join("\n  ")}`);
   else console.log("✓ no private visa-status palettes");
+}
+
+// ── 3b. the pair pages report a truthful "last modified" ─────────────────────
+// Every sitemap <lastmod> and JSON-LD dateModified derives from CONTENT_UPDATED
+// (seo/freshness.ts). The files whose text reaches the pages are fingerprinted
+// here, so the wording cannot change while the date stays put — the failure a
+// hand-bumped constant guarantees.
+{
+  const { createHash } = await import("node:crypto");
+  const h = createHash("sha256");
+  for (const f of M.CONTENT_SOURCES) h.update(readFileSync(join(root, f)));
+  const fp = h.digest("hex").slice(0, 16);
+  const today = new Date().toISOString().slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(M.CONTENT_UPDATED) || M.CONTENT_UPDATED > today) {
+    fail(`CONTENT_UPDATED is "${M.CONTENT_UPDATED}"; it must be a past date as YYYY-MM-DD (artifacts/api-server/src/seo/freshness.ts).`);
+  }
+  if (fp !== M.CONTENT_FINGERPRINT) {
+    fail(`The pair-page wording sources changed but the date the pages report did not.\n  In artifacts/api-server/src/seo/freshness.ts set CONTENT_FINGERPRINT to "${fp}", and set CONTENT_UPDATED to ${today} if the change alters what a page says (leave it for a pure refactor).\n  Fingerprinted: ${M.CONTENT_SOURCES.join(", ")}`);
+  } else console.log(`✓ pair-page wording fingerprint matches; pages report last modified ${M.CONTENT_UPDATED}`);
 }
 
 // ── 4 & 5. every pair page ───────────────────────────────────────────────────

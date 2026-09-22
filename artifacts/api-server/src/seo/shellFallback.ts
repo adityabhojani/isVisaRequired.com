@@ -13,6 +13,7 @@
 // robots directive differ, which is exactly what crawlers need to tell apart.
 import type { Request, Response, NextFunction } from "express";
 import { loadShell, SITE } from "./appShell";
+import { countryFromCode, slugify } from "./render";
 
 // Client-side routes with no server-rendered handler (see visa-checker App.tsx).
 // Routes that ARE server-rendered never reach this middleware.
@@ -32,6 +33,22 @@ export function isKnownClientRoute(p: string): boolean {
 
 function isPrivate(p: string): boolean {
   return PRIVATE.some((pre) => p === pre || p.startsWith(`${pre}/`));
+}
+
+// /passport/XX and /destination/XX are the app's views of the server-rendered
+// hubs. The raw shell canonicalises to the homepage, so a crawler that followed
+// an in-app link to one of them saw a content-free page claiming to be "/".
+// Point it at the hub that carries the content; an unknown code is a 404.
+function hubFor(p: string): string | null | undefined {
+  const m = p.match(/^\/(passport|destination)\/([^/]+)$/);
+  if (!m) return null;
+  const c = countryFromCode(m[2]);
+  if (!c) return undefined;
+  return `${SITE}/${m[1] === "passport" ? "visa-requirements" : "countries"}/${slugify(c.name)}`;
+}
+
+function withCanonical(html: string, url: string): string {
+  return html.replace(/<link\s+rel="canonical"\s+href="[\s\S]*?"\s*\/?>/i, `<link rel="canonical" href="${url}" />`);
 }
 
 function withRobots(html: string, directive: string): string {
@@ -57,8 +74,10 @@ export function shellFallback(req: Request, res: Response, next: NextFunction): 
   const shell = loadShell();
   if (!shell) { next(); return; }
 
-  if (isKnownClientRoute(req.path)) {
-    const html = isPrivate(req.path) ? withRobots(shell, "noindex, nofollow") : shell;
+  const hub = hubFor(req.path);
+  if (isKnownClientRoute(req.path) && hub !== undefined) {
+    let html = isPrivate(req.path) ? withRobots(shell, "noindex, nofollow") : shell;
+    if (hub) html = withCanonical(html, hub);
     res.status(200).setHeader("Cache-Control", "public, max-age=0, s-maxage=3600");
     res.type("html").send(html);
     return;

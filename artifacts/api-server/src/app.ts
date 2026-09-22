@@ -54,7 +54,16 @@ app.use(
     logger,
     serializers: {
       req(req) {
-        return { id: req.id, method: req.method, url: req.url?.split("?")[0] };
+        // Who is asking, not just what. The user agent tells a search crawler
+        // from a scraper; the JA4 hash (set by Vercel) survives a spoofed
+        // agent; the country is Vercel's geo lookup. No IP address: that is
+        // personal data, and nobody reading these logs needs it.
+        const h = req.headers ?? {};
+        return {
+          id: req.id, method: req.method, url: req.url?.split("?")[0],
+          ua: String(h["user-agent"] ?? "").slice(0, 160),
+          ja4: h["x-vercel-ja4-digest"], country: h["x-vercel-ip-country"],
+        };
       },
       res(res) {
         return { statusCode: res.statusCode };

@@ -130,7 +130,9 @@ export default function PrivacyPage() {
                 <Strong>Hosting and request logs.</Strong> Our site is hosted by Vercel. Each time your browser requests a
                 page or file, Vercel receives your IP address, browser and device details (the "user agent"), the address
                 requested including any search parameters, and the time. Our own server logs record which address was
-                requested (without search parameters) and whether the request worked. When you check visa requirements, the
+                requested (without search parameters), whether the request worked, your user agent, the country Vercel
+                places you in, and a fingerprint of your browser's connection settings (a "JA4" hash) that helps us tell
+                automated scrapers from people — but not your IP address. When you check visa requirements, the
                 log also records the country codes you checked. When someone signs up for email
                 updates, the log records a partly hidden version of the email address. If a technical error stops us saving
                 something you submitted, the error log can contain what you submitted.

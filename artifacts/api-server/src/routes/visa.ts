@@ -6,13 +6,15 @@ import { getVisaDetail, getCountryTouristInfo } from "../data/countryDetails";
 import { officialLinks } from "../data/officialLinks";
 import { cache, TTL } from "../lib/cache";
 import { PASSPORT_TIERS, tierUpperBound } from "../data/passportTiers";
+import { CACHE_STATIC, CACHE_SHORT } from "../lib/cacheControl";
 
 const router: IRouter = Router();
 
 // Static data — cache forever (data never changes at runtime)
 const STATIC = TTL.FOREVER;
-const CACHE_CONTROL_STATIC = "public, max-age=86400, stale-while-revalidate=604800";
-const CACHE_CONTROL_SHORT  = "public, max-age=300, stale-while-revalidate=3600";
+// Both carry s-maxage so the CDN, not a function, answers repeat requests.
+const CACHE_CONTROL_STATIC = CACHE_STATIC;
+const CACHE_CONTROL_SHORT  = CACHE_SHORT;
 
 const popularDestinationCodes = [
   "FR", "ES", "IT", "US", "GB", "JP", "TH", "AU",

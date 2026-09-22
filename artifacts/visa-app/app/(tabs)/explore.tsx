@@ -19,12 +19,15 @@ import { Skeleton } from "@/components/SkeletonCard";
 
 const REGIONS = ["All", "Europe", "Asia", "Americas", "Africa", "Oceania"];
 
-const REQ_DOT: Record<VisaRequirement, { color: string; label: string }> = {
-  visa_free:       { color: "#22c55e", label: "Visa Free" },
-  visa_on_arrival: { color: "#f59e0b", label: "On Arrival" },
-  e_visa:          { color: "#3b82f6", label: "eVisa" },
-  visa_required:   { color: "#f97316", label: "Visa Req." },
-  no_admission:    { color: "#ef4444", label: "No Entry" },
+// Colours come from the palette (constants/colors.ts → lib/travel-data), the
+// same record as the website. This tab once kept its own five hex values.
+type StatusColorKey = "visaFree" | "visaOnArrival" | "eVisa" | "visaRequired" | "noAdmission";
+const REQ_DOT: Record<VisaRequirement, { colorKey: StatusColorKey; label: string }> = {
+  visa_free:       { colorKey: "visaFree", label: "Visa Free" },
+  visa_on_arrival: { colorKey: "visaOnArrival", label: "On Arrival" },
+  e_visa:          { colorKey: "eVisa", label: "eVisa" },
+  visa_required:   { colorKey: "visaRequired", label: "Visa Req." },
+  no_admission:    { colorKey: "noAdmission", label: "No Entry" },
 };
 
 export default function ExploreScreen() {
@@ -259,9 +262,9 @@ export default function ExploreScreen() {
             />
             {allVisaResults.length > 0 && (
               <View style={styles.legendRow}>
-                {Object.entries(REQ_DOT).map(([key, { color, label }]) => (
+                {Object.entries(REQ_DOT).map(([key, { colorKey, label }]) => (
                   <View key={key} style={styles.legendItem}>
-                    <View style={[styles.legendDot, { backgroundColor: color }]} />
+                    <View style={[styles.legendDot, { backgroundColor: colors[colorKey] }]} />
                     <Text style={styles.legendText}>{label}</Text>
                   </View>
                 ))}
@@ -298,9 +301,9 @@ export default function ExploreScreen() {
                 <Text style={styles.countryRegion}>{item.region}</Text>
               </View>
               {reqConfig ? (
-                <View style={[styles.reqBadge, { backgroundColor: `${reqConfig.color}18` }]}>
-                  <View style={[styles.reqDot, { backgroundColor: reqConfig.color }]} />
-                  <Text style={[styles.reqLabel, { color: reqConfig.color }]}>{reqConfig.label}</Text>
+                <View style={[styles.reqBadge, { backgroundColor: `${colors[reqConfig.colorKey]}18` }]}>
+                  <View style={[styles.reqDot, { backgroundColor: colors[reqConfig.colorKey] }]} />
+                  <Text style={[styles.reqLabel, { color: colors[reqConfig.colorKey] }]}>{reqConfig.label}</Text>
                 </View>
               ) : (
                 <Text style={styles.countryCode}>{item.code}</Text>

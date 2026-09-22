@@ -5,6 +5,7 @@ import { sql } from "drizzle-orm";
 import { logger } from "../lib/logger";
 import { writeLimiter } from "../middleware/rateLimiter";
 import { requireAdmin } from "../middleware/requireAdmin";
+import { CACHE_EDITABLE } from "../lib/cacheControl";
 
 const router: IRouter = Router();
 
@@ -55,7 +56,7 @@ router.post("/newsletter/subscribe", writeLimiter, async (req: Request, res: Res
 router.get("/newsletter/count", async (_req: Request, res: Response): Promise<void> => {
   try {
     const result = await db.execute(sql`SELECT COUNT(*) as count FROM newsletter_subscribers`);
-    res.setHeader("Cache-Control", "public, max-age=60");
+    res.setHeader("Cache-Control", CACHE_EDITABLE);
     res.json({ count: Number((result.rows[0] as { count: string }).count) });
   } catch {
     res.json({ count: 0 });

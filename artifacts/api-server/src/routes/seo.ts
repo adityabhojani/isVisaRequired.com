@@ -9,6 +9,7 @@ import { Router, type IRouter, type Request, type Response } from "express";
 import {
   allCountries,
   countryFromSlug,
+  canonicalSlug,
   pairPath,
   renderPairPage,
   renderPairNotFound,
@@ -16,6 +17,7 @@ import {
   SITE_ORIGIN,
   DATA_LAST_UPDATED,
 } from "../seo/render";
+import { latest, pairLastmod, passportHubLastmod, destinationHubLastmod, siteLastmod } from "../seo/freshness";
 import { renderTransitHub, renderTransitGuide } from "../seo/transit";
 import { TRANSIT_GUIDES, getTransitGuide } from "../data/transitData";
 import { renderAuthHub, renderAuthGuide } from "../seo/auth";
@@ -40,6 +42,13 @@ const router: IRouter = Router();
 
 const HTML_CACHE = "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800";
 const XML_CACHE = "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800";
+
+// One page, one address: an alias ("usa") or a capitalised slug ("India") 308s
+// to the canonical URL instead of rendering the same page at a second one.
+function redirectCanonical(res: Response, path: string): void {
+  res.setHeader("Cache-Control", HTML_CACHE);
+  res.redirect(308, path);
+}
 
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -91,6 +100,7 @@ router.get("/visa-requirements/:from", (req: Request, res: Response): void => {
     res.type("html").send(renderPairNotFound());
     return;
   }
+  if (canonicalSlug(req.params.from as string)) { redirectCanonical(res, `/visa-requirements/${slugify(from.name)}`); return; }
   res.setHeader("Cache-Control", HTML_CACHE);
   res.type("html").send(renderPassportHub(from));
 });
@@ -120,6 +130,7 @@ router.get("/countries/:slug", (req: Request, res: Response): void => {
     res.type("html").send(renderPairNotFound());
     return;
   }
+  if (canonicalSlug(req.params.slug as string)) { redirectCanonical(res, `/countries/${slugify(to.name)}`); return; }
   res.setHeader("Cache-Control", HTML_CACHE);
   res.type("html").send(renderDestinationHub(to));
 });
@@ -250,19 +261,22 @@ router.get("/visa-requirements/:from/:to", (req: Request, res: Response): void =
     res.type("html").send(renderPairNotFound());
     return;
   }
+  if (canonicalSlug(req.params.from as string) || canonicalSlug(req.params.to as string)) { redirectCanonical(res, pairPath(from, to)); return; }
   res.setHeader("Cache-Control", HTML_CACHE);
   res.type("html").send(renderPairPage(from, to));
 });
 
 // ── sitemaps ─────────────────────────────────────────────────────────────────
-router.get("/sitemap.xml", (_req: Request, res: Response): void => {
-  const sitemaps = [
-    `${SITE_ORIGIN}/sitemaps/core.xml`,
-    `${SITE_ORIGIN}/sitemaps/blog.xml`,
-    ...allCountries().map((c) => `${SITE_ORIGIN}/sitemaps/pairs-${c.code}.xml`),
+// Every <lastmod> below is the latest date among that file's URLs (see
+// seo/freshness.ts) — never one site-wide constant, which Bing learns to ignore.
+router.get("/sitemap.xml", async (_req: Request, res: Response): Promise<void> => {
+  const sitemaps: [string, string][] = [
+    [`${SITE_ORIGIN}/sitemaps/core.xml`, siteLastmod()],
+    [`${SITE_ORIGIN}/sitemaps/blog.xml`, latest(...(await blogEntries()).values())],
+    ...allCountries().map((c): [string, string] => [`${SITE_ORIGIN}/sitemaps/pairs-${c.code}.xml`, passportHubLastmod(c)]),
   ];
   const body = sitemaps
-    .map((loc) => `  <sitemap><loc>${loc}</loc><lastmod>${DATA_LAST_UPDATED}</lastmod></sitemap>`)
+    .map(([loc, lastmod]) => `  <sitemap><loc>${loc}</loc><lastmod>${lastmod}</lastmod></sitemap>`)
     .join("\n");
   res.setHeader("Cache-Control", XML_CACHE);
   res.type("application/xml").send(
@@ -276,26 +290,29 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
     "/schengen", "/tier-list", "/digital-nomad", "/reciprocity", "/blog", "/alerts",
     "/visa-requirements", "/countries", "/methodology", "/residence-permit-visa-benefits", "/privacy", "/terms",
   ];
-  const urls: string[] = [];
-  for (const p of staticPaths) urls.push(`${SITE_ORIGIN}${p}`);
-  urls.push(`${SITE_ORIGIN}/transit-visa`);
-  for (const g of TRANSIT_GUIDES) urls.push(`${SITE_ORIGIN}/transit-visa/${g.slug}`);
-  urls.push(`${SITE_ORIGIN}/travel-authorization`);
-  for (const a of TRAVEL_AUTHS) urls.push(`${SITE_ORIGIN}/travel-authorization/${a.slug}`);
-  urls.push(`${SITE_ORIGIN}${REPORT_PATH}`);
-  urls.push(`${SITE_ORIGIN}${WELCOMING_PATH}`);
-  urls.push(`${SITE_ORIGIN}${CHANGES_PATH}`);
-  urls.push(`${SITE_ORIGIN}/guides`);
-  for (const g of GUIDES) urls.push(`${SITE_ORIGIN}/guides/${g.slug}`);
+  // Pages that describe the whole site carry the site's latest date; each hub
+  // carries the latest date among its own pairs.
+  const site = siteLastmod();
+  const urls: [string, string][] = [];
+  for (const p of staticPaths) urls.push([`${SITE_ORIGIN}${p}`, site]);
+  urls.push([`${SITE_ORIGIN}/transit-visa`, site]);
+  for (const g of TRANSIT_GUIDES) urls.push([`${SITE_ORIGIN}/transit-visa/${g.slug}`, site]);
+  urls.push([`${SITE_ORIGIN}/travel-authorization`, site]);
+  for (const a of TRAVEL_AUTHS) urls.push([`${SITE_ORIGIN}/travel-authorization/${a.slug}`, site]);
+  urls.push([`${SITE_ORIGIN}${REPORT_PATH}`, site]);
+  urls.push([`${SITE_ORIGIN}${WELCOMING_PATH}`, site]);
+  urls.push([`${SITE_ORIGIN}${CHANGES_PATH}`, site]);
+  urls.push([`${SITE_ORIGIN}/guides`, site]);
+  for (const g of GUIDES) urls.push([`${SITE_ORIGIN}/guides/${g.slug}`, site]);
   // Canonical passport & destination hubs (server-rendered). The SPA
   // /passport/{code} and /destination/{code} routes canonicalise here, so they
   // are deliberately kept OUT of the sitemap to avoid duplicate-URL signals.
   for (const c of allCountries()) {
-    urls.push(`${SITE_ORIGIN}/visa-requirements/${slugify(c.name)}`);
-    urls.push(`${SITE_ORIGIN}/countries/${slugify(c.name)}`);
+    urls.push([`${SITE_ORIGIN}/visa-requirements/${slugify(c.name)}`, passportHubLastmod(c)]);
+    urls.push([`${SITE_ORIGIN}/countries/${slugify(c.name)}`, destinationHubLastmod(c)]);
   }
   const body = urls
-    .map((loc) => `  <url><loc>${loc}</loc><lastmod>${DATA_LAST_UPDATED}</lastmod></url>`)
+    .map(([loc, lastmod]) => `  <url><loc>${loc}</loc><lastmod>${lastmod}</lastmod></url>`)
     .join("\n");
   res.setHeader("Cache-Control", XML_CACHE);
   res.type("application/xml").send(
@@ -312,7 +329,7 @@ router.get("/sitemaps/pairs-:code.xml", (req: Request, res: Response): void => {
   }
   const body = allCountries()
     .filter((c) => c.code !== from.code)
-    .map((to) => `  <url><loc>${SITE_ORIGIN}${pairPath(from, to)}</loc><lastmod>${DATA_LAST_UPDATED}</lastmod><changefreq>monthly</changefreq></url>`)
+    .map((to) => `  <url><loc>${SITE_ORIGIN}${pairPath(from, to)}</loc><lastmod>${pairLastmod(from, to)}</lastmod></url>`)
     .join("\n");
   res.setHeader("Cache-Control", XML_CACHE);
   res.type("application/xml").send(
@@ -409,7 +426,8 @@ router.get("/blog/:slug", async (req: Request, res: Response): Promise<void> => 
 });
 
 // ── blog sitemap (repo posts + database posts) ───────────────────────────────
-router.get("/sitemaps/blog.xml", async (_req: Request, res: Response): Promise<void> => {
+// slug → the day the post last changed, for the blog sitemap and the index.
+async function blogEntries(): Promise<Map<string, string>> {
   const entries = new Map<string, string>();
   for (const p of staticPostsNewestFirst()) entries.set(p.slug, p.updated_at);
   if (isDatabaseConfigured()) {
@@ -423,6 +441,11 @@ router.get("/sitemaps/blog.xml", async (_req: Request, res: Response): Promise<v
       }
     } catch { /* repo posts still ship on a database error */ }
   }
+  return entries;
+}
+
+router.get("/sitemaps/blog.xml", async (_req: Request, res: Response): Promise<void> => {
+  const entries = await blogEntries();
   const body = [...entries]
     .map(([slug, lastmod]) => `  <url><loc>${SITE_ORIGIN}/blog/${slug}</loc><lastmod>${lastmod}</lastmod></url>`)
     .join("\n");

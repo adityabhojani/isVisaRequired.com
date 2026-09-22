@@ -15,19 +15,18 @@ import { getVisaDetail, getCountryTouristInfo } from "../data/countryDetails";
 import { officialLinks } from "../data/officialLinks";
 import { getEntryRules, hasSpecificRules } from "../data/entryRequirements";
 import { verdictKind, verdictStatus, statusIconSvg, isKnownFact, unknownFactsSentence, needsApplication, type VerdictKind } from "@workspace/travel-data";
+import { DATA_LAST_UPDATED, pairLastmod } from "./freshness";
 
 // Canonical host (matches existing sitemap/robots). Keep in sync with robots.txt.
 export const SITE_ORIGIN = "https://www.isvisarequired.com";
 
-// Date the visa dataset was last reviewed. Bump when data is refreshed.
-//
-// Machine-readable only: it feeds sitemap <lastmod>, JSON-LD dateModified and
-// the year in page titles. It is deliberately NOT printed on any page. A
-// hand-bumped site-wide date that nobody remembers to bump makes the whole site
-// look abandoned the week after it was set. Where freshness genuinely matters —
-// an individually verified rule — the page names the source and the date that
-// rule was checked instead (see entry.verifiedSource below).
-export const DATA_LAST_UPDATED = "2026-09-12";
+// Dates live in ./freshness: the dataset review date, the day the pair-page
+// wording last changed (fingerprinted by the deploy guard so it can't rot the
+// way a hand-bumped constant did) and each pair's own verified date. None is
+// printed on a page; they feed <lastmod>, JSON-LD dateModified and the year in
+// titles. Where freshness matters to a reader — an individually verified rule —
+// the page names the source and the date instead (see entry.verifiedSource).
+export { DATA_LAST_UPDATED };
 
 // ── slug helpers ─────────────────────────────────────────────────────────────
 export function slugify(name: string): string {
@@ -46,8 +45,63 @@ for (const c of countries) {
   bySlug.set(slugify(c.name), c);
 }
 
+// Names people type that aren't the dataset's. "United Arab Emirates" was a
+// 404 because the data says "UAE"; the same for "USA", "Türkiye", "Czechia".
+// Each alias maps to a real slug, and the module refuses to load if a target
+// doesn't exist or an alias shadows a real country — the deploy guard bundles
+// this file, so a typo here fails the build, never a visitor.
+const SLUG_ALIASES: Record<string, string> = {
+  "united-arab-emirates": "uae", emirates: "uae",
+  usa: "united-states", "united-states-of-america": "united-states", america: "united-states",
+  uk: "united-kingdom", "great-britain": "united-kingdom", britain: "united-kingdom",
+  turkiye: "turkey",
+  czechia: "czech-republic",
+  "cote-d-ivoire": "ivory-coast", "cote-divoire": "ivory-coast",
+  swaziland: "eswatini",
+  burma: "myanmar",
+  macedonia: "north-macedonia",
+  "cape-verde": "cabo-verde",
+  "east-timor": "timor-leste",
+  holland: "netherlands", "the-netherlands": "netherlands",
+  korea: "south-korea", "republic-of-korea": "south-korea",
+  "democratic-republic-of-the-congo": "dr-congo", "congo-kinshasa": "dr-congo",
+  "congo-brazzaville": "republic-of-the-congo",
+  "russian-federation": "russia",
+  "viet-nam": "vietnam",
+  "the-bahamas": "bahamas", "the-gambia": "gambia", "the-philippines": "philippines",
+  "st-kitts-and-nevis": "saint-kitts-and-nevis", "st-lucia": "saint-lucia",
+  "st-vincent-and-the-grenadines": "saint-vincent-and-the-grenadines",
+  "kyrgyz-republic": "kyrgyzstan",
+  "brunei-darussalam": "brunei",
+  bosnia: "bosnia-and-herzegovina",
+  trinidad: "trinidad-and-tobago",
+  antigua: "antigua-and-barbuda",
+  "palestinian-territories": "palestine",
+};
+for (const [alias, target] of Object.entries(SLUG_ALIASES)) {
+  if (!bySlug.has(target)) throw new Error(`slug alias "${alias}" points at unknown slug "${target}"`);
+  if (bySlug.has(alias)) throw new Error(`slug alias "${alias}" shadows a real country`);
+}
+
 export function countryFromSlug(slug: string): CountryData | undefined {
-  return bySlug.get(slug.toLowerCase());
+  const s = slug.toLowerCase();
+  return bySlug.get(SLUG_ALIASES[s] ?? s);
+}
+
+export function countryFromCode(code: string): CountryData | undefined {
+  return byCode.get(code.toUpperCase());
+}
+
+/**
+ * The slug a request for `slug` should redirect to, or null when it is already
+ * canonical. An alias or a capitalised slug would otherwise render the same
+ * page at a second address, which is a duplicate to a search engine.
+ */
+export function canonicalSlug(slug: string): string | null {
+  const c = countryFromSlug(slug);
+  if (!c) return null;
+  const want = slugify(c.name);
+  return want === slug ? null : want;
 }
 
 export function pairPath(from: CountryData, to: CountryData): string {
@@ -258,7 +312,7 @@ export function renderPairPage(from: CountryData, to: CountryData): string {
     name: title,
     description: metaDesc,
     url: canonical,
-    dateModified: DATA_LAST_UPDATED,
+    dateModified: pairLastmod(from, to),
     inLanguage: "en",
     isPartOf: { "@type": "WebSite", name: "isvisarequired.com", url: SITE_ORIGIN },
   };
