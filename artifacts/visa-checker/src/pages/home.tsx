@@ -344,9 +344,17 @@ const GUIDE_FOR_REQUIREMENT: Record<string, { href: string; label: string }> = {
 
 export default function HomePage() {
   const [initialParams] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
+    // Inbound links arrive as a query string (/?passport=IN&destinations=JP):
+    // the widget, the hubs, old cached links. The server 308s a single
+    // passport→destination query to that pair's own page, so what reaches
+    // here is a multi-destination or partial link. The app's OWN state lives
+    // in the hash (see pushUrl): the server never sees it, so a reload or a
+    // shared link after a check keeps the interactive checker.
     // `from`/`to` are legacy aliases used by older server-rendered pair-page
     // CTAs (and anything Google has cached with those links) — honor both.
+    const search = new URLSearchParams(window.location.search);
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const params = search.has("passport") || search.has("from") || search.has("destinations") || search.has("to") ? search : hash;
     const p = params.get("passport") ?? params.get("from") ?? "";
     const d = (params.get("destinations") ?? params.get("to"))?.split(",").filter(Boolean) ?? [];
     return { passport: p.toUpperCase(), destinations: d.map((c) => c.toUpperCase()) };
@@ -481,7 +489,9 @@ export default function HomePage() {
     const params = new URLSearchParams();
     params.set("passport", p);
     params.set("destinations", dests.join(","));
-    window.history.replaceState({}, "", `?${params.toString()}`);
+    // Hash, not query: a query with one destination is 308'd by the server to
+    // the pair page, which is right for an inbound link and wrong for a reload.
+    window.history.replaceState({}, "", `${window.location.pathname}#${params.toString()}`);
   };
 
   const handleCheck = () => {

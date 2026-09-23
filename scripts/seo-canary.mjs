@@ -53,6 +53,10 @@ const INDEXABLE = [
   "/methodology",
   "/privacy",
   "/sitemap.xml",
+  // The sitemap files themselves: a noindex header on them is as fatal as one
+  // on the pages, and they are fetched here anyway.
+  "/sitemaps/core.xml",
+  "/sitemaps/pairs-IN.xml",
 ];
 
 const failures = [];
@@ -96,6 +100,18 @@ async function checkIndexable(path) {
   const xr = res.headers.get("x-robots-tag");
   if (xr && /noindex|none|unavailable_after/i.test(xr)) {
     fail(url, `X-Robots-Tag says "${xr}" — THIS IS THE JUNE-JULY 2026 OUTAGE MODE`);
+  }
+
+  // The direct assertion behind the header above: the app stamps every response
+  // with the Vercel environment that produced it (app.ts). The June–July outage
+  // WAS a preview serving the live domain; this names it instead of inferring
+  // it from a side effect Vercel could change. A missing header is only a
+  // warning — the deploy that adds it may not be live when the canary runs.
+  const env = res.headers.get("x-deploy-env");
+  if (env && env !== "production") {
+    fail(url, `served by a "${env}" deployment, not production — the live domain is pointed at the wrong build`);
+  } else if (!env) {
+    console.warn(`  (no X-Deploy-Env header on ${path} — not yet deployed?)`);
   }
 
   // A page must never bounce a crawler to another host. Checked on the first
@@ -172,6 +188,13 @@ async function checkApexRedirects() {
     if (!res) continue;
     if (res.status !== 308 && res.status !== 301) {
       fail(`${APEX}${path}`, `apex should redirect, got ${res.status}`);
+      continue;
+    }
+    // Not just "a redirect": THE redirect. A dangling or mis-pointed Location
+    // passes a status-only check and loses every apex link.
+    const location = res.headers.get("location") ?? "";
+    if (location !== `${ORIGIN}${path}`) {
+      fail(`${APEX}${path}`, `apex redirects to "${location}", expected ${ORIGIN}${path}`);
     }
   }
 }
@@ -196,10 +219,14 @@ async function checkRobotsTxt() {
   if (!/text\/plain/i.test(ct)) fail(url, `robots.txt content-type is "${ct}"`);
   const body = await res.text();
   if (/<html/i.test(body)) fail(url, "robots.txt is being served HTML (catch-all swallowed it)");
+  // Every section that carries real pages. A Disallow that is one of these, or
+  // a prefix of one, hides a whole page type; a blanket "/" hides the site.
+  const REAL = /^\/(visa-requirements|countries|guides|transit-visa|travel-authorization|blog|reports|sitemaps?)(\/|\.xml|$)/;
   for (const line of body.split("\n")) {
-    if (/^\s*Disallow:\s*\/\s*$/i.test(line)) {
-      fail(url, "robots.txt contains a blanket 'Disallow: /' — the whole site is blocked");
-    }
+    const rule = line.match(/^\s*Disallow:\s*(\S+)\s*$/i)?.[1];
+    if (!rule) continue;
+    if (rule === "/") fail(url, "robots.txt contains a blanket 'Disallow: /' — the whole site is blocked");
+    else if (REAL.test(rule)) fail(url, `robots.txt Disallows a real section: "${rule}"`);
   }
   if (!/^\s*Sitemap:\s*https?:\/\//im.test(body)) fail(url, "robots.txt declares no Sitemap:");
 }
@@ -223,6 +250,14 @@ async function sitemapSample(n) {
     return [];
   }
   const children = [...idxBody.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  // Freshness must vary. Until 2026-09-22 every sitemap file carried one
+  // hand-bumped date; Bing says it ignores <lastmod> once the dates look
+  // invented. The blog, the hubs and the pairs change on different days, so
+  // identical dates across every file means the date is a constant again.
+  const lastmods = new Set([...idxBody.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((m) => m[1]));
+  if (children.length >= 3 && lastmods.size === 1) {
+    fail(`${ORIGIN}/sitemap.xml`, `every sitemap file reports the same <lastmod> (${[...lastmods][0]}) — the date has become a constant again`);
+  }
   const pool = [];
   // Sample a few child sitemaps rather than downloading all of them.
   for (const c of children.sort(() => Math.random() - 0.5).slice(0, 4)) {

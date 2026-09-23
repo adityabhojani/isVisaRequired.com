@@ -1,13 +1,12 @@
 User-agent: *
 Allow: /
 
-# Homepage deep-link parameters (used by page CTAs) — same content as /,
-# blocked so crawl budget goes to the real pages instead of tens of
-# thousands of query-string duplicates.
-Disallow: /*?passport=
-Disallow: /*?destinations=
-Disallow: /*?from=
-Disallow: /*?to=
+# Homepage deep links (/?passport=IN&destinations=JP) are what the widget,
+# the hubs and old cached links use. A single passport→destination link now
+# 308-redirects to the real page for that pair; every other shape serves the
+# homepage with a canonical of "/". Both need to be crawlable to take effect:
+# from 28 Aug to 22 Sep 2026 these were Disallowed, which left ~19,700 such
+# URLs in Bing's index that no crawler was allowed to revisit.
 
 # Sitemap
 Sitemap: https://www.isvisarequired.com/sitemap.xml

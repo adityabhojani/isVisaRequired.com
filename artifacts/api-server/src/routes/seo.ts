@@ -9,6 +9,7 @@ import { Router, type IRouter, type Request, type Response } from "express";
 import {
   allCountries,
   countryFromSlug,
+  countryFromCode,
   canonicalSlug,
   pairPath,
   renderPairPage,
@@ -505,11 +506,32 @@ router.get("/blog", async (_req: Request, res: Response): Promise<void> => {
   }
 });
 
+// A homepage deep link that names exactly one passport and one destination
+// (/?passport=IN&destinations=JP, or the legacy from/to) IS the pair page: the
+// widget, the hubs and old cached links all point at the homepage this way, and
+// Bing had ~19,700 such URLs indexed as copies of "/". Send them to the page
+// that carries the answer. Anything else — several destinations, a passport
+// alone, an unknown code — still gets the checker, canonicalised to "/".
+function pairFromDeepLink(query: Request["query"]): string | null {
+  const one = (v: unknown): string | null => (typeof v === "string" && v && !v.includes(",") ? v : null);
+  const p = one(query.passport) ?? one(query.from);
+  const d = one(query.destinations) ?? one(query.to);
+  if (!p || !d) return null;
+  const from = countryFromCode(p);
+  const to = countryFromCode(d);
+  if (!from || !to || from.code === to.code) return null;
+  return pairPath(from, to);
+}
+
 // ── SPA marketing/tool routes: serve the index.html shell with route-specific
 // SEO content injected into #root (React takes over on load). Falls back to the
 // raw shell so the page never breaks.
 for (const [routePath, seo] of Object.entries(ROUTE_SEO)) {
-  router.get(routePath, (_req: Request, res: Response): void => {
+  router.get(routePath, (req: Request, res: Response): void => {
+    if (routePath === "/") {
+      const pair = pairFromDeepLink(req.query);
+      if (pair) { redirectCanonical(res, pair); return; }
+    }
     try {
       const html = renderAppRoute(routePath, seo) ?? loadShell();
       if (!html) { res.status(503).type("html").send("Temporarily unavailable. Please refresh."); return; }

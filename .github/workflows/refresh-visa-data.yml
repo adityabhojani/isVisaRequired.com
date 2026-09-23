@@ -63,15 +63,16 @@ jobs:
           fi
 
   indexnow:
-    # Weekly IndexNow ping (Bing/DuckDuckGo/Yandex + AI search engines). The
-    # submitter is quota-aware: it submits core pages first in small batches and
-    # stops cleanly when the daily quota is hit, so partial runs are fine —
-    # coverage accumulates week over week as the key earns trust.
+    # Weekly IndexNow ping (Bing/Yandex/Naver; DuckDuckGo and Copilot read
+    # Bing's index; Google ignores IndexNow). Only pages whose sitemap
+    # <lastmod> falls in the last 8 days are sent — until 2026-09-22 this
+    # resubmitted all ~37,800 URLs every Monday, and indexnow.org asks sites not
+    # to resubmit unchanged URLs. The lastmod is real per page since then.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - name: Submit sitemap URLs to IndexNow
-        run: node scripts/indexnow-submit.mjs
+      - name: Submit URLs changed in the last 8 days to IndexNow
+        run: node scripts/indexnow-submit.mjs --since="$(date -u -d '8 days ago' +%F)"

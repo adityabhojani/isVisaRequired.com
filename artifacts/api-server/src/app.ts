@@ -48,6 +48,18 @@ app.use(
 // Gzip/brotli compression
 app.use(compression());
 
+// Which environment answered. From 6 June to early August 2026 the live domain
+// was served by a PREVIEW deployment, and Vercel stamps previews with
+// X-Robots-Tag: noindex — Google dropped every page and nobody could see why.
+// The SEO canary (scripts/seo-canary.mjs) now asserts this header says
+// "production" on the live domain, so that failure is caught within six hours
+// instead of being inferred months later from a traffic graph. VERCEL_ENV is
+// a Vercel system variable: "production", "preview" or "development".
+app.use((_req, res, next) => {
+  res.setHeader("X-Deploy-Env", process.env.VERCEL_ENV ?? "local");
+  next();
+});
+
 // Structured request logging
 app.use(
   pinoHttp({
