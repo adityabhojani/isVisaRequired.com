@@ -34,8 +34,14 @@ export function renderDestinationHub(to: CountryData): string {
   const openness = opennessRankOf(to.code);
 
   const canonical = `${SITE_ORIGIN}/countries/${slugify(to.name)}`;
-  const title = `${to.name} Visa Requirements (${YEAR}) — Who Needs a Visa?`;
-  const description = `${to.name} visa requirements by nationality: ${vf} passports enter visa-free, ${voa} get a visa on arrival and ${ev} need an eVisa. Plus ${to.name} entry rules — passport validity, proof of funds and insurance — with official guidance.`;
+  // Bing (Sept 2026) shows these hubs at positions 5–7 for the question form —
+  // "do i need a visa for croatia", "do you need a visa for guatemala" — and
+  // 0–2.6% of searchers click. The title now IS that question, and the
+  // description leads with the answer's shape and tells the reader the page
+  // answers for THEIR passport, which "X Visa Requirements — Who Needs a
+  // Visa?" left them to guess.
+  const title = `Do You Need a Visa for ${to.name}? Requirements by Passport (${YEAR})`;
+  const description = `${vf} nationalities enter ${to.name} visa-free, ${voa} get a visa on arrival, ${ev} need an eVisa and ${vr} need a visa in advance. Find your passport, then ${to.name}'s entry rules — passport validity, funds, insurance — from official sources.`;
 
   const statCards = [
     { n: vf, k: "Enter visa-free" },
