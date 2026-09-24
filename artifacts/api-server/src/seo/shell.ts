@@ -36,6 +36,9 @@ export const FONT_LINKS =
 // renderer that appends to it, holds no literal colour values of its own.
 export const BASE_STYLE = `
 ${TOKENS_CSS}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+details[open]>*:not(summary){animation:fade var(--motion-base) var(--motion-ease)}
+@media (prefers-reduced-motion:reduce){*,::before,::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important;scroll-behavior:auto!important}}
 html{-webkit-text-size-adjust:100%}body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
 a{color:var(--navy)}
 .wrap{max-width:920px;margin:0 auto;padding:0 20px}

@@ -181,6 +181,28 @@
   }
   @media (hover: hover) { .hover-elevate:hover::after { opacity: 1; } }
   .active-elevate-2:active::after { background: var(--elevate-2); opacity: 1; }
+
+  /* The one entrance the site has: an answer arriving. Rows rise 6px and fade
+     over --motion-base; the caller staggers them with animation-delay. Both
+     values come from lib/travel-data, the same tokens the server pages use. */
+  .reveal { animation: rise-in var(--motion-base) var(--motion-ease) both; }
+  .ease-brand { transition-timing-function: var(--motion-ease); }
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Reduced motion: everything that moves finishes in a millisecond. Spinners
+   and skeletons hold still, reveals simply appear, the hero snaps. The
+   server-rendered pages carry the same rule in their base style. */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Register the shared status tokens as Tailwind utilities. This block is

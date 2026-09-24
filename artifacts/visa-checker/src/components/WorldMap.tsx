@@ -12,6 +12,8 @@ const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"
 // all (Antarctica, Western Sahara, Kosovo…), and is not clickable.
 const PASSPORT_FILL = "hsl(222 89% 30%)";
 const UNMAPPED_FILL = "#e2e8f0";
+// Hover and highlight ease on the shared fast track (lib/travel-data MOTION).
+const MAP_EASE = "opacity var(--motion-fast) var(--motion-ease), filter var(--motion-fast) var(--motion-ease)";
 
 // Status textures, fills and the legend swatch are shared with the /map page
 // (components/mapPatterns.tsx) so the two maps can't drift apart.
@@ -133,19 +135,24 @@ export default function WorldMap({
                     strokeWidth={0.4}
                     tabIndex={interactive ? 0 : -1}
                     role={interactive ? "button" : undefined}
+                    // The library swaps the whole style object per state, so
+                    // the easing has to ride on every state or the hover-off
+                    // snaps while hover-on glides.
                     style={{
                       default: {
                         opacity: isHighlighted ? 1 : 0.9,
                         filter: isHighlighted ? "brightness(1.2) drop-shadow(0 0 4px rgba(0,0,0,0.4))" : "none",
+                        transition: MAP_EASE,
                         ...ringOutline,
                       },
                       hover: {
                         opacity: 1,
                         cursor,
                         filter: "brightness(1.15)",
+                        transition: MAP_EASE,
                         ...ringOutline,
                       },
-                      pressed: { cursor, ...ringOutline },
+                      pressed: { cursor, transition: MAP_EASE, ...ringOutline },
                     }}
                     onClick={activate}
                     onKeyDown={(e: KeyboardEvent<SVGPathElement>) => {

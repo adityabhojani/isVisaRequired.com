@@ -515,7 +515,7 @@ details{border-top:1px solid var(--line)}
 details:first-of-type{border-top:0}
 summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;font-weight:600;font-size:var(--type-h3)}
 summary::-webkit-details-marker{display:none}
-summary::after{content:"";flex:none;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-3px);transition:transform .15s}
+summary::after{content:"";flex:none;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-3px);transition:transform var(--motion-fast) var(--motion-ease)}
 details[open]>summary::after{transform:rotate(-135deg) translateY(-2px)}
 summary span{margin-left:auto;white-space:nowrap;font-weight:500;font-size:var(--type-meta);color:var(--muted)}
 summary:focus-visible{outline:2px solid var(--navy);outline-offset:2px;border-radius:6px}

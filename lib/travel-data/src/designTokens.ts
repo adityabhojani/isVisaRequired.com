@@ -69,6 +69,27 @@ export const SHADOW = {
   xl: "0 28px 48px -12px rgb(15 23 41/.16),0 10px 18px -8px rgb(15 23 41/.08)",
 } as const;
 
+/**
+ * Motion. Three durations and two curves; nothing on the site moves on any
+ * other schedule. `fast` is feedback (hover, press, a chevron), `base` is a
+ * reveal or an expand, `slow` is reserved for the hero stepping back once an
+ * answer is on screen. Named --motion-* on purpose: Tailwind v4 owns
+ * --ease-out and friends, and redefining a framework variable in :root is how
+ * the --muted clash happened. Under prefers-reduced-motion every stylesheet
+ * collapses these to ~1ms; the rule lives next to each renderer's base style.
+ */
+export const MOTION = {
+  fast: "150ms",
+  base: "220ms",
+  slow: "360ms",
+  ease: "cubic-bezier(.2,.8,.2,1)",
+  easeInOut: "cubic-bezier(.4,0,.2,1)",
+} as const;
+
+const MOTION_CSS =
+  `--motion-fast:${MOTION.fast};--motion-base:${MOTION.base};--motion-slow:${MOTION.slow};` +
+  `--motion-ease:${MOTION.ease};--motion-ease-in-out:${MOTION.easeInOut};`;
+
 /** One list of font faces, so the SSR <link> and the app can never load different weights. */
 export const FONT_FAMILIES = "Inter:wght@400;500;600;700&family=Playfair+Display:wght@600";
 export const FONT_HREF = `https://fonts.googleapis.com/css2?family=${FONT_FAMILIES}&display=swap`;
@@ -86,6 +107,7 @@ export const TOKENS_CSS: string =
   `--type-lead:${TYPE.lead};--type-body:${TYPE.body};--type-meta:${TYPE.meta};--type-label:${TYPE.label};` +
   `--r-chip:${RADIUS.chip};--r-card:${RADIUS.card};--r-hero:${RADIUS.hero};--r-pill:${RADIUS.pill};` +
   `--sh-xs:${SHADOW.xs};--sh-sm:${SHADOW.sm};--sh-md:${SHADOW.md};--sh-xl:${SHADOW.xl};` +
+  MOTION_CSS +
   statusCssVars() +
   `}`;
 
@@ -103,5 +125,6 @@ export const APP_TOKENS_CSS: string =
   `--type-display:${TYPE.display};--type-verdict:${TYPE.verdict};--type-h1:${TYPE.h1};--type-h2:${TYPE.h2};--type-h3:${TYPE.h3};` +
   `--type-lead:${TYPE.lead};--type-body:${TYPE.body};--type-meta:${TYPE.meta};--type-label:${TYPE.label};` +
   `--r-chip:${RADIUS.chip};--r-card:${RADIUS.card};--r-hero:${RADIUS.hero};--r-pill:${RADIUS.pill};` +
+  MOTION_CSS +
   statusCssVars() +
   `}`;

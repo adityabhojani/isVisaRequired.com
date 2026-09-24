@@ -47,7 +47,7 @@ export const CONTENT_SOURCES = [
 ] as const;
 
 /** sha256 (first 16 hex) of CONTENT_SOURCES, checked by scripts/check-drift.mjs. */
-export const CONTENT_FINGERPRINT = "52b9a72e5de3c864";
+export const CONTENT_FINGERPRINT = "1f15daa00ab7bd34";
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 

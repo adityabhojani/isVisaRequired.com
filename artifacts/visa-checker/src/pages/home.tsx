@@ -195,7 +195,7 @@ function ResultCard({ result, passport, isExpanded, onToggle, soleResult = false
       </button>
 
       {isExpanded && (
-        <div id={`detail-${result.destinationCountry.code}`} className="bg-background border-t border-border/70 px-4 sm:px-5 py-5">
+        <div id={`detail-${result.destinationCountry.code}`} className="bg-background border-t border-border/70 px-4 sm:px-5 py-5 animate-in fade-in slide-in-from-top-1 duration-[var(--motion-base)] ease-brand">
           <DestinationDetailExpanded
             passport={passport}
             destinationCode={result.destinationCountry.code}
@@ -597,8 +597,13 @@ export default function HomePage() {
         {/* Once there is an answer the hero steps back: the question is the one
             the reader already asked, and at 375px it used to hold the answer
             below the fold. */}
-        <div className={`max-w-5xl mx-auto px-4 text-center transition-[padding] duration-200 ${heroCompact ? "pt-4 pb-14 md:pt-6 md:pb-16" : "pt-6 pb-16 md:pt-12 md:pb-24"}`}>
-          <h1 className={`font-serif font-semibold text-white leading-[1.06] tracking-[-0.022em] text-balance ${heroCompact ? "text-[1.75rem] md:text-[2.25rem] mb-1" : "text-[2.5rem] md:text-[3.25rem] mb-3"}`}>
+        {/* The step back is one movement: padding, headline size and margin
+            all ease together. The size used to jump while only the padding
+            eased, which read as a glitch, not a gesture. A font-size transition
+            re-lays out the page every frame, so it gets --motion-base, not
+            --motion-slow: 220ms is a gesture on a Moto G, 360ms is a stutter. */}
+        <div className={`max-w-5xl mx-auto px-4 text-center transition-[padding] duration-[var(--motion-base)] ease-brand ${heroCompact ? "pt-4 pb-14 md:pt-6 md:pb-16" : "pt-6 pb-16 md:pt-12 md:pb-24"}`}>
+          <h1 className={`font-serif font-semibold text-white leading-[1.06] tracking-[-0.022em] text-balance transition-[font-size,margin] duration-[var(--motion-base)] ease-brand ${heroCompact ? "text-[1.75rem] md:text-[2.25rem] mb-1" : "text-[2.5rem] md:text-[3.25rem] mb-3"}`}>
             Do you need a visa?
           </h1>
           {/* Fixed min-height so the async subscriber count cannot add a wrap
@@ -680,8 +685,12 @@ export default function HomePage() {
         {passport && !results && renderMap(false)}
         {/* Specific destination results */}
         {results && results.length > 0 && (
-          <div ref={resultsRef} className="space-y-5 scroll-mt-20">
-            <div className="flex items-start justify-between gap-4">
+          // Keyed on the result set, so the reveal runs once when an answer
+          // arrives and never again on a filter or a sort. The headline rises
+          // first; each row follows 40ms later, capped so a long list is never
+          // waiting on its tail. Reduced motion collapses all of it to 1ms.
+          <div key={`${passport}:${results.map((r) => r.destinationCountry.code).join(",")}`} ref={resultsRef} className="space-y-5 scroll-mt-20">
+            <div className="flex items-start justify-between gap-4 reveal">
               <div className="flex-1 min-w-0">
                 <TripSummary results={results} passportFlag={passportCountry?.flag ?? ""} passportName={passportCountry?.name ?? passport} />
               </div>
@@ -733,15 +742,16 @@ export default function HomePage() {
 
             {/* Result cards */}
             <div className="rounded-2xl bg-card shadow-sm ring-1 ring-[rgb(15_23_41/0.06)] divide-y divide-border/70 overflow-hidden">
-              {sortedFilteredResults.map((r) => (
-                <ResultCard
-                  key={r.destinationCountry.code}
-                  result={r}
-                  passport={passport}
-                  isExpanded={expandedCode === r.destinationCountry.code}
-                  onToggle={() => setExpandedCode((prev) => prev === r.destinationCountry.code ? null : r.destinationCountry.code)}
-                  soleResult={results.length === 1}
-                />
+              {sortedFilteredResults.map((r, i) => (
+                <div key={r.destinationCountry.code} className="reveal" style={{ animationDelay: `${20 + Math.min(i, 6) * 35}ms` }}>
+                  <ResultCard
+                    result={r}
+                    passport={passport}
+                    isExpanded={expandedCode === r.destinationCountry.code}
+                    onToggle={() => setExpandedCode((prev) => prev === r.destinationCountry.code ? null : r.destinationCountry.code)}
+                    soleResult={results.length === 1}
+                  />
+                </div>
               ))}
               {sortedFilteredResults.length === 0 && (
                 <div className="px-5 py-10 text-center text-sm text-muted-foreground">No results match this filter.</div>
