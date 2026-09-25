@@ -6,7 +6,7 @@
 // derived at load time so they always match the live checker.
 import { countries, type CountryData } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
-import { slugify } from "./render";
+import { slugify } from "./urls";
 import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED } from "./hubLayout";
 
 const YEAR = "2026";

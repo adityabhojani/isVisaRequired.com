@@ -1,7 +1,8 @@
 // Shared layout + helpers for the rich passport & destination hub pages.
 import { VISA_STATUS, VISA_STATUS_ORDER, statusIconSvg, type VisaRequirement } from "@workspace/travel-data";
 import { FONT_LINKS, BASE_STYLE, renderHeader, renderFooter } from "./shell";
-import { SITE_ORIGIN, DATA_LAST_UPDATED } from "./render";
+import { SITE_ORIGIN } from "./urls";
+import { DATA_LAST_UPDATED } from "./freshness";
 
 export { SITE_ORIGIN, DATA_LAST_UPDATED };
 

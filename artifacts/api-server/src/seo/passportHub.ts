@@ -5,10 +5,10 @@
 import type { CountryData } from "../data/countries";
 import { countries } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
-import { slugify, pairPath } from "./render";
+import { slugify, pairPath } from "./urls";
 import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED, statusHeading } from "./hubLayout";
 import type { VisaRequirement } from "@workspace/travel-data";
-import { GUIDES } from "../data/guidesData";
+import { passportRoundupLinks } from "../data/guidesData";
 import { guideLinksForHub } from "./guideLinks";
 
 const YEAR = "2026";
@@ -104,9 +104,9 @@ export function renderPassportHub(from: CountryData): string {
   ];
 
   // If we have a written guide for this passport, surface it prominently.
-  const guide = GUIDES.find((g) => g.kind === "passport-roundup" && g.code === from.code);
-  const guideCta = guide
-    ? `<div class="card" style="border-color:#bfdbfe;background:#eff6ff"><strong>Read the full guide:</strong> <a href="/guides/${guide.slug}">Visa-free countries for ${esc(from.name)} passport holders (${YEAR})</a> — with practical tips, stay limits and how each category works.</div>`
+  const guideSlug = new Map(passportRoundupLinks()).get(from.code);
+  const guideCta = guideSlug
+    ? `<div class="card" style="border-color:#bfdbfe;background:#eff6ff"><strong>Read the full guide:</strong> <a href="/guides/${guideSlug}">Visa-free countries for ${esc(from.name)} passport holders (${YEAR})</a> — with practical tips, stay limits and how each category works.</div>`
     : "";
 
   const body = `

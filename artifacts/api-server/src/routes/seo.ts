@@ -18,7 +18,7 @@ import {
   SITE_ORIGIN,
   DATA_LAST_UPDATED,
 } from "../seo/render";
-import { latest, pairLastmod, passportHubLastmod, destinationHubLastmod, siteLastmod } from "../seo/freshness";
+import { latest, pairLastmod, pairsSitemapLastmod, passportHubLastmod, destinationHubLastmod, siteLastmod } from "../seo/freshness";
 import { renderTransitHub, renderTransitGuide } from "../seo/transit";
 import { TRANSIT_GUIDES, getTransitGuide } from "../data/transitData";
 import { renderAuthHub, renderAuthGuide } from "../seo/auth";
@@ -272,9 +272,9 @@ router.get("/visa-requirements/:from/:to", (req: Request, res: Response): void =
 // seo/freshness.ts) — never one site-wide constant, which Bing learns to ignore.
 router.get("/sitemap.xml", async (_req: Request, res: Response): Promise<void> => {
   const sitemaps: [string, string][] = [
-    [`${SITE_ORIGIN}/sitemaps/core.xml`, siteLastmod()],
+    [`${SITE_ORIGIN}/sitemaps/core.xml`, latest(...coreEntries().map(([, lastmod]) => lastmod))],
     [`${SITE_ORIGIN}/sitemaps/blog.xml`, latest(...(await blogEntries()).values())],
-    ...allCountries().map((c): [string, string] => [`${SITE_ORIGIN}/sitemaps/pairs-${c.code}.xml`, passportHubLastmod(c)]),
+    ...allCountries().map((c): [string, string] => [`${SITE_ORIGIN}/sitemaps/pairs-${c.code}.xml`, pairsSitemapLastmod(c)]),
   ];
   const body = sitemaps
     .map(([loc, lastmod]) => `  <sitemap><loc>${loc}</loc><lastmod>${lastmod}</lastmod></sitemap>`)
@@ -285,14 +285,17 @@ router.get("/sitemap.xml", async (_req: Request, res: Response): Promise<void> =
   );
 });
 
-router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
+// The URLs in core.xml with their dates, built in one place so the index's date
+// for core.xml is always the latest date inside it — including a hub dated
+// later than the rest of the site.
+function coreEntries(): [string, string][] {
   const staticPaths = [
     "/", "/compare", "/dual-citizenship", "/discover", "/stats", "/popular", "/map", "/trip-planner",
     "/schengen", "/tier-list", "/digital-nomad", "/reciprocity", "/blog", "/alerts",
     "/visa-requirements", "/countries", "/methodology", "/residence-permit-visa-benefits", "/privacy", "/terms",
   ];
   // Pages that describe the whole site carry the site's latest date; each hub
-  // carries the latest date among its own pairs.
+  // carries its own (seo/freshness.ts: its template's date and its data's).
   const site = siteLastmod();
   const urls: [string, string][] = [];
   for (const p of staticPaths) urls.push([`${SITE_ORIGIN}${p}`, site]);
@@ -312,6 +315,11 @@ router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
     urls.push([`${SITE_ORIGIN}/visa-requirements/${slugify(c.name)}`, passportHubLastmod(c)]);
     urls.push([`${SITE_ORIGIN}/countries/${slugify(c.name)}`, destinationHubLastmod(c)]);
   }
+  return urls;
+}
+
+router.get("/sitemaps/core.xml", (_req: Request, res: Response): void => {
+  const urls = coreEntries();
   const body = urls
     .map(([loc, lastmod]) => `  <url><loc>${loc}</loc><lastmod>${lastmod}</lastmod></url>`)
     .join("\n");

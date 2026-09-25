@@ -10,7 +10,7 @@ import type { CountryData } from "../data/countries";
 import { countries } from "../data/countries";
 import { getDefaultEntry } from "../data/visaData";
 import { getEntryRules } from "../data/entryRequirements";
-import { slugify, pairPath } from "./render";
+import { slugify, pairPath } from "./urls";
 import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED, statusHeading } from "./hubLayout";
 import type { VisaRequirement } from "@workspace/travel-data";
 import { WELCOMING_PATH } from "./report";

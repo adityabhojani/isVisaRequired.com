@@ -4,7 +4,7 @@
 // same "openness" figure the report already publishes, so the two pages can
 // never disagree. As with the report, no number is hand-written; everything is
 // computed from the live dataset, and tied countries share a rank.
-import { slugify } from "./render";
+import { slugify } from "./urls";
 import { page, esc, SITE_ORIGIN, DATA_LAST_UPDATED } from "./hubLayout";
 import { computeReport, competitionRanks, REPORT_PATH, WELCOMING_PATH, type Row } from "./report";
 

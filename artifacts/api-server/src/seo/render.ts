@@ -16,9 +16,11 @@ import { officialLinks } from "../data/officialLinks";
 import { getEntryRules, hasSpecificRules } from "../data/entryRequirements";
 import { verdictKind, verdictStatus, statusIconSvg, isKnownFact, unknownFactsSentence, needsApplication, type VerdictKind } from "@workspace/travel-data";
 import { DATA_LAST_UPDATED, pairLastmod } from "./freshness";
+import { SITE_ORIGIN, slugify, pairPath } from "./urls";
 
-// Canonical host (matches existing sitemap/robots). Keep in sync with robots.txt.
-export const SITE_ORIGIN = "https://www.isvisarequired.com";
+// URL helpers live in ./urls so the hub pages can use them without depending on
+// this pair-page template; re-exported here for the pages that import them from it.
+export { SITE_ORIGIN, slugify, pairPath };
 
 // Dates live in ./freshness: the dataset review date, the day the pair-page
 // wording last changed (fingerprinted by the deploy guard so it can't rot the
@@ -29,14 +31,6 @@ export const SITE_ORIGIN = "https://www.isvisarequired.com";
 export { DATA_LAST_UPDATED };
 
 // ── slug helpers ─────────────────────────────────────────────────────────────
-export function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 const byCode = new Map<string, CountryData>();
 const bySlug = new Map<string, CountryData>();
@@ -104,9 +98,6 @@ export function canonicalSlug(slug: string): string | null {
   return want === slug ? null : want;
 }
 
-export function pairPath(from: CountryData, to: CountryData): string {
-  return `/visa-requirements/${slugify(from.name)}/${slugify(to.name)}`;
-}
 
 export function allCountries(): CountryData[] {
   return countries;

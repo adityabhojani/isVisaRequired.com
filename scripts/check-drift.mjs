@@ -10,6 +10,10 @@
 //      answer card, has other than one <h1>, or has FAQ structured data that
 //      doesn't match the visible FAQ text (a manual-action risk with Google).
 //   5. The golden pairs stop saying what they must say.
+//   3b. The files behind a kind of page (pair pages, destination hubs, passport
+//      hubs) change while the "last modified" date those pages report does not,
+//      or a hub template starts using a file that is neither fingerprinted nor
+//      excused (see FRESHNESS_CHECKS in artifacts/api-server/src/seo/freshness.ts).
 //
 // Why this exists: this repo has shipped the same class of bug five times — the
 // server-rendered page and the React app drifting apart (heading levels, footer
@@ -17,7 +21,7 @@
 // requirements data with different ETIAS and NZ facts). Nothing typechecked or
 // tested on deploy. This is that check.
 import { build } from "../artifacts/api-server/node_modules/esbuild/lib/main.js";
-import { readFileSync, readdirSync, statSync, mkdtempSync } from "node:fs";
+import { readFileSync, readdirSync, statSync, mkdtempSync, existsSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
@@ -47,7 +51,7 @@ export * from ${JSON.stringify(join(root, "lib/travel-data/src/index.ts"))};
 export { renderPairPage } from ${JSON.stringify(join(root, "artifacts/api-server/src/seo/render.ts"))};
 export { countries } from ${JSON.stringify(join(root, "artifacts/api-server/src/data/countries.ts"))};
 export { getDefaultEntry } from ${JSON.stringify(join(root, "artifacts/api-server/src/data/visaData.ts"))};
-export { CONTENT_SOURCES, CONTENT_UPDATED, CONTENT_FINGERPRINT } from ${JSON.stringify(join(root, "artifacts/api-server/src/seo/freshness.ts"))};
+export { FRESHNESS_CHECKS } from ${JSON.stringify(join(root, "artifacts/api-server/src/seo/freshness.ts"))};
 `);
 await build({ entryPoints: [entry], bundle: true, platform: "node", format: "esm", outfile: out, logLevel: "error" });
 const M = await import(pathToFileURL(out).href);
@@ -90,23 +94,103 @@ const M = await import(pathToFileURL(out).href);
   else console.log("✓ no private visa-status palettes");
 }
 
-// ── 3b. the pair pages report a truthful "last modified" ─────────────────────
-// Every sitemap <lastmod> and JSON-LD dateModified derives from CONTENT_UPDATED
-// (seo/freshness.ts). The files whose text reaches the pages are fingerprinted
-// here, so the wording cannot change while the date stays put — the failure a
-// hand-bumped constant guarantees.
+// ── 3b. every page reports a truthful "last modified" ───────────────────────
+// Every sitemap <lastmod> derives from the dates in seo/freshness.ts. For each
+// kind of page (FRESHNESS_CHECKS there) the files whose text reaches it are
+// fingerprinted here, so the wording cannot change while the date stays put —
+// the failure a hand-bumped constant guarantees. The guard also bundles each
+// page template and fails when it now includes a repo file that is neither
+// fingerprinted nor excused, so text cannot slip into an untracked file.
 {
   const { createHash } = await import("node:crypto");
-  const h = createHash("sha256");
-  for (const f of M.CONTENT_SOURCES) h.update(readFileSync(join(root, f)));
-  const fp = h.digest("hex").slice(0, 16);
+  const FILE = "artifacts/api-server/src/seo/freshness.ts";
   const today = new Date().toISOString().slice(0, 10);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(M.CONTENT_UPDATED) || M.CONTENT_UPDATED > today) {
-    fail(`CONTENT_UPDATED is "${M.CONTENT_UPDATED}"; it must be a past date as YYYY-MM-DD (artifacts/api-server/src/seo/freshness.ts).`);
+  // A real calendar day, written YYYY-MM-DD, no later than today (UTC).
+  const validDate = (d) => typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d)
+    && !Number.isNaN(Date.parse(`${d}T00:00:00Z`)) && new Date(`${d}T00:00:00Z`).toISOString().slice(0, 10) === d && d <= today;
+  const codes = new Set(M.countries.map((c) => c.code));
+  // Bundle `export { name } from file` on its own. The stdin is plain JS so that a
+  // missing export is an error rather than silently read as a TypeScript type.
+  let seq = 0;
+  const bundle = async (file, exportName, alias) => build({
+    stdin: { contents: `export { ${exportName}${alias ? ` as ${alias}` : ""} } from ${JSON.stringify(join(root, file))};`, resolveDir: root, loader: "js" },
+    absWorkingDir: root, bundle: true, platform: "node", format: "esm", metafile: true, logLevel: "silent", outfile: join(dir, `freshness-${seq++}.mjs`),
+  });
+  const firstLine = (e) => String(e?.errors?.[0]?.text ?? e?.message ?? e).split("\n")[0];
+
+  for (const c of M.FRESHNESS_CHECKS) {
+    const n = c.names;
+    let ok = true;
+    const bad = (msg) => { ok = false; fail(msg); };
+
+    if (!validDate(c.updated)) bad(`${n.updated} is "${c.updated}"; it must be a real date no later than today (${today}), written YYYY-MM-DD (${FILE}).`);
+    for (const [code, d] of Object.entries(c.pages ?? {})) {
+      if (!codes.has(code)) bad(`${n.pages} in ${FILE} has "${code}", which is not a country code in data/countries.ts.`);
+      if (!validDate(d)) bad(`${n.pages}.${code} is "${d}"; it must be a real date no later than today (${today}), written YYYY-MM-DD (${FILE}).`);
+    }
+
+    const where = { [n.sources]: c.sources, "renderer": c.renderer ? [c.renderer.file] : [], "derived": c.derived ? [c.derived.file] : [] };
+    const missing = Object.entries(where).flatMap(([k, fs]) => fs.filter((f) => !existsSync(join(root, f))).map((f) => `${f} (in ${k})`));
+    if (missing.length) {
+      bad(`The ${c.label} entry in FRESHNESS_CHECKS / ${FILE} names ${missing.join(", ")}, which does not exist. If a file was renamed or moved, put its new path everywhere it is named there; the guard will then print the new fingerprint.`);
+      continue;
+    }
+
+    // What of a large, mostly-irrelevant file actually reaches these pages.
+    let derivedJson = "";
+    if (c.derived) {
+      try {
+        await bundle(c.derived.file, c.derived.exportName, "derived");
+        const fn = (await import(pathToFileURL(join(dir, `freshness-${seq - 1}.mjs`)).href)).derived;
+        derivedJson = JSON.stringify(fn());
+      } catch (e) {
+        bad(`The ${c.label} entry in FRESHNESS_CHECKS (${FILE}) fingerprints ${c.derived.exportName}() from ${c.derived.file}, which could not be run: ${firstLine(e)}. If that function was renamed or moved, update derived there.`);
+        continue;
+      }
+    }
+
+    const h = createHash("sha256");
+    for (const f of c.sources) h.update(readFileSync(join(root, f)));
+    if (c.derived) h.update(derivedJson);
+    const fp = h.digest("hex").slice(0, 16);
+    if (fp !== c.fingerprint) {
+      bad([
+        `The files behind the ${c.label} changed, but the date those pages report did not. In ${FILE}:`,
+        `  1. Always: replace  ${n.fingerprint} = "${c.fingerprint}"  with  ${n.fingerprint} = "${fp}"`,
+        `  2. Then decide whether what these pages SAY changed (title, description, headings, text, FAQ, links):`,
+        c.updated === today
+          ? `     - ${n.updated} is already today (${today}), so there is nothing more to do.`
+          : `     - on every one of them: also set  ${n.updated} = "${today}"`,
+        ...(n.pages && c.updated !== today ? [`     - on only some of them: instead add those pages to ${n.pages} by country code, e.g. { XX: "${today}" }`] : []),
+        `     - only styling or code structure: change nothing else.`,
+        `  Never set a date earlier than it already is: search engines would be told these pages are older than they are.`,
+        `  Fingerprinted: ${c.sources.join(", ")}${c.derived ? `, and the result of ${c.derived.exportName}() in ${c.derived.file}` : ""}`,
+      ].join("\n"));
+    }
+
+    if (c.renderer) {
+      let inputs = null;
+      try { inputs = Object.values((await bundle(c.renderer.file, c.renderer.exportName)).metafile.outputs)[0].inputs; }
+      catch (e) { bad(`The ${c.label} template could not be bundled from ${c.renderer.file} (export ${c.renderer.exportName}): ${firstLine(e)}. If that file or function was renamed or moved, update renderer in FRESHNESS_CHECKS (${FILE}).`); }
+      if (inputs) {
+        const bundled = Object.keys(inputs).filter((p) => inputs[p].bytesInOutput > 0 && !p.includes("node_modules"));
+        if (!bundled.includes(c.renderer.file)) {
+          bad(`The ${c.label} template ${c.renderer.file} contributed nothing when bundled through ${c.renderer.exportName}, so the date check could not see what these pages are built from. If the function was renamed or moved, update renderer in FRESHNESS_CHECKS (${FILE}).`);
+        } else {
+          const listed = new Set([...c.sources, ...Object.keys(c.notTracked ?? {})]);
+          const unknown = bundled.filter((p) => !listed.has(p));
+          if (unknown.length) bad(`The ${c.label} are now built from ${unknown.join(", ")}, which the date check neither fingerprints nor excuses. In ${FILE}, add each file to ${n.sources} if any of its text can reach these pages (the guard will then print the new fingerprint), or to ${n.notTracked} with the reason none can.`);
+          const gone = [...listed].filter((p) => !bundled.includes(p));
+          if (gone.length) console.warn(`⚠ ${c.label}: ${gone.join(", ")} no longer reach${gone.length === 1 ? "es" : ""} these pages; remove from ${n.sources} / ${n.notTracked} in ${FILE} when convenient.`);
+        }
+      }
+    }
+
+    if (ok) {
+      const pages = Object.keys(c.pages ?? {}).length;
+      console.log(`✓ ${c.label}: wording fingerprint matches; they report last modified ${c.updated}${pages ? ` (${pages} later, per page)` : ""}`);
+    }
   }
-  if (fp !== M.CONTENT_FINGERPRINT) {
-    fail(`The pair-page wording sources changed but the date the pages report did not.\n  In artifacts/api-server/src/seo/freshness.ts set CONTENT_FINGERPRINT to "${fp}", and set CONTENT_UPDATED to ${today} if the change alters what a page says (leave it for a pure refactor).\n  Fingerprinted: ${M.CONTENT_SOURCES.join(", ")}`);
-  } else console.log(`✓ pair-page wording fingerprint matches; pages report last modified ${M.CONTENT_UPDATED}`);
 }
 
 // ── 4 & 5. every pair page ───────────────────────────────────────────────────

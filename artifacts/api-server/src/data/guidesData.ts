@@ -1066,3 +1066,13 @@ export const GUIDES: Guide[] = [
 export function getGuide(slug: string): Guide | undefined {
   return GUIDES.find((g) => g.slug === slug);
 }
+
+/**
+ * [passport code, guide slug] for every "visa-free countries for X passport
+ * holders" guide: the only thing the passport hubs take from this file. The
+ * deploy guard fingerprints this list for those pages (seo/freshness.ts), so
+ * adding or moving a roundup dates them while editing a guide's text does not.
+ */
+export function passportRoundupLinks(): [string, string][] {
+  return GUIDES.filter((g) => g.kind === "passport-roundup").map((g) => [g.code, g.slug]);
+}
